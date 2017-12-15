@@ -7,8 +7,12 @@ d3.select(window)
     .on("mouseup", mouseup);
 
 
-var width = 960, //These intial values are the only ones that work, not too sure why
-    height = 500; // Something might be hardcoded somewhere else
+var width = document.documentElement.clientWidth,
+    height = document.documentElement.clientHeight;
+
+var fixedWidth = document.documentElement.clientWidth, //Need a fixed copy of the width and height
+    fixedHeight = document.documentElement.clientHeight;
+
 
 var frozenWidth = 960, // These values need to not change, used when hiding labels
     frozenHeight = 500;
@@ -89,6 +93,7 @@ function ready(error, world, places) {
     .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
+    .attr("id", "circle1")
     .style("fill", "url(#ocean_fill)");
 
   svg.append("path")
@@ -100,12 +105,14 @@ function ready(error, world, places) {
     .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
+    .attr("id", "circle2")
     .style("fill", "url(#globe_highlight)");
 
   svg.append("circle")
     .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
+    .attr("id", "circle3")
     .style("fill", "url(#globe_shading)");
 
   svg.append("path")
@@ -248,10 +255,12 @@ function zoomIn() {
   height += 100; // Possible change for future versions
 
   sky = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(width / 3); //Works fairly well, can adjust to change height of flyers
 
   proj = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(width / 4);
 
@@ -270,10 +279,12 @@ function zoomOut() {
   height -= 100;
 
   sky = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(width / 3);
 
   proj = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(width / 4);
 
@@ -375,4 +386,39 @@ function mouseup() {
     m0 = null;
     o0 = proj.rotate();
   }
+}
+
+// Any resizing of window also resizes the svg
+d3.select(window).on('resize', resize);
+
+function resize() {
+  fixedWidth = document.documentElement.clientWidth, //Need a fixed copy of the width and height
+      fixedHeight = document.documentElement.clientHeight;
+  
+  svg.attr("width", fixedWidth);
+  svg.attr("height", fixedHeight);
+
+  document.getElementById("circle1").setAttribute("cx", fixedWidth / 2);
+  document.getElementById("circle1").setAttribute("cy", fixedHeight / 2);
+  document.getElementById("circle2").setAttribute("cx", fixedWidth / 2);
+  document.getElementById("circle2").setAttribute("cy", fixedHeight / 2);
+  document.getElementById("circle3").setAttribute("cx", fixedWidth / 2);
+  document.getElementById("circle3").setAttribute("cy", fixedHeight / 2);
+
+  sky = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(width / 3);
+
+  proj = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(width / 4);
+
+  path = d3.geo.path().projection(proj).pointRadius(3);
+
+  proj.rotate(o0);
+  sky.rotate(o0);
+
+  refresh();
 }

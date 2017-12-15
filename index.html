@@ -2,6 +2,11 @@
 <meta charset="utf-8">
 <style>
 
+body {
+  margin: 0px;
+  overflow: hidden;
+}
+
 .borders {
   fill: #000;
   stroke-opacity: 1;
@@ -65,20 +70,33 @@ div.tooltip {
     pointer-events: none;
 }
 
+#zoomInButton {
+    top: 7px;
+    left: 5px;
+    position: absolute;
+}
+
+#zoomOutButton {
+    top: 40px;
+    left: 5px;
+    position: absolute;
+}
 
 </style>
 
 <body>
 
   <div id="option">
-      <input name="zoomInButton"
+      <input id="zoomInButton"
+             name="zoomInButton"
              type="button"
              value="Zoom In"
              onclick="zoomIn()" />
   </div>
 
   <div id="option">
-      <input name="zoomOutButton"
+      <input class="zoomOutButton"
+             id="zoomOutButton"
              type="button"
              value="Zoom Out"
              onclick="zoomOut()" />
