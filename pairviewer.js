@@ -258,6 +258,10 @@ function zoomIn() {
   path = d3.geo.path().projection(proj).pointRadius(3);
 
   svg.selectAll("circle").attr("r", width / 4);
+
+  proj.rotate(o0);
+  sky.rotate(o0);
+
   refresh();
 }
 
@@ -276,8 +280,11 @@ function zoomOut() {
   path = d3.geo.path().projection(proj).pointRadius(3);
 
   svg.selectAll("circle").attr("r", width / 4);
-  refresh();
 
+  proj.rotate(o0);
+  sky.rotate(o0);
+
+  refresh();
 }
 
 function flying_arc(pts) {
@@ -366,5 +373,6 @@ function mouseup() {
   if (m0) {
     mousemove();
     m0 = null;
+    o0 = proj.rotate();
   }
 }
