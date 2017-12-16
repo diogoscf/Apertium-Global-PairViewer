@@ -7,8 +7,8 @@ d3.select(window)
     .on("mouseup", mouseup);
 
 
-var width = document.documentElement.clientWidth * 2,
-    height = document.documentElement.clientHeight * 2;
+var width = document.documentElement.clientWidth,
+    height = document.documentElement.clientHeight;
 
 var fixedWidth = document.documentElement.clientWidth, //Need a fixed copy of the width and height
     fixedHeight = document.documentElement.clientHeight;
@@ -26,6 +26,11 @@ var sky = d3.geo.orthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 3);
+
+var zoom = d3.behavior.zoom(true)
+    .scale(proj.scale())
+    .scaleExtent([100, 50000])
+    .on("zoom", zoomed);
 
 // Point radius can be updated here
 var path = d3.geo.path().projection(proj).pointRadius(3);
@@ -249,64 +254,29 @@ function chooseColor(d) {
   return color;
 }
 
-// Recreates all of the needed objects and resizes
+// Zooms by interpolating
 function zoomIn() {
-  width += 200; // These values should probably be scaled rather than hard coded
-  height += 100; // Possible change for future versions
+  var scale = zoom.scale();
 
-  sky = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(width / 3); //Works fairly well, can adjust to change height of flyers
-
-  proj = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(width / 4);
-
-  path = d3.geo.path().projection(proj).pointRadius(3);
-
-  svg.selectAll("circle").attr("r", width / 4);
-
-  if(o0) {
-    proj.rotate(o0);
-    sky.rotate(o0);
-  }
-
-  refresh();
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, scale * 1.2);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
 }
 
 function zoomOut() {
-  if(width - 200 <= 0) {
-    return;
-  }
-  if(height - 100 <= 0) {
-    return;
-  }
+  var scale = zoom.scale();
 
-  width -= 200;
-  height -= 100;
-
-  sky = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(width / 3);
-
-  proj = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(width / 4);
-
-  path = d3.geo.path().projection(proj).pointRadius(3);
-
-  svg.selectAll("circle").attr("r", width / 4);
-
-  if(o0) {
-    proj.rotate(o0);
-    sky.rotate(o0);
-  }
-
-  refresh();
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, scale / 1.2);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
 }
 
 function flying_arc(pts) {
@@ -403,7 +373,7 @@ function mouseup() {
 d3.select(window).on('resize', resize);
 
 function resize() {
-  fixedWidth = document.documentElement.clientWidth, //Need a fixed copy of the width and height
+  fixedWidth = document.documentElement.clientWidth,
       fixedHeight = document.documentElement.clientHeight;
   
   svg.attr("width", fixedWidth);
@@ -434,4 +404,64 @@ function resize() {
   }
 
   refresh();
+}
+
+svg.call(zoom)
+    .on("mousedown.zoom", null)
+    .on("touchstart.zoom", null)
+    .on("touchmove.zoom", null)
+    .on("touchend.zoom", null)
+    .on("dblclick.zoom", null);
+
+function initialzoom() {
+  var scale = zoom.scale();
+
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, scale * 7);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
+}
+
+// Start off slightly zoomed-in
+initialzoom();
+
+function zoomed() {
+  var scale = zoom.scale();
+  width = scale;
+
+  proj = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(scale / 4);
+
+  sky = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(scale / 3);
+
+  path = d3.geo.path().projection(proj).pointRadius(3);
+
+  svg.selectAll("circle").attr("r", scale / 4);
+
+  if(o0) {
+    proj.rotate(o0);
+    sky.rotate(o0);
+  }
+
+  refresh();
+}
+
+// Zoom-in with + key and zoom-out with - key
+window.onkeydown = function(e) {
+  if(e.keyCode === 187) {
+    e.preventDefault()
+    zoomIn();
+  }
+  if(e.keyCode === 189) {
+    e.preventDefault()
+    zoomOut();
+  }
 }
