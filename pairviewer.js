@@ -53,6 +53,7 @@ var svg = d3.select("body").append("svg")
             .attr("width", width)
             .attr("height", height)
             .on("mousedown", mousedown);
+svg.style("background", "#311B92");
 
 
 queue()
@@ -70,8 +71,8 @@ function ready(error, world, places) {
         .attr("id", "ocean_fill")
         .attr("cx", "75%")
         .attr("cy", "25%");
-      ocean_fill.append("stop").attr("offset", "5%").attr("stop-color", "#fff");
-      ocean_fill.append("stop").attr("offset", "100%").attr("stop-color", "#ababab");
+      ocean_fill.append("stop").attr("offset", "5%").attr("stop-color", "#82B1FF");
+      ocean_fill.append("stop").attr("offset", "100%").attr("stop-color", "#2196F3");
 
   var drop_shadow = svg.append("defs").append("radialGradient")
         .attr("id", "drop_shadow")
@@ -94,7 +95,7 @@ function ready(error, world, places) {
   svg.append("path")
     .datum(topojson.object(world, world.objects.land))
     .attr("class", "land")
-    .attr("d", path);
+    .attr("d", path).style("fill", "white");
 
   svg.append("circle")
     .attr("cx", width / 2).attr("cy", height / 2)
@@ -111,8 +112,8 @@ function ready(error, world, places) {
   svg.append("path")
     .datum(borders)
     .attr("class", "mesh")
-    .style("stroke", "white") // Border color can be changed here
-    .style("fill", "999");
+    .style("stroke", "#2196F3") // Border color can be changed here
+    .style("fill", "999").style("fill","transparent");
 
 
   svg.append("g").attr("class","labels")
@@ -223,21 +224,21 @@ function position_labels() {
 
 // Chooses flyer color based on language pair stage
 function chooseColor(d) {
-  var color = "orange";
+  var color = "#FF9800";
   if (d.stage == "trunk") {
-    color = "lightgreen";
+    color = "#CDDC39";
   }
   else if (d.stage == "staging") {
-    color = "green";
+    color = "#4CAF50";
   }
   else if (d.stage == "nursery") {
-    color = "yellow";
+    color = "#FFEB3B";
   }
   else if (d.stage == "incubator") {
-    color = "red";
+    color = "#E91E63";
   }
   else {
-    color = "purple"
+    color = "#9C27B0"
   }
   return color;
 }
@@ -247,15 +248,11 @@ function zoomIn() {
   width += 200; // These values should probably be scaled rather than hard coded
   height += 100; // Possible change for future versions
 
-  sky = d3.geo.orthographic()
-      .clipAngle(90)
-      .scale(width / 3); //Works fairly well, can adjust to change height of flyers
-
-  proj = d3.geo.orthographic()
-      .clipAngle(90)
-      .scale(width / 4);
-
-  path = d3.geo.path().projection(proj).pointRadius(3);
+  sky = sky.scale(width / 3);
+  
+    proj = proj.scale(width / 4);
+  
+    path = path.projection(proj).pointRadius(3);
 
   svg.selectAll("circle").attr("r", width / 4);
   refresh();
@@ -265,15 +262,11 @@ function zoomOut() {
   width -= 200;
   height -= 100;
 
-  sky = d3.geo.orthographic()
-      .clipAngle(90)
-      .scale(width / 3);
+  sky = sky.scale(width / 3);
 
-  proj = d3.geo.orthographic()
-      .clipAngle(90)
-      .scale(width / 4);
+  proj = proj.scale(width / 4);
 
-  path = d3.geo.path().projection(proj).pointRadius(3);
+  path = path.projection(proj).pointRadius(3);
 
   svg.selectAll("circle").attr("r", width / 4);
   refresh();
@@ -287,7 +280,8 @@ function flying_arc(pts) {
   var mid = location_along_arc(source, target, .5);
   var result = [ proj(source),
                  sky(mid),
-                 proj(target) ]
+                 proj(target)]
+  
   return result;
 }
 
@@ -312,7 +306,7 @@ function refresh() {
   svg.selectAll(".flyer")
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
     .attr("opacity", function(d) {
-      return fade_at_edge(d)
+      return 1;//fade_at_edge(d)
     })
 }
 
@@ -335,7 +329,7 @@ function fade_at_edge(d) {
 
   var fade = d3.scale.linear().domain([-.1,0]).range([0,.1])
   var dist = start_dist < end_dist ? start_dist : end_dist;
-  return fade(dist)
+  return fade(dist)*2.0
 }
 
 function location_along_arc(start, end, loc) {
