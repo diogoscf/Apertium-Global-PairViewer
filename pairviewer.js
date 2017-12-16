@@ -7,8 +7,8 @@ d3.select(window)
     .on("mouseup", mouseup);
 
 
-var width = document.documentElement.clientWidth,
-    height = document.documentElement.clientHeight;
+var width = document.documentElement.clientWidth * 2,
+    height = document.documentElement.clientHeight * 2;
 
 var fixedWidth = document.documentElement.clientWidth, //Need a fixed copy of the width and height
     fixedHeight = document.documentElement.clientHeight;
@@ -18,12 +18,12 @@ var frozenWidth = 960, // These values need to not change, used when hiding labe
     frozenHeight = 500;
 
 var proj = d3.geo.orthographic()
-    .translate([width / 2, height / 2])
+    .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 4);
 
 var sky = d3.geo.orthographic()
-    .translate([width / 2, height / 2])
+    .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 3);
 
@@ -54,8 +54,8 @@ var codeToLangTable = {};
 // var graticule = d3.geo.graticule();
 
 var svg = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height", height)
+            .attr("width", fixedWidth)
+            .attr("height", fixedHeight)
             .on("mousedown", mousedown);
 
 
@@ -90,7 +90,7 @@ function ready(error, world, places) {
 
 
   svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
+    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
     .attr("id", "circle1")
@@ -102,14 +102,14 @@ function ready(error, world, places) {
     .attr("d", path);
 
   svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
+    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
     .attr("id", "circle2")
     .style("fill", "url(#globe_highlight)");
 
   svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
+    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
     .attr("id", "circle3")
@@ -268,13 +268,22 @@ function zoomIn() {
 
   svg.selectAll("circle").attr("r", width / 4);
 
-  proj.rotate(o0);
-  sky.rotate(o0);
+  if(o0) {
+    proj.rotate(o0);
+    sky.rotate(o0);
+  }
 
   refresh();
 }
 
 function zoomOut() {
+  if(width - 200 <= 0) {
+    return;
+  }
+  if(height - 100 <= 0) {
+    return;
+  }
+
   width -= 200;
   height -= 100;
 
@@ -292,8 +301,10 @@ function zoomOut() {
 
   svg.selectAll("circle").attr("r", width / 4);
 
-  proj.rotate(o0);
-  sky.rotate(o0);
+  if(o0) {
+    proj.rotate(o0);
+    sky.rotate(o0);
+  }
 
   refresh();
 }
@@ -417,8 +428,10 @@ function resize() {
 
   path = d3.geo.path().projection(proj).pointRadius(3);
 
-  proj.rotate(o0);
-  sky.rotate(o0);
+  if(o0) {
+    proj.rotate(o0);
+    sky.rotate(o0);
+  }
 
   refresh();
 }
