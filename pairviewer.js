@@ -124,7 +124,7 @@ function ready(error, world, places) {
     .datum(borders)
     .attr("class", "mesh")
     .style("stroke", "white") // Border color can be changed here
-    .style("fill", "999");
+    .style("fill", "#999999");
 
 
   svg.append("g").attr("class","labels")
@@ -454,14 +454,47 @@ function zoomed() {
   refresh();
 }
 
+function resetZoom() {
+  var scale = zoom.scale();
+  var defaultScale = 2520;
+
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, defaultScale);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
+}
+
 // Zoom-in with + key and zoom-out with - key
 window.onkeydown = function(e) {
-  if(e.keyCode === 187) {
-    e.preventDefault()
-    zoomIn();
+  if (navigator.userAgent.search("Chrome") >= 0) {
+    if(e.keyCode === 187) {
+      e.preventDefault();
+      zoomIn();
+    }
+    if(e.keyCode === 189) {
+      e.preventDefault();
+      zoomOut();
+    }
+    if(e.keyCode === 48) {
+      e.preventDefault();
+      resetZoom();
+    }
   }
-  if(e.keyCode === 189) {
-    e.preventDefault()
-    zoomOut();
+  else if (navigator.userAgent.search("Firefox") >= 0) {
+    if(e.keyCode === 61) {
+      e.preventDefault();
+      zoomIn();
+    }
+    if(e.keyCode === 173) {
+      e.preventDefault();
+      zoomOut();
+    }
+    if(e.keyCode === 48) {
+      e.preventDefault();
+      resetZoom();
+    }
   }
-}
+};
