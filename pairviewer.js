@@ -49,12 +49,19 @@ var codeToLangTable = {};
 // var graticule = d3.geo.graticule();
 
 var svg = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height", height)
+  .attr("width", width)
+  .attr("height", height)
   .on("mousedown", mousedown).on("touchstart", mousedown);
-svg.on("mousewheel",mousewheel)
+//svg.on("mousewheel",mousewheel)
 svg.style("background", "#311B92");
 window.addEventListener("resize", resize);
+var zoomT = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', function () {
+  console.log("zoom", d3.event.scale);
+ // alert("zoom");
+  zoom(d3.event.scale/viewScale);
+
+});
+svg.call(zoomT);
 function resize() {
   var off = proj([0, 0]);
   var off2 = sky([0, 0]);
