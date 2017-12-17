@@ -2,26 +2,23 @@
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
 
-var width = document.documentElement.clientWidth,
-    height = document.documentElement.clientHeight;
 
-var fixedWidth = document.documentElement.clientWidth, //Need a fixed copy of the width and height
-    fixedHeight = document.documentElement.clientHeight;
+
+var width = window.innerWidth, //These intial values are the only ones that work, not too sure why
+    height = window.innerHeight; // Something might be hardcoded somewhere else
+var viewScale = 1;
+
 
 var proj = d3.geo.orthographic()
-    .translate([fixedWidth / 2, fixedHeight / 2])
+    .translate([width / 2, height / 2])
     .clipAngle(90)
     .scale(width / 4);
 
 var sky = d3.geo.orthographic()
-    .translate([fixedWidth / 2, fixedHeight / 2])
+    .translate([width / 2, height / 2])
     .clipAngle(90)
     .scale(width / 3);
 
-var zoom = d3.behavior.zoom()
-    .scale(proj.scale())
-    .scaleExtent([100, 50000])
-    .on("zoom", zoomed);
 
 // Point radius can be updated here
 var path = d3.geo.path().projection(proj).pointRadius(3);
@@ -50,8 +47,31 @@ var codeToLangTable = {};
 // var graticule = d3.geo.graticule();
 
 var svg = d3.select("body").append("svg")
-            .attr("width", fixedWidth)
-            .attr("height", fixedHeight)
+  .attr("width", width)
+  .attr("height", height);
+//svg.on("mousewheel",mousewheel)
+svg.style("background", "#311B92");
+window.addEventListener("resize", resize);
+var zoomBehavior = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', function () {
+  //console.log("zoom", d3.event.scale);
+ // alert("zoom");
+  zoom(d3.event.scale/viewScale);
+
+});
+svg.call(zoomBehavior);
+function resize() {
+  var off = proj([0, 0]);
+  var off2 = sky([0, 0]);
+  width = window.innerWidth;
+  height = window.innerHeight;
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+  proj = proj.translate([-off[0], -off[1]]).translate([width / 2, height / 2]);
+  sky = sky.translate([-off2[0], -off2[1]]).translate([width / 2, height / 2]);
+  path = path.projection(proj).pointRadius(3);
+  
+    svg.selectAll("circle").attr("r", width / 4).attr("cx", width / 2).attr("cy", height / 2);
+  zoom(1);
+}
 
 queue()
     .defer(d3.json, "world-110m.json")
@@ -68,8 +88,8 @@ function ready(error, world, places) {
         .attr("id", "ocean_fill")
         .attr("cx", "75%")
         .attr("cy", "25%");
-      ocean_fill.append("stop").attr("offset", "5%").attr("stop-color", "#fff");
-      ocean_fill.append("stop").attr("offset", "100%").attr("stop-color", "#ababab");
+      ocean_fill.append("stop").attr("offset", "5%").attr("stop-color", "#82B1FF");
+      ocean_fill.append("stop").attr("offset", "100%").attr("stop-color", "#2196F3");
 
   var drop_shadow = svg.append("defs").append("radialGradient")
         .attr("id", "drop_shadow")
@@ -84,7 +104,7 @@ function ready(error, world, places) {
 
 
   svg.append("circle")
-    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
+    .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
     .attr("id", "circle1")
@@ -93,27 +113,28 @@ function ready(error, world, places) {
   svg.append("path")
     .datum(topojson.object(world, world.objects.land))
     .attr("class", "land")
-    .attr("d", path);
-
+    .attr("d", path).style("fill", "white");
+/*
   svg.append("circle")
-    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
+    .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
     .attr("id", "circle2")
     .style("fill", "url(#globe_highlight)");
 
   svg.append("circle")
-    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
+    .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
     .attr("id", "circle3")
     .style("fill", "url(#globe_shading)");
-
+*/
   svg.append("path")
     .datum(borders)
     .attr("class", "mesh")
-    .style("stroke", "white") // Border color can be changed here
-    .style("fill", "#999999");
+    .style("stroke", "#2196F3") // Border color can be changed here
+    .style("fill", "999").style("fill","transparent");
+
 
 
   svg.append("g").attr("class","labels")
@@ -198,7 +219,7 @@ function ready(error, world, places) {
 
 //Position and hiding labels
 function position_labels() {
-  var centerPos = proj.invert([fixedWidth/2, fixedHeight/2]);
+  var centerPos = proj.invert([width/2, height/2]);
   var arc = d3.geo.greatArc();
 
   svg.selectAll(".label")
@@ -224,48 +245,46 @@ function position_labels() {
 
 // Chooses flyer color based on language pair stage
 function chooseColor(d) {
-  var color = "orange";
+  var color = "#FF9800";
   if (d.stage == "trunk") {
-    color = "lightgreen";
+    color = "#CDDC39";
   }
   else if (d.stage == "staging") {
-    color = "green";
+    color = "#4CAF50";
   }
   else if (d.stage == "nursery") {
-    color = "yellow";
+    color = "#FFEB3B";
   }
   else if (d.stage == "incubator") {
-    color = "red";
+    color = "#E91E63";
   }
   else {
-    color = "purple"
+    color = "#9C27B0"
   }
   return color;
 }
 
-// Zooms by interpolating
-function zoomIn() {
-  var scale = zoom.scale();
 
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, scale * 1.2);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
-}
 
-function zoomOut() {
-  var scale = zoom.scale();
+function zoom(factor) {
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+  width = window.innerWidth;
+  height = window.innerHeight;
+  
+  if (factor > 0) {
+    viewScale = viewScale * factor;
+  }
+  var vH = height * viewScale;
+  var vW = width * viewScale;
+  var vM = Math.min(vW, vH);
+  sky = sky.scale(vM / 3);
 
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, scale / 1.2);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
+  proj = proj.scale(vM / 4);
+
+  path = path.projection(proj).pointRadius(3);
+
+  svg.selectAll("circle").attr("r", vM / 4);
+  refresh();
 }
 
 function flying_arc(pts) {
@@ -275,7 +294,8 @@ function flying_arc(pts) {
   var mid = location_along_arc(source, target, .5);
   var result = [ proj(source),
                  sky(mid),
-                 proj(target) ]
+                 proj(target)]
+  
   return result;
 }
 
@@ -298,14 +318,15 @@ function refresh() {
   position_labels();
 
   svg.selectAll(".flyer")
-    .attr("d", function(d) { return swoosh(flying_arc(d)) })
-    .attr("opacity", function(d) {
+    .attr("d", function (d) { return swoosh(flying_arc(d)) })
+    .attr("opacity", function (d) {
       return fade_at_edge(d)
-    })
+    });
 }
 
 function fade_at_edge(d) {
-  var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
+  var centerPos = proj.invert([width / 2, height / 2]),
+
       arc = d3.geo.greatArc(),
       start, end;
   // function is called on 2 different data structures..
@@ -331,6 +352,7 @@ function location_along_arc(start, end, loc) {
   return interpolator(loc)
 }
 
+
 // modified from http://bl.ocks.org/KoGor/5994804
 var sens = 0.25;
 var o0;
@@ -349,133 +371,11 @@ svg.call(d3.behavior.drag()
     })
 );
 
-// Any resizing of window also resizes the svg
-d3.select(window).on('resize', resize);
 
-function resize() {
-  fixedWidth = document.documentElement.clientWidth,
-      fixedHeight = document.documentElement.clientHeight;
-  
-  svg.attr("width", fixedWidth);
-  svg.attr("height", fixedHeight);
 
-  document.getElementById("circle1").setAttribute("cx", fixedWidth / 2);
-  document.getElementById("circle1").setAttribute("cy", fixedHeight / 2);
-  document.getElementById("circle2").setAttribute("cx", fixedWidth / 2);
-  document.getElementById("circle2").setAttribute("cy", fixedHeight / 2);
-  document.getElementById("circle3").setAttribute("cx", fixedWidth / 2);
-  document.getElementById("circle3").setAttribute("cy", fixedHeight / 2);
-
-  sky = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(width / 3);
-
-  proj = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(width / 4);
-
-  path = d3.geo.path().projection(proj).pointRadius(3);
-
-  if(o0) {
-    proj.rotate(o0);
-    sky.rotate(o0);
-  }
-
-  refresh();
-}
-
-svg.call(zoom)
-    .call(zoom.event)
-    .on("dblclick.zoom", null);
-
-function initialzoom() {
-  var scale = zoom.scale();
-
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, scale * 7);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
-}
-
-// Start off slightly zoomed-in
-initialzoom();
-
-function zoomed() {
-  var scale = zoom.scale();
-  width = scale;
-
-  proj = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(scale / 4);
-
-  sky = d3.geo.orthographic()
-      .translate([fixedWidth / 2, fixedHeight / 2])
-      .clipAngle(90)
-      .scale(scale / 3);
-
-  path = d3.geo.path().projection(proj).pointRadius(3);
-
-  svg.selectAll("circle").attr("r", scale / 4);
-
-  if(o0) {
-    proj.rotate(o0);
-    sky.rotate(o0);
-  }
-
-  refresh();
-}
-
-function resetZoom() {
-  var scale = zoom.scale();
-  var defaultScale = 2520;
-
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, defaultScale);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
-}
-
-// Zoom-in with + key and zoom-out with - key
-window.onkeydown = function(e) {
-  if (navigator.userAgent.search("Chrome") >= 0) {
-    if(e.keyCode === 187) {
-      e.preventDefault();
-      zoomIn();
-    }
-    if(e.keyCode === 189) {
-      e.preventDefault();
-      zoomOut();
-    }
-    if(e.keyCode === 48) {
-      e.preventDefault();
-      resetZoom();
-    }
-  }
-  else if (navigator.userAgent.search("Firefox") >= 0) {
-    if(e.keyCode === 61) {
-      e.preventDefault();
-      zoomIn();
-    }
-    if(e.keyCode === 173) {
-      e.preventDefault();
-      zoomOut();
-    }
-    if(e.keyCode === 48) {
-      e.preventDefault();
-      resetZoom();
-    }
-  }
-};
-
-window.addEventListener('touchmove', function(e) {
+  window.addEventListener('touchmove',
+    function (e) {
   e.preventDefault();
-}, false);
+    }
+  , false);
+zoom(1);
