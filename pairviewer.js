@@ -11,8 +11,6 @@ d3.select(window)
 var width = window.innerWidth, //These intial values are the only ones that work, not too sure why
     height = window.innerHeight; // Something might be hardcoded somewhere else
 var viewScale = 1;
-var frozenWidth = 960, // These values need to not change, used when hiding labels
-    frozenHeight = 500;
 
 var proj = d3.geo.orthographic()
     .translate([width / 2, height / 2])
@@ -213,7 +211,7 @@ function ready(error, world, places) {
 
 //Position and hiding labels
 function position_labels() {
-  var centerPos = proj.invert([frozenWidth/2, frozenHeight/2]);
+  var centerPos = proj.invert([width/2, height/2]);
   var arc = d3.geo.greatArc();
 
   svg.selectAll(".label")
