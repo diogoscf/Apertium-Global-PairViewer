@@ -7,9 +7,9 @@ d3.select(window)
     .on("mouseup", mouseup);
 
 
-var width = 960, //These intial values are the only ones that work, not too sure why
-    height = 500; // Something might be hardcoded somewhere else
-
+var width = window.innerWidth, //These intial values are the only ones that work, not too sure why
+    height = window.innerHeight; // Something might be hardcoded somewhere else
+var viewScale = 1;
 var frozenWidth = 960, // These values need to not change, used when hiding labels
     frozenHeight = 500;
 
@@ -52,9 +52,23 @@ var codeToLangTable = {};
 var svg = d3.select("body").append("svg")
             .attr("width", width)
             .attr("height", height)
-            .on("mousedown", mousedown);
+  .on("mousedown", mousedown);
+svg.on("mousewheel",mousewheel)
 svg.style("background", "#311B92");
-
+window.addEventListener("resize", resize);
+function resize() {
+  var off = proj([0, 0]);
+  var off2 = sky([0, 0]);
+  width = window.innerWidth;
+  height = window.innerHeight;
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+  proj = proj.translate([-off[0], -off[1]]).translate([width / 2, height / 2]);
+  sky = sky.translate([-off2[0], -off2[1]]).translate([width / 2, height / 2]);
+  path = path.projection(proj).pointRadius(3);
+  
+    svg.selectAll("circle").attr("r", width / 4).attr("cx", width / 2).attr("cy", height / 2);
+  zoom(1);
+}
 
 queue()
     .defer(d3.json, "world-110m.json")
@@ -243,35 +257,31 @@ function chooseColor(d) {
   return color;
 }
 
-// Recreates all of the needed objects and resizes
-function zoomIn() {
-  width += 200; // These values should probably be scaled rather than hard coded
-  height += 100; // Possible change for future versions
 
-  sky = sky.scale(width / 3);
+
+function zoom(factor) {
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+  width = window.innerWidth;
+  height = window.innerHeight;
   
-    proj = proj.scale(width / 4);
-  
-    path = path.projection(proj).pointRadius(3);
+  if (factor > 0) { 
+    viewScale = viewScale * factor;
+  }
+  var vH = height * viewScale;  
+  var vW = width * viewScale;  
+  var vM = Math.min(vW , vH );
+  sky = sky.scale(vM / 3);
 
-  svg.selectAll("circle").attr("r", width / 4);
-  refresh();
-}
-
-function zoomOut() {
-  width -= 200;
-  height -= 100;
-
-  sky = sky.scale(width / 3);
-
-  proj = proj.scale(width / 4);
+  proj = proj.scale(vM / 4);
 
   path = path.projection(proj).pointRadius(3);
 
-  svg.selectAll("circle").attr("r", width / 4);
+  svg.selectAll("circle").attr("r", vM/ 4);
   refresh();
 
 }
+
+
 
 function flying_arc(pts) {
   var source = pts.source,
@@ -306,12 +316,12 @@ function refresh() {
   svg.selectAll(".flyer")
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
     .attr("opacity", function(d) {
-      return 1;//fade_at_edge(d)
+      return fade_at_edge(d)
     })
 }
 
 function fade_at_edge(d) {
-  var centerPos = proj.invert([frozenWidth / 2, frozenHeight / 2]),
+  var centerPos = proj.invert([width / 2, height / 2]),
       arc = d3.geo.greatArc(),
       start, end;
   // function is called on 2 different data structures..
@@ -329,7 +339,7 @@ function fade_at_edge(d) {
 
   var fade = d3.scale.linear().domain([-.1,0]).range([0,.1])
   var dist = start_dist < end_dist ? start_dist : end_dist;
-  return fade(dist)*2.0
+  return fade(dist)
 }
 
 function location_along_arc(start, end, loc) {
@@ -342,6 +352,15 @@ var m0, o0;
 function mousedown() {
   m0 = [d3.event.pageX, d3.event.pageY];
   o0 = proj.rotate();
+  d3.event.preventDefault();
+}
+function mousewheel() {
+  //console.log(d3.event, d3.event.wheelDelta);
+  var delta = d3.event.wheelDelta;
+  var mxChange = 10;
+  delta = Math.max(Math.min(delta, mxChange), -mxChange);
+  var factor = Math.pow(1.01, delta);
+  zoom(factor);
   d3.event.preventDefault();
 }
 function mousemove() {
