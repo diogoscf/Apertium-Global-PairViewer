@@ -116,7 +116,7 @@ function ready(error, world, places) {
     .datum(topojson.object(world, world.objects.land))
     .attr("class", "land")
     .attr("d", path).style("fill", "white");
-
+/*
   svg.append("circle")
     .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
@@ -128,7 +128,7 @@ function ready(error, world, places) {
     .attr("r", proj.scale())
     .attr("class","noclicks")
     .style("fill", "url(#globe_shading)");
-
+*/
   svg.append("path")
     .datum(borders)
     .attr("class", "mesh")
