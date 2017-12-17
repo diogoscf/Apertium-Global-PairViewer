@@ -2,20 +2,11 @@
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
 
-d3.select(window)
-    .on("mousemove", mousemove)
-    .on("mouseup", mouseup);
-
-
 var width = document.documentElement.clientWidth,
     height = document.documentElement.clientHeight;
 
 var fixedWidth = document.documentElement.clientWidth, //Need a fixed copy of the width and height
     fixedHeight = document.documentElement.clientHeight;
-
-
-var frozenWidth = 960, // These values need to not change, used when hiding labels
-    frozenHeight = 500;
 
 var proj = d3.geo.orthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
@@ -27,7 +18,7 @@ var sky = d3.geo.orthographic()
     .clipAngle(90)
     .scale(width / 3);
 
-var zoom = d3.behavior.zoom(true)
+var zoom = d3.behavior.zoom()
     .scale(proj.scale())
     .scaleExtent([100, 50000])
     .on("zoom", zoomed);
@@ -61,8 +52,6 @@ var codeToLangTable = {};
 var svg = d3.select("body").append("svg")
             .attr("width", fixedWidth)
             .attr("height", fixedHeight)
-            .on("mousedown", mousedown);
-
 
 queue()
     .defer(d3.json, "world-110m.json")
@@ -209,7 +198,7 @@ function ready(error, world, places) {
 
 //Position and hiding labels
 function position_labels() {
-  var centerPos = proj.invert([frozenWidth/2, frozenHeight/2]);
+  var centerPos = proj.invert([fixedWidth/2, fixedHeight/2]);
   var arc = d3.geo.greatArc();
 
   svg.selectAll(".label")
@@ -316,7 +305,7 @@ function refresh() {
 }
 
 function fade_at_edge(d) {
-  var centerPos = proj.invert([frozenWidth / 2, frozenHeight / 2]),
+  var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
       arc = d3.geo.greatArc(),
       start, end;
   // function is called on 2 different data structures..
@@ -342,32 +331,23 @@ function location_along_arc(start, end, loc) {
   return interpolator(loc)
 }
 
-// modified from http://bl.ocks.org/1392560
-var m0, o0;
-function mousedown() {
-  m0 = [d3.event.pageX, d3.event.pageY];
-  o0 = proj.rotate();
-  d3.event.preventDefault();
-}
-function mousemove() {
-  if (m0) {
-    var m1 = [d3.event.pageX, d3.event.pageY]
-      , o1 = [o0[0] + (m1[0] - m0[0]) / 6, o0[1] + (m0[1] - m1[1]) / 6];
-    o1[1] = o1[1] > 40  ? 40  :  // Affects maximum turn (upper and lower limit)
-            o1[1] < -40 ? -40 :
-            o1[1];
-    proj.rotate(o1);
-    sky.rotate(o1);
-    refresh();
-  }
-}
-function mouseup() {
-  if (m0) {
-    mousemove();
-    m0 = null;
-    o0 = proj.rotate();
-  }
-}
+// modified from http://bl.ocks.org/KoGor/5994804
+var sens = 0.25;
+var o0;
+svg.call(d3.behavior.drag()
+    .origin(function() { var r = proj.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
+    .on("drag", function() {
+      var rotate = proj.rotate();
+      var ydir = -d3.event.y * sens;
+      ydir = ydir > 40 ? 40 : // Affects maximum turn (upper and lower limit)
+                  ydir < -40 ? -40 :
+                  ydir;
+      proj.rotate([d3.event.x * sens, ydir, rotate[2]]);
+      sky.rotate([d3.event.x * sens, ydir, rotate[2]]);
+      o0 = proj.rotate();
+      refresh();
+    })
+);
 
 // Any resizing of window also resizes the svg
 d3.select(window).on('resize', resize);
@@ -407,10 +387,7 @@ function resize() {
 }
 
 svg.call(zoom)
-    .on("mousedown.zoom", null)
-    .on("touchstart.zoom", null)
-    .on("touchmove.zoom", null)
-    .on("touchend.zoom", null)
+    .call(zoom.event)
     .on("dblclick.zoom", null);
 
 function initialzoom() {
