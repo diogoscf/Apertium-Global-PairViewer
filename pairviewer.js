@@ -280,22 +280,21 @@ function zoom(factor) {
   width = window.innerWidth;
   height = window.innerHeight;
   
-  if (factor > 0) { 
+  if (factor > 0) {
     viewScale = viewScale * factor;
   }
-  var vH = height * viewScale;  
-  var vW = width * viewScale;  
-  var vM = Math.min(vW , vH );
+  var vH = height * viewScale;
+  var vW = width * viewScale;
+  var vM = Math.min(vW, vH);
   sky = sky.scale(vM / 3);
 
   proj = proj.scale(vM / 4);
 
   path = path.projection(proj).pointRadius(3);
 
-  svg.selectAll("circle").attr("r", vM/ 4);
+  svg.selectAll("circle").attr("r", vM / 4);
   refresh();
-
-
+}
 
 function flying_arc(pts) {
   var source = pts.source,
@@ -328,10 +327,10 @@ function refresh() {
   position_labels();
 
   svg.selectAll(".flyer")
-    .attr("d", function(d) { return swoosh(flying_arc(d)) })
-    .attr("opacity", function(d) {
+    .attr("d", function (d) { return swoosh(flying_arc(d)) })
+    .attr("opacity", function (d) {
       return fade_at_edge(d)
-    })
+    });
 }
 
 function fade_at_edge(d) {
@@ -383,8 +382,8 @@ svg.call(d3.behavior.drag()
 
 
 
-window.addEventListener('touchmove', function (e) {
+  window.addEventListener('touchmove',
+    function (e) {
   e.preventDefault();
-}, false);
-
-
+    }
+    , false);
