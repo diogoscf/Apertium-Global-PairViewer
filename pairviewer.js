@@ -2,10 +2,6 @@
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
 
-d3.select(window)
-    .on("mousemove", mousemove)
-    .on("mouseup", mouseup).on("touchmove", mousemove)
-    .on("touchend", mouseup);
 
 
 var width = window.innerWidth, //These intial values are the only ones that work, not too sure why
@@ -14,19 +10,15 @@ var viewScale = 1;
 
 
 var proj = d3.geo.orthographic()
-    .translate([fixedWidth / 2, fixedHeight / 2])
+    .translate([width / 2, height / 2])
     .clipAngle(90)
     .scale(width / 4);
 
 var sky = d3.geo.orthographic()
-    .translate([fixedWidth / 2, fixedHeight / 2])
+    .translate([width / 2, height / 2])
     .clipAngle(90)
     .scale(width / 3);
 
-var zoom = d3.behavior.zoom()
-    .scale(proj.scale())
-    .scaleExtent([100, 50000])
-    .on("zoom", zoomed);
 
 // Point radius can be updated here
 var path = d3.geo.path().projection(proj).pointRadius(3);
@@ -56,13 +48,12 @@ var codeToLangTable = {};
 
 var svg = d3.select("body").append("svg")
   .attr("width", width)
-  .attr("height", height)
-  .on("mousedown", mousedown).on("touchstart", mousedown);
+  .attr("height", height);
 //svg.on("mousewheel",mousewheel)
 svg.style("background", "#311B92");
 window.addEventListener("resize", resize);
 var zoomT = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', function () {
-  console.log("zoom", d3.event.scale);
+  //console.log("zoom", d3.event.scale);
  // alert("zoom");
   zoom(d3.event.scale/viewScale);
 
@@ -113,7 +104,7 @@ function ready(error, world, places) {
 
 
   svg.append("circle")
-    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
+    .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
     .attr("id", "circle1")
@@ -125,14 +116,14 @@ function ready(error, world, places) {
     .attr("d", path).style("fill", "white");
 /*
   svg.append("circle")
-    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
+    .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
     .attr("id", "circle2")
     .style("fill", "url(#globe_highlight)");
 
   svg.append("circle")
-    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
+    .attr("cx", width / 2).attr("cy", height / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
     .attr("id", "circle3")
