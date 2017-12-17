@@ -475,3 +475,7 @@ window.onkeydown = function(e) {
     }
   }
 };
+
+window.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+}, false);
