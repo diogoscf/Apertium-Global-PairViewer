@@ -12,15 +12,21 @@ var width = window.innerWidth, //These intial values are the only ones that work
     height = window.innerHeight; // Something might be hardcoded somewhere else
 var viewScale = 1;
 
+
 var proj = d3.geo.orthographic()
-    .translate([width / 2, height / 2])
+    .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 4);
 
 var sky = d3.geo.orthographic()
-    .translate([width / 2, height / 2])
+    .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 3);
+
+var zoom = d3.behavior.zoom()
+    .scale(proj.scale())
+    .scaleExtent([100, 50000])
+    .on("zoom", zoomed);
 
 // Point radius can be updated here
 var path = d3.geo.path().projection(proj).pointRadius(3);
@@ -107,9 +113,10 @@ function ready(error, world, places) {
 
 
   svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
+    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
+    .attr("id", "circle1")
     .style("fill", "url(#ocean_fill)");
 
   svg.append("path")
@@ -118,15 +125,17 @@ function ready(error, world, places) {
     .attr("d", path).style("fill", "white");
 /*
   svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
+    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
+    .attr("id", "circle2")
     .style("fill", "url(#globe_highlight)");
 
   svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
+    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class","noclicks")
+    .attr("id", "circle3")
     .style("fill", "url(#globe_shading)");
 */
   svg.append("path")
@@ -134,6 +143,7 @@ function ready(error, world, places) {
     .attr("class", "mesh")
     .style("stroke", "#2196F3") // Border color can be changed here
     .style("fill", "999").style("fill","transparent");
+
 
 
   svg.append("g").attr("class","labels")
@@ -285,8 +295,6 @@ function zoom(factor) {
   svg.selectAll("circle").attr("r", vM/ 4);
   refresh();
 
-}
-
 
 
 function flying_arc(pts) {
@@ -328,6 +336,7 @@ function refresh() {
 
 function fade_at_edge(d) {
   var centerPos = proj.invert([width / 2, height / 2]),
+
       arc = d3.geo.greatArc(),
       start, end;
   // function is called on 2 different data structures..
@@ -353,40 +362,29 @@ function location_along_arc(start, end, loc) {
   return interpolator(loc)
 }
 
-// modified from http://bl.ocks.org/1392560
-var m0, o0;
-function mousedown() {
-  m0 = [d3.event.pageX|(d3.event.touches?d3.event.touches:[d3.event])[0].pageX, d3.event.pageY|(d3.event.touches?d3.event.touches:[d3.event])[0].pageY];
-  o0 = proj.rotate();
-  d3.event.preventDefault();
-}
-function mousewheel() {
-  //console.log(d3.event, d3.event.wheelDelta);
-  var delta = d3.event.wheelDelta;
-  var mxChange = 10;
-  delta = Math.max(Math.min(delta, mxChange), -mxChange);
-  var factor = Math.pow(1.01, delta);
-  zoom(factor);
-  d3.event.preventDefault();
-}
-function mousemove() {
-  if (m0) {
-    var m1 = [d3.event.pageX|(d3.event.touches?d3.event.touches:[d3.event])[0].pageX, d3.event.page|(d3.event.touches?d3.event.touches:[d3.event])[0].pageY]
-      , o1 = [o0[0] + (m1[0] - m0[0]) / 6, o0[1] + (m0[1] - m1[1]) / 6];
-    o1[1] = o1[1] > 40  ? 40  :  // Affects maximum turn (upper and lower limit)
-            o1[1] < -40 ? -40 :
-            o1[1];
-    proj.rotate(o1);
-    sky.rotate(o1);
-    refresh();
-  }
-}
-function mouseup() {
-  if (m0) {
-    mousemove();
-    m0 = null;
-  }
-}
+
+// modified from http://bl.ocks.org/KoGor/5994804
+var sens = 0.25;
+var o0;
+svg.call(d3.behavior.drag()
+    .origin(function() { var r = proj.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
+    .on("drag", function() {
+      var rotate = proj.rotate();
+      var ydir = -d3.event.y * sens;
+      ydir = ydir > 40 ? 40 : // Affects maximum turn (upper and lower limit)
+                  ydir < -40 ? -40 :
+                  ydir;
+      proj.rotate([d3.event.x * sens, ydir, rotate[2]]);
+      sky.rotate([d3.event.x * sens, ydir, rotate[2]]);
+      o0 = proj.rotate();
+      refresh();
+    })
+);
+
+
+
 window.addEventListener('touchmove', function (e) {
   e.preventDefault();
 }, false);
+
+
