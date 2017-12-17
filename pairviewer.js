@@ -387,3 +387,6 @@ function mouseup() {
     m0 = null;
   }
 }
+window.addEventListener('touchmove', function (e) {
+  e.preventDefault();
+}, false);
