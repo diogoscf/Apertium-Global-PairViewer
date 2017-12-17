@@ -4,7 +4,8 @@
 
 d3.select(window)
     .on("mousemove", mousemove)
-    .on("mouseup", mouseup);
+    .on("mouseup", mouseup).on("touchmove", mousemove)
+    .on("touchend", mouseup);
 
 
 var width = window.innerWidth, //These intial values are the only ones that work, not too sure why
@@ -52,7 +53,7 @@ var codeToLangTable = {};
 var svg = d3.select("body").append("svg")
             .attr("width", width)
             .attr("height", height)
-  .on("mousedown", mousedown);
+  .on("mousedown", mousedown).on("touchstart", mousedown);
 svg.on("mousewheel",mousewheel)
 svg.style("background", "#311B92");
 window.addEventListener("resize", resize);
@@ -350,7 +351,7 @@ function location_along_arc(start, end, loc) {
 // modified from http://bl.ocks.org/1392560
 var m0, o0;
 function mousedown() {
-  m0 = [d3.event.pageX, d3.event.pageY];
+  m0 = [d3.event.pageX|d3.event.touches[0].pageX, d3.event.pageY|d3.event.touches[0].pageY];
   o0 = proj.rotate();
   d3.event.preventDefault();
 }
@@ -365,7 +366,7 @@ function mousewheel() {
 }
 function mousemove() {
   if (m0) {
-    var m1 = [d3.event.pageX, d3.event.pageY]
+    var m1 = [d3.event.pageX|d3.event.touches[0].pageX, d3.event.page|d3.event.touches[0].pageY]
       , o1 = [o0[0] + (m1[0] - m0[0]) / 6, o0[1] + (m0[1] - m1[1]) / 6];
     o1[1] = o1[1] > 40  ? 40  :  // Affects maximum turn (upper and lower limit)
             o1[1] < -40 ? -40 :
