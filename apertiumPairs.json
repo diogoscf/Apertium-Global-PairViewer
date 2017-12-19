@@ -1,243 +1,106 @@
 {
 "type": "FeatureCollection",
 "pairs": [
-	{"stems": 16228, "repo": "trunk", "created": "2013-05-13", "last_updated": "2014-10-15", "lg2": "eng", "lg1": "hbs", "coordinates1": [-1.0, 53.0], "coordinates2": [19.0, 45.5], "direction": "<>"}
+	{"stems": 16228, "repo": "trunk", "created": "2013-05-13", "last_updated": "2014-10-15", "lg2": "eng", "lg1": "hbs", "direction": "<>"}
 ,
-	{"stems": 10452, "repo": "trunk", "created": "2007-06-08", "last_updated": "2014-10-12", "lg2": "mkd", "lg1": "hbs", "coordinates1": [22.0, 41.5], "coordinates2": [19.0, 45.5], "direction": ">"}
+	{"stems": 10452, "repo": "trunk", "created": "2007-06-08", "last_updated": "2014-10-12", "lg2": "mkd", "lg1": "hbs", "direction": ">"}
 ,
-	{"stems": 22863, "repo": "trunk", "created": "2012-04-27", "last_updated": "2014-09-02", "lg2": "slv", "lg1": "hbs", "coordinates1": [19.0, 49.0], "coordinates2": [19.0, 45.5], "direction": "<>"}
+	{"stems": 22863, "repo": "trunk", "created": "2012-04-27", "last_updated": "2014-09-02", "lg2": "slv", "lg1": "hbs", "direction": "<>"}
 ,
-	{"stems": 8702, "repo": "trunk", "created": "2007-06-20", "last_updated": "2014-10-12", "lg2": "eng", "lg1": "isl", "coordinates1": [-1.0, 53.0], "coordinates2": [-19.0, 64.0], "direction": ">"}
+	{"stems": 8702, "repo": "trunk", "created": "2007-06-20", "last_updated": "2014-10-12", "lg2": "eng", "lg1": "isl", "direction": ">"}
 ,
-	{"stems": 9921, "repo": "trunk", "created": "2012-04-12", "last_updated": "2014-10-12", "lg2": "tat", "lg1": "kaz", "coordinates1": [60.0, 56.0], "coordinates2": [73.2, 48.9], "direction": "<>"}
+	{"stems": 9921, "repo": "trunk", "created": "2012-04-12", "last_updated": "2014-10-12", "lg2": "tat", "lg1": "kaz", "direction": "<>"}
 ,
-	{"stems": 69012, "repo": "trunk", "created": "2008-03-24", "last_updated": "2014-10-25", "lg2": "nob", "lg1": "nno", "coordinates1": [11.0, 60.0], "coordinates2": [7.0, 61.0], "direction": "<>"}
+	{"stems": 69012, "repo": "trunk", "created": "2008-03-24", "last_updated": "2014-10-25", "lg2": "nob", "lg1": "nno", "direction": "<>"}
 ,
-	{"stems": 76389, "repo": "trunk", "created": "2010-01-11", "last_updated": "2014-10-20", "lg2": "nob", "lg1": "sme", "coordinates1": [11.0, 60.0], "coordinates2": [23.0, 69.0], "direction": ">"}
+	{"stems": 76389, "repo": "trunk", "created": "2010-01-11", "last_updated": "2014-10-20", "lg2": "nob", "lg1": "sme", "direction": ">"}
 ,
-	{"stems": 4840, "repo": "trunk", "created": "2010-03-17", "last_updated": "2014-10-15", "lg2": "hin", "lg1": "urd", "coordinates1": [78.0, 28.0], "coordinates2": [68.0, 25.0], "direction": "<>"}
+	{"stems": 4840, "repo": "trunk", "created": "2010-03-17", "last_updated": "2014-10-15", "lg2": "hin", "lg1": "urd", "direction": "<>"}
 ,
-	{"stems": 18919, "repo": "staging", "created": "2007-02-23", "last_updated": "2014-10-06", "lg2": "por", "lg1": "fra", "coordinates1": [-8.5, 40.0], "coordinates2": [2.5, 47.0], "direction": "<>"}
+	{"stems": 18919, "repo": "staging", "created": "2007-02-23", "last_updated": "2014-10-06", "lg2": "por", "lg1": "fra", "direction": "<>"}
 ,
-	{"stems": 39242, "repo": "nursery", "created": "2009-07-01", "last_updated": "2014-08-18", "lg2": "hin", "lg1": "eng", "coordinates1": [78.0, 28.0], "coordinates2": [-1.0, 53.0], "direction": "<>"}
+	{"stems": 39242, "repo": "nursery", "created": "2009-07-01", "last_updated": "2014-08-18", "lg2": "hin", "lg1": "eng", "direction": "<>"}
 ,
-	{"stems": 159430, "repo": "nursery", "created": "2013-05-12", "last_updated": "2014-10-24", "lg2": "eng", "lg1": "fin", "coordinates1": [-1.0, 53.0], "coordinates2": [25.0, 62.0], "direction": "<>"}
+	{"stems": 159430, "repo": "nursery", "created": "2013-05-12", "last_updated": "2014-10-24", "lg2": "eng", "lg1": "fin", "direction": "<>"}
 ,
-	{"stems": 5008, "repo": "nursery", "created": "2013-03-10", "last_updated": "2014-06-09", "lg2": "rus", "lg1": "hbs", "coordinates1": [39.0, 57.0], "coordinates2": [19.0, 45.5], "direction": "<>"}
+	{"stems": 5008, "repo": "nursery", "created": "2013-03-10", "last_updated": "2014-06-09", "lg2": "rus", "lg1": "hbs", "direction": "<>"}
 ,
-	{"stems": 7623, "repo": "nursery", "created": "2013-04-23", "last_updated": "2014-09-02", "lg2": "kir", "lg1": "kaz", "coordinates1": [75.0, 42.0], "coordinates2": [73.2, 48.9], "direction": "<>"}
+	{"stems": 7623, "repo": "nursery", "created": "2013-04-23", "last_updated": "2014-09-02", "lg2": "kir", "lg1": "kaz", "direction": "<>"}
 ,
-	{"stems": 561, "repo": "nursery", "created": "2014-07-19", "last_updated": "2014-07-27", "lg2": "kum", "lg1": "kaz", "coordinates1": [47.5, 42.7], "coordinates2": [73.2, 48.9], "direction": "<>"}
+	{"stems": 561, "repo": "nursery", "created": "2014-07-19", "last_updated": "2014-07-27", "lg2": "kum", "lg1": "kaz", "direction": "<>"}
 ,
-	{"stems": 12149, "repo": "nursery", "created": "2007-05-10", "last_updated": "2014-07-16", "lg2": "ukr", "lg1": "rus", "coordinates1": [30.0, 50.0], "coordinates2": [39.0, 57.0], "direction": "<>"}
+	{"stems": 12149, "repo": "nursery", "created": "2007-05-10", "last_updated": "2014-07-16", "lg2": "ukr", "lg1": "rus", "direction": "<>"}
 ,
-	{"stems": -1, "repo": "nursery", "created": "2011-04-18", "last_updated": "2014-06-09", "lg2": "spa", "lg1": "slv", "coordinates1": [-3.0, 41.0], "coordinates2": [19.0, 49.0], "direction": ""}
+	{"stems": -1, "repo": "nursery", "created": "2011-04-18", "last_updated": "2014-06-09", "lg2": "spa", "lg1": "slv", "direction": ""}
 ,
-	{"stems": 7160, "repo": "nursery", "created": "2010-05-17", "last_updated": "2014-10-23", "lg2": "fin", "lg1": "sme", "coordinates1": [25.0, 62.0], "coordinates2": [23.0, 69.0], "direction": "<>"}
+	{"stems": 7160, "repo": "nursery", "created": "2010-05-17", "last_updated": "2014-10-23", "lg2": "fin", "lg1": "sme", "direction": "<>"}
 ,
-	{"stems": 5999, "repo": "nursery", "created": "2012-01-21", "last_updated": "2014-08-18", "lg2": "rus", "lg1": "tat", "coordinates1": [39.0, 57.0], "coordinates2": [60.0, 56.0], "direction": ">"}
+	{"stems": 5999, "repo": "nursery", "created": "2012-01-21", "last_updated": "2014-08-18", "lg2": "rus", "lg1": "tat", "direction": ">"}
 ,
-	{"stems": 7123, "repo": "nursery", "created": "2011-03-30", "last_updated": "2014-07-13", "lg2": "kir", "lg1": "tur", "coordinates1": [75.0, 42.0], "coordinates2": [31.0, 40.0], "direction": "<>"}
+	{"stems": 7123, "repo": "nursery", "created": "2011-03-30", "last_updated": "2014-07-13", "lg2": "kir", "lg1": "tur", "direction": "<>"}
 ,
-	{"stems": 213, "repo": "nursery", "created": "2012-01-29", "last_updated": "2014-06-09", "lg2": "tat", "lg1": "tur", "coordinates1": [60.0, 56.0], "coordinates2": [31.0, 40.0], "direction": "<>"}
+	{"stems": 213, "repo": "nursery", "created": "2012-01-29", "last_updated": "2014-06-09", "lg2": "tat", "lg1": "tur", "direction": "<>"}
 ,
-	{"stems": 2416, "repo": "nursery", "created": "2013-05-05", "last_updated": "2014-06-09", "lg2": "uzb", "lg1": "tur", "coordinates1": [67.0, 40.0], "coordinates2": [31.0, 40.0], "direction": "<>"}
+	{"stems": 2416, "repo": "nursery", "created": "2013-05-05", "last_updated": "2014-06-09", "lg2": "uzb", "lg1": "tur", "direction": "<>"}
 ,
-	{"stems": 5509, "repo": "incubator", "created": "2013-11-11", "last_updated": "2014-06-09", "lg2": "rus", "lg1": "ava", "coordinates1": [39.0, 57.0], "coordinates2": [46.5, 42.5], "direction": ">"}
+	{"stems": 5509, "repo": "incubator", "created": "2013-11-11", "last_updated": "2014-06-09", "lg2": "rus", "lg1": "ava", "direction": ">"}
 ,
-	{"stems": 198, "repo": "incubator", "created": "2012-01-21", "last_updated": "2014-07-14", "lg2": "tat", "lg1": "chv", "coordinates1": [60.0, 56.0], "coordinates2": [47.5, 56.0], "direction": "<>"}
+	{"stems": 198, "repo": "incubator", "created": "2012-01-21", "last_updated": "2014-07-14", "lg2": "tat", "lg1": "chv", "direction": "<>"}
 ,
-	{"stems": 830, "repo": "incubator", "created": "2014-03-20", "last_updated": "2014-07-02", "lg2": "eng", "lg1": "ell", "coordinates1": [-1.0, 53.0], "coordinates2": [22.0, 39.0], "direction": "<>"}
+	{"stems": 830, "repo": "incubator", "created": "2014-03-20", "last_updated": "2014-07-02", "lg2": "eng", "lg1": "ell", "direction": "<>"}
 ,
-	{"stems": 13388, "repo": "incubator", "created": "2012-06-07", "last_updated": "2014-10-12", "lg2": "kaz", "lg1": "eng", "coordinates1": [73.2, 48.9], "coordinates2": [-1.0, 53.0], "direction": "<>"}
+	{"stems": 13388, "repo": "incubator", "created": "2012-06-07", "last_updated": "2014-10-12", "lg2": "kaz", "lg1": "eng", "direction": "<>"}
 ,
-	{"stems": 175, "repo": "incubator", "created": "2014-06-02", "last_updated": "2014-10-07", "lg2": "fin", "lg1": "eus", "coordinates1": [25.0, 62.0], "coordinates2": [-2.5, 43.3], "direction": ">"}
+	{"stems": 175, "repo": "incubator", "created": "2014-06-02", "last_updated": "2014-10-07", "lg2": "fin", "lg1": "eus", "direction": ">"}
 ,
-	{"stems": 586, "repo": "incubator", "created": "2011-07-28", "last_updated": "2012-04-19", "lg2": "sme", "lg1": "eus", "coordinates1": [23.0, 69.0], "coordinates2": [-2.5, 43.3], "direction": ">"}
+	{"stems": 586, "repo": "incubator", "created": "2011-07-28", "last_updated": "2012-04-19", "lg2": "sme", "lg1": "eus", "direction": ">"}
 ,
-	{"stems": 250, "repo": "incubator", "created": "2014-06-15", "last_updated": "2014-09-02", "lg2": "hbs", "lg1": "fin", "coordinates1": [19.0, 45.5], "coordinates2": [25.0, 62.0], "direction": "<>"}
+	{"stems": 250, "repo": "incubator", "created": "2014-06-15", "last_updated": "2014-09-02", "lg2": "hbs", "lg1": "fin", "direction": "<>"}
 ,
-	{"stems": 1000, "repo": "incubator", "created": "2014-05-25", "last_updated": "2014-06-09", "lg2": "isl", "lg1": "fin", "coordinates1": [-19.0, 64.0], "coordinates2": [25.0, 62.0], "direction": "<>"}
+	{"stems": 1000, "repo": "incubator", "created": "2014-05-25", "last_updated": "2014-06-09", "lg2": "isl", "lg1": "fin", "direction": "<>"}
 ,
-	{"stems": 281, "repo": "incubator", "created": "2014-09-10", "last_updated": "2014-09-11", "lg2": "ita", "lg1": "fin", "coordinates1": [13.0, 42.5], "coordinates2": [25.0, 62.0], "direction": "<>"}
+	{"stems": 281, "repo": "incubator", "created": "2014-09-10", "last_updated": "2014-09-11", "lg2": "ita", "lg1": "fin", "direction": "<>"}
 ,
-	{"stems": 283, "repo": "incubator", "created": "2014-08-21", "last_updated": "2014-08-22", "lg2": "spa", "lg1": "fin", "coordinates1": [-3.0, 41.0], "coordinates2": [25.0, 62.0], "direction": "<>"}
+	{"stems": 283, "repo": "incubator", "created": "2014-08-21", "last_updated": "2014-08-22", "lg2": "spa", "lg1": "fin", "direction": "<>"}
 ,
-	{"stems": 1893, "repo": "incubator", "created": "2014-04-27", "last_updated": "2014-06-09", "lg2": "swe", "lg1": "fin", "coordinates1": [15.0, 59.0], "coordinates2": [25.0, 62.0], "direction": "<>"}
+	{"stems": 1893, "repo": "incubator", "created": "2014-04-27", "last_updated": "2014-06-09", "lg2": "swe", "lg1": "fin", "direction": "<>"}
 ,
-	{"stems": 194, "repo": "incubator", "created": "2013-05-11", "last_updated": "2014-06-09", "lg2": "eng", "lg1": "fra", "coordinates1": [-1.0, 53.0], "coordinates2": [2.5, 47.0], "direction": "<>"}
+	{"stems": 194, "repo": "incubator", "created": "2013-05-11", "last_updated": "2014-06-09", "lg2": "eng", "lg1": "fra", "direction": "<>"}
 ,
-	{"stems": 52, "repo": "incubator", "created": "2014-02-09", "last_updated": "2014-06-09", "lg2": "rus", "lg1": "isl", "coordinates1": [39.0, 57.0], "coordinates2": [-19.0, 64.0], "direction": "<>"}
+	{"stems": 52, "repo": "incubator", "created": "2014-02-09", "last_updated": "2014-06-09", "lg2": "rus", "lg1": "isl", "direction": "<>"}
 ,
-	{"stems": 1, "repo": "incubator", "created": "?", "last_updated": "2014-01-07", "lg2": "ita", "lg1": "ita", "coordinates1": [13.0, 42.5], "coordinates2": [13.0, 42.5], "direction": "?"}
+	{"stems": 1, "repo": "incubator", "created": "?", "last_updated": "2014-01-07", "lg2": "ita", "lg1": "ita", "direction": "?"}
 ,
-	{"stems": 5408, "repo": "incubator", "created": "2013-10-17", "last_updated": "2014-08-29", "lg2": "kaa", "lg1": "kaz", "coordinates1": [49.0, 53.0], "coordinates2": [73.2, 48.9], "direction": "<>"}
+	{"stems": 5408, "repo": "incubator", "created": "2013-10-17", "last_updated": "2014-08-29", "lg2": "kaa", "lg1": "kaz", "direction": "<>"}
 ,
-	{"stems": 145, "repo": "incubator", "created": "2013-05-10", "last_updated": "2014-06-09", "lg2": "uzb", "lg1": "kir", "coordinates1": [67.0, 40.0], "coordinates2": [75.0, 42.0], "direction": "<>"}
+	{"stems": 145, "repo": "incubator", "created": "2013-05-10", "last_updated": "2014-06-09", "lg2": "uzb", "lg1": "kir", "direction": "<>"}
 ,
-	{"stems": 137, "repo": "incubator", "created": "2014-04-01", "last_updated": "2014-06-09", "lg2": "spa", "lg1": "mlt", "coordinates1": [-3.0, 41.0], "coordinates2": [14.4, 35.9], "direction": ">"}
+	{"stems": 137, "repo": "incubator", "created": "2014-04-01", "last_updated": "2014-06-09", "lg2": "spa", "lg1": "mlt", "direction": ">"}
 ,
-	{"stems": -1, "repo": "incubator", "created": "2011-03-31", "last_updated": "2014-05-18", "lg2": "eng", "lg1": "rus", "coordinates1": [-1.0, 53.0], "coordinates2": [39.0, 57.0], "direction": ""}
+	{"stems": -1, "repo": "incubator", "created": "2011-03-31", "last_updated": "2014-05-18", "lg2": "eng", "lg1": "rus", "direction": ""}
 ,
-	{"stems": 1586, "repo": "incubator", "created": "2011-04-28", "last_updated": "2014-10-25", "lg2": "ita", "lg1": "slv", "coordinates1": [13.0, 42.5], "coordinates2": [19.0, 49.0], "direction": "<>"}
+	{"stems": 1586, "repo": "incubator", "created": "2011-04-28", "last_updated": "2014-10-25", "lg2": "ita", "lg1": "slv", "direction": "<>"}
 ,
-	{"stems": 1, "repo": "incubator", "created": "?", "last_updated": "2012-04-19", "lg2": "spa", "lg1": "sme", "coordinates1": [-3.0, 41.0], "coordinates2": [23.0, 69.0], "direction": "?"}
+	{"stems": 1, "repo": "incubator", "created": "?", "last_updated": "2012-04-19", "lg2": "spa", "lg1": "sme", "direction": "?"}
 ,
-	{"stems": 159, "repo": "incubator", "created": "2013-05-13", "last_updated": "2014-06-09", "lg2": "dan", "lg1": "swe", "coordinates1": [11.5, 55.5], "coordinates2": [15.0, 59.0], "direction": "<>"}
+	{"stems": 159, "repo": "incubator", "created": "2013-05-13", "last_updated": "2014-06-09", "lg2": "dan", "lg1": "swe", "direction": "<>"}
 ,
-	{"stems": -1, "repo": "incubator", "created": "?", "last_updated": "2013-12-29", "lg2": "kir", "lg1": "tat", "coordinates1": [75.0, 42.0], "coordinates2": [60.0, 56.0], "direction": "?"}
+	{"stems": -1, "repo": "incubator", "created": "?", "last_updated": "2013-12-29", "lg2": "kir", "lg1": "tat", "direction": "?"}
 ,
-{ "name1": "Bikol", "lg1": "bik", "coordinates1": [ 121.262634, 16.566233 ], "name2": "Chamorro", "tag2":"cha", "coordinates2": [ 144.793732, 13.444304 ] }
+        {"lg2": "cha", "lg1": "bik", "direction": "?"}
 ,
-{ "name1": "Guarani", "lg1": "gug", "coordinates1": [ -54.615440, -25.513475 ], "name2": "Warlpiri", "tag2":"wbp", "coordinates2": [ 132.550964, -19.491411 ] }
+        {"lg2": "wbp", "lg1": "gug", "direction": "?"}
 ,
-{ "name1": "Jeju", "lg1": "jje", "coordinates1": [ 126.4983, 33.4890 ], "name2": "Ainu", "tag2":"ain", "coordinates2": [ 142.8635, 43.2203 ] }
+        {"lg2": "ain", "lg1": "jje", "direction": "?"}
 ,
-{ "name1": "Kalmyk", "lg1": "xal", "coordinates1": [ 44.2794, 46.3155 ], "name2": "Judeo-Tat", "tag2":"jdt", "coordinates2": [ 47.5769, 40.1431 ] }
+        {"lg2": "jdt", "lg1": "xal", "direction": "?"}
 ,
-{ "name1": "Khasi", "lg1": "kha", "coordinates1": [ 91.3662, 25.4670 ], "name2": "Wôpanâak", "tag2":"wam", "coordinates2": [ -71.3824, 42.4072 ] }
+        {"lg2": "wam", "lg1": "kha", "direction": "?"}
 ,
-{ "name1": "Lingala", "lg1": "lin", "coordinates1": [ 21.7587, -4.0383 ], "name2": "Kikuyu", "tag2":"kik", "coordinates2": [ 36.8304, -1.1748 ] }
+        {"lg2": "kik", "lg1": "lin", "direction": "?"}
 ,
-{ "name1": "Okinawan", "lg1": "ryu", "coordinates1": [ 127.6809, 26.2124 ], "name2": "Miyako", "tag2":"mvi", "coordinates2": [ 125.3247, 24.7674 ] }
+        {"lg2": "mvi", "lg1": "ryu", "direction": "?"}
 ,
-{ "name1": "Wamesa", "lg1": "wad", "coordinates1": [ 132.5000, -1.5000 ], "name2": "Tongan", "tag2":"ton", "coordinates2": [ -175.1982, -21.1790 ] }
-]
-,
-"point_data": [
-	{"type": "Feature", "tag": "nno", "geometry": { "type": "Point", "coordinates": [7.0, 61.0]} }
-,
-	{"type": "Feature", "tag": "tat", "geometry": { "type": "Point", "coordinates": [50.0, 56.0]} }
-,
-	{"type": "Feature", "tag": "ron", "geometry": { "type": "Point", "coordinates": [25.0, 46.0]} }
-,
-	{"type": "Feature", "tag": "tkm", "geometry": { "type": "Point", "coordinates": [60.0, 38.0]} }
-,
-	{"type": "Feature", "tag": "por", "geometry": { "type": "Point", "coordinates": [-8.5, 40.0]} }
-,
-	{"type": "Feature", "tag": "uzb", "geometry": { "type": "Point", "coordinates": [67.0, 40.0]} }
-,
-	{"type": "Feature", "tag": "ita", "geometry": { "type": "Point", "coordinates": [13.0, 42.5]} }
-,
-	{"type": "Feature", "tag": "ara", "geometry": { "type": "Point", "coordinates": [36.0, 28.0]} }
-,
-	{"type": "Feature", "tag": "nld", "geometry": { "type": "Point", "coordinates": [5.5, 52.0]} }
-,
-	{"type": "Feature", "tag": "arg", "geometry": { "type": "Point", "coordinates": [-0.3, 42.7]} }
-,
-	{"type": "Feature", "tag": "ind", "geometry": { "type": "Point", "coordinates": [119.0, -5.0]} }
-,
-	{"type": "Feature", "tag": "spa", "geometry": { "type": "Point", "coordinates": [-3.0, 41.0]} }
-,
-	{"type": "Feature", "tag": "bre", "geometry": { "type": "Point", "coordinates": [-3.4, 48.3]} }
-,
-	{"type": "Feature", "tag": "glg", "geometry": { "type": "Point", "coordinates": [-8.0, 42.7]} }
-,
-	{"type": "Feature", "tag": "ava", "geometry": { "type": "Point", "coordinates": [46.5, 42.5]} }
-,
-	{"type": "Feature", "tag": "oci", "geometry": { "type": "Point", "coordinates": [2.0, 44.0]} }
-,
-	{"type": "Feature", "tag": "fra", "geometry": { "type": "Point", "coordinates": [2.5, 47.0]} }
-,
-	{"type": "Feature", "tag": "mkd", "geometry": { "type": "Point", "coordinates": [22.0, 41.5]} }
-,
-	{"type": "Feature", "tag": "ell", "geometry": { "type": "Point", "coordinates": [22.0, 39.0]} }
-,
-	{"type": "Feature", "tag": "eng", "geometry": { "type": "Point", "coordinates": [-1.0, 53.0]} }
-,
-	{"type": "Feature", "tag": "rus", "geometry": { "type": "Point", "coordinates": [39.0, 57.0]} }
-,
-	{"type": "Feature", "tag": "hrv", "geometry": { "type": "Point", "coordinates": [16.0, 46.0]} }
-,
-	{"type": "Feature", "tag": "swe", "geometry": { "type": "Point", "coordinates": [15.0, 59.0]} }
-,
-	{"type": "Feature", "tag": "ukr", "geometry": { "type": "Point", "coordinates": [30.0, 50.0]} }
-,
-	{"type": "Feature", "tag": "kum", "geometry": { "type": "Point", "coordinates": [47.5, 42.7]} }
-,
-	{"type": "Feature", "tag": "cym", "geometry": { "type": "Point", "coordinates": [-4.0, 52.5]} }
-,
-	{"type": "Feature", "tag": "chv", "geometry": { "type": "Point", "coordinates": [47.5, 56.0]} }
-,
-	{"type": "Feature", "tag": "sme", "geometry": { "type": "Point", "coordinates": [23.0, 69.0]} }
-,
-	{"type": "Feature", "tag": "fin", "geometry": { "type": "Point", "coordinates": [25.0, 62.0]} }
-,
-	{"type": "Feature", "tag": "tur", "geometry": { "type": "Point", "coordinates": [31.0, 40.0]} }
-,
-	{"type": "Feature", "tag": "eus", "geometry": { "type": "Point", "coordinates": [-2.5, 43.3]} }
-,
-	{"type": "Feature", "tag": "kmr", "geometry": { "type": "Point", "coordinates": [42.5, 37.5]} }
-,
-	{"type": "Feature", "tag": "kaa", "geometry": { "type": "Point", "coordinates": [59.0, 43.0]} }
-,
-	{"type": "Feature", "tag": "ast", "geometry": { "type": "Point", "coordinates": [-6.0, 43.0]} }
-,
-	{"type": "Feature", "tag": "kir", "geometry": { "type": "Point", "coordinates": [75.0, 42.0]} }
-,
-	{"type": "Feature", "tag": "dan", "geometry": { "type": "Point", "coordinates": [11.5, 55.5]} }
-,
-	{"type": "Feature", "tag": "nob", "geometry": { "type": "Point", "coordinates": [11.0, 60.0]} }
-,
-	{"type": "Feature", "tag": "bul", "geometry": { "type": "Point", "coordinates": [35.0, 43.0]} }
-,
-	{"type": "Feature", "tag": "kaz", "geometry": { "type": "Point", "coordinates": [73.2, 48.9]} }
-,
-	{"type": "Feature", "tag": "tyv", "geometry": { "type": "Point", "coordinates": [94.0, 52.0]} }
-,
-	{"type": "Feature", "tag": "hin", "geometry": { "type": "Point", "coordinates": [78.0, 28.0]} }
-,
-	{"type": "Feature", "tag": "urd", "geometry": { "type": "Point", "coordinates": [68.0, 25.0]} }
-,
-	{"type": "Feature", "tag": "zlm", "geometry": { "type": "Point", "coordinates": [105.0, -4.0]} }
-,
-	{"type": "Feature", "tag": "slv", "geometry": { "type": "Point", "coordinates": [19.0, 49.0]} }
-,
-	{"type": "Feature", "tag": "bos", "geometry": { "type": "Point", "coordinates": [18.0, 44.0]} }
-,
-	{"type": "Feature", "tag": "cat", "geometry": { "type": "Point", "coordinates": [0.5, 41.0]} }
-,
-	{"type": "Feature", "tag": "srp", "geometry": { "type": "Point", "coordinates": [21.0, 44.0]} }
-,
-	{"type": "Feature", "tag": "afr", "geometry": { "type": "Point", "coordinates": [22.0, -32.0]} }
-,
-	{"type": "Feature", "tag": "mlt", "geometry": { "type": "Point", "coordinates": [14.4, 35.9]} }
-,
-	{"type": "Feature", "tag": "isl", "geometry": { "type": "Point", "coordinates": [-19.0, 64.0]} }
-,
-	{"type": "Feature", "tag": "hbs", "geometry": { "type": "Point", "coordinates": [19.0, 45.5]} }
-,
-	{ "type": "Feature", "name": "Bikol", "tag": "bik", "geometry": { "type": "Point", "coordinates": [ 121.262634, 16.566233 ] } }
-,
-	{ "type": "Feature", "name": "Chamorro", "tag": "cha", "geometry": { "type": "Point", "coordinates": [ 144.793732, 13.444304 ] } }
-,
-	{ "type": "Feature", "name": "Guarani", "tag": "gug", "geometry": { "type": "Point", "coordinates": [ -54.615440, -25.513475 ] } }
-,
-	{ "type": "Feature", "name": "Warlpiri", "tag": "wbp", "geometry": { "type": "Point", "coordinates": [ 132.550964, -19.491411 ] } }
-,
-	{ "type": "Feature", "name": "Jeju", "tag": "jje", "geometry": { "type": "Point", "coordinates": [ 126.4983, 33.4890 ] } }
-,
-	{ "type": "Feature", "name": "Ainu", "tag": "ain", "geometry": { "type": "Point", "coordinates": [ 142.8635, 43.2203 ] } }
-,
-	{ "type": "Feature", "name": "Kalmyk", "tag": "xal", "geometry": { "type": "Point", "coordinates": [ 44.2794, 46.3155 ] } }
-,
-	{ "type": "Feature", "name": "Judeo-Tat", "tag": "jdt", "geometry": { "type": "Point", "coordinates": [ 47.5769, 40.1431 ] } }
-,
-	{ "type": "Feature", "name": "Khasi", "tag": "kha", "geometry": { "type": "Point", "coordinates": [ 91.3662, 25.4670 ] } }
-,
-	{ "type": "Feature", "name": "Wôpanâak", "tag": "wam", "geometry": { "type": "Point", "coordinates": [ -71.3824, 42.4072 ] } }
-,
-	{ "type": "Feature", "name": "Lingala", "tag": "lin", "geometry": { "type": "Point", "coordinates": [ 21.7587, -4.0383 ] } }
-,
-	{ "type": "Feature", "name": "Kikuyu", "tag": "kik", "geometry": { "type": "Point", "coordinates": [ 36.8304, -1.1748 ] } }
-,
-	{ "type": "Feature", "name": "Okinawan", "tag": "ryu", "geometry": { "type": "Point", "coordinates": [ 127.6809, 26.2124 ] } }
-,
-	{ "type": "Feature", "name": "Miyako", "tag": "mvi", "geometry": { "type": "Point", "coordinates": [ 125.3247, 24.7674 ] } }
-,
-	{ "type": "Feature", "name": "Wamesa", "tag": "wad", "geometry": { "type": "Point", "coordinates": [ 132.5000, -1.5000 ] } }
-,
-	{ "type": "Feature", "name": "Tongan", "tag": "ton", "geometry": { "type": "Point", "coordinates": [ -175.1982, -21.1790 ] } }
-
+        {"lg2": "ton", "lg1": "wad", "direction": "?"}
 ]
 }

@@ -76,9 +76,10 @@ function resize() {
 queue()
     .defer(d3.json, "world-110m.json")
     .defer(d3.json, "apertiumPairs.json")
+    .defer(d3.json, "apertiumPoints.json")
     .await(ready);
 
-function ready(error, world, places) {
+function ready(error, world, places, points) {
   var land = topojson.object(world, world.objects.land),
       borders = topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; });
       // grid = graticule(); currently lat lon lines not used, can uncomment to use
@@ -138,7 +139,7 @@ function ready(error, world, places) {
 
 
   svg.append("g").attr("class","labels")
-        .selectAll("text").data(places.point_data)
+        .selectAll("text").data(points.point_data)
       .enter().append("text")
       .attr("class", "label")
       .text(function(d) { return d.tag })
@@ -158,7 +159,7 @@ function ready(error, world, places) {
         });
 
   svg.append("g").attr("class","points")
-      .selectAll("text").data(places.point_data)
+      .selectAll("text").data(points.point_data)
     .enter().append("path")
       .attr("class", "point")
       .attr("d", path)
@@ -187,9 +188,18 @@ function ready(error, world, places) {
 
 
   places.pairs.forEach(function(a) {
+    var s, t;
+    for(var pointInd = 0; pointInd < points.point_data.length; pointInd++) {
+      if(points.point_data[pointInd].tag === a.lg2) {
+        s = points.point_data[pointInd].geometry.coordinates;
+      }
+      if(points.point_data[pointInd].tag === a.lg1) {
+        t = points.point_data[pointInd].geometry.coordinates;
+      }
+    }
     links.push({
-      source: a.coordinates1,
-      target: a.coordinates2,
+      source: s,
+      target: t,
       stage: a.repo
     });
   });
