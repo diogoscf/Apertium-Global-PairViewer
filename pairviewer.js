@@ -104,28 +104,28 @@ function ready(error, world, places, points) {
         .attr("stop-opacity","0")
 
   var markerDef = svg.append("defs");
-    markerDef.append("marker")
-        .attr("id", "end")
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", "0")
-        .attr("refY", "0")
-        .attr("markerWidth", "5")
-        .attr("markerHeight", "5")
-        .attr("orient", "auto")
-        .style("fill", "#000000")
-      .append("path")
-        .attr("d", "M0,-5L10,0L0,5");
   markerDef.append("marker")
-        .attr("id", "start")
+        .attr("id", "oneway")
         .attr("viewBox", "0 -5 10 10")
-        .attr("refX", "3")
-        .attr("refY", "0")
-        .attr("markerWidth", "5")
-        .attr("markerHeight", "5")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "10")
+        .attr("markerHeight", "10")
         .attr("orient", "auto")
         .style("fill", "#000000")
       .append("path")
-        .attr("d", "M0,0L10,-5L10,5Z");
+        .attr("d", "M2 2 L0 0 L 6 2 L 0 4 z");
+  markerDef.append("marker")
+        .attr("id", "twoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "16")
+        .attr("markerHeight", "16")
+        .attr("orient", "auto")
+        .style("fill", "#000000")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
 
   svg.append("circle")
     .attr("cx", width / 2).attr("cy", height / 2)
@@ -352,30 +352,21 @@ function refresh() {
   position_labels();
   svg.selectAll(".flyer")
     .attr("d", function (d) { return swoosh(flying_arc(d)) })
-    .attr("marker-mid", function (d) {return addMarker(d,"end")})
-    //.attr("marker-end", function (d) {return addMarker(d,"end")})
-    //.attr("marker-start", function (d) {return addMarker(d,"start")})
+    .attr("marker-mid", function (d) {return addMarker(d)})
     .attr("opacity", function (d) {
       return fade_at_edge(d)
     });
 }
 
-function addMarker(d, pos) {
-  if(pos === "end") {
-    if(d.direction === "<>" || d.direction === ">") {
-      return "url(#end)";
-    }
-    else {
-      return "";
-    }
+function addMarker(d) {
+  if(d.direction === "<>") {
+    return "url(#twoway)";
+  }
+  else if (d.direction === ">") {
+    return "url(#oneway)";
   }
   else {
-    if(d.direction === "<>") {
-      return "url(#start)";
-    }
-    else {
-      return "";
-    }
+    return "";
   }
 }
 

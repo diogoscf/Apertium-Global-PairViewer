@@ -79,7 +79,7 @@
 ,
 	{"type": "Feature", "tag": "spa", "geometry": { "type": "Point", "coordinates": [-3.0, 41.0]} } 
 ,
-	{"type": "Feature", "tag": "kaa", "geometry": { "type": "Point", "coordinates": [49.0, 53.0]} } 
+	{"type": "Feature", "tag": "kaa", "geometry": { "type": "Point", "coordinates": [43.0, 59.0]} } 
 ,
 	{"type": "Feature", "tag": "bik", "geometry": { "type": "Point", "coordinates": [121.3, 16.6]} } 
 ,
