@@ -103,6 +103,29 @@ function ready(error, world, places, points) {
         .attr("offset","100%").attr("stop-color", "#000")
         .attr("stop-opacity","0")
 
+  var markerDef = svg.append("defs");
+    markerDef.append("marker")
+        .attr("id", "end")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "0")
+        .attr("refY", "0")
+        .attr("markerWidth", "5")
+        .attr("markerHeight", "5")
+        .attr("orient", "auto")
+        .style("fill", "#000000")
+      .append("path")
+        .attr("d", "M0,-5L10,0L0,5");
+  markerDef.append("marker")
+        .attr("id", "start")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "3")
+        .attr("refY", "0")
+        .attr("markerWidth", "5")
+        .attr("markerHeight", "5")
+        .attr("orient", "auto")
+        .style("fill", "#000000")
+      .append("path")
+        .attr("d", "M0,0L10,-5L10,5Z");
 
   svg.append("circle")
     .attr("cx", width / 2).attr("cy", height / 2)
@@ -200,7 +223,8 @@ function ready(error, world, places, points) {
     links.push({
       source: s,
       target: t,
-      stage: a.repo
+      stage: a.repo,
+      direction: a.direction
     });
   });
 
@@ -326,12 +350,33 @@ function refresh() {
   // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
 
   position_labels();
-
   svg.selectAll(".flyer")
     .attr("d", function (d) { return swoosh(flying_arc(d)) })
+    .attr("marker-mid", function (d) {return addMarker(d,"end")})
+    //.attr("marker-end", function (d) {return addMarker(d,"end")})
+    //.attr("marker-start", function (d) {return addMarker(d,"start")})
     .attr("opacity", function (d) {
       return fade_at_edge(d)
     });
+}
+
+function addMarker(d, pos) {
+  if(pos === "end") {
+    if(d.direction === "<>" || d.direction === ">") {
+      return "url(#end)";
+    }
+    else {
+      return "";
+    }
+  }
+  else {
+    if(d.direction === "<>") {
+      return "url(#start)";
+    }
+    else {
+      return "";
+    }
+  }
 }
 
 function fade_at_edge(d) {
