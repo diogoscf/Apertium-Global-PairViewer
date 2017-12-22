@@ -2,10 +2,8 @@
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
 
-
-
-var width = window.innerWidth, //These intial values are the only ones that work, not too sure why
-    height = window.innerHeight; // Something might be hardcoded somewhere else
+var width = window.innerWidth,
+    height = window.innerHeight;
 var viewScale = 1;
 
 
@@ -49,16 +47,14 @@ var codeToLangTable = {};
 var svg = d3.select("body").append("svg")
   .attr("width", width)
   .attr("height", height);
-//svg.on("mousewheel",mousewheel)
 svg.style("background", "#311B92");
+
 window.addEventListener("resize", resize);
 var zoomBehavior = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', function () {
-  //console.log("zoom", d3.event.scale);
- // alert("zoom");
   zoom(d3.event.scale/viewScale);
-
 });
 svg.call(zoomBehavior);
+
 function resize() {
   var off = proj([0, 0]);
   var off2 = sky([0, 0]);
@@ -138,21 +134,7 @@ function ready(error, world, places, points) {
     .datum(topojson.object(world, world.objects.land))
     .attr("class", "land")
     .attr("d", path).style("fill", "white");
-/*
-  svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
-    .attr("r", proj.scale())
-    .attr("class","noclicks")
-    .attr("id", "circle2")
-    .style("fill", "url(#globe_highlight)");
 
-  svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
-    .attr("r", proj.scale())
-    .attr("class","noclicks")
-    .attr("id", "circle3")
-    .style("fill", "url(#globe_shading)");
-*/
   svg.append("path")
     .datum(borders)
     .attr("class", "mesh")
@@ -418,10 +400,9 @@ svg.call(d3.behavior.drag()
 );
 
 
-
-  window.addEventListener('touchmove',
-    function (e) {
-  e.preventDefault();
-    }
-  , false);
+window.addEventListener('touchmove',
+  function (e) {
+    e.preventDefault();
+  }
+, false);
 zoom(1);
