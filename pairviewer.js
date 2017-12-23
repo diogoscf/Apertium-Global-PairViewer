@@ -101,25 +101,107 @@ function ready(error, world, places, points) {
 
   var markerDef = svg.append("defs");
   markerDef.append("marker")
-        .attr("id", "oneway")
+        .attr("id", "trunkoneway")
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
-        .attr("markerWidth", "10")
-        .attr("markerHeight", "10")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#000000")
+        .style("fill", "#CDDC39")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
       .append("path")
-        .attr("d", "M2 2 L0 0 L 6 2 L 0 4 z");
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
   markerDef.append("marker")
-        .attr("id", "twoway")
+        .attr("id", "trunktwoway")
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
-        .attr("markerWidth", "16")
-        .attr("markerHeight", "16")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#000000")
+        .style("fill", "#CDDC39")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+  markerDef.append("marker")
+        .attr("id", "stagingoneway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#4CAF50")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
+  markerDef.append("marker")
+        .attr("id", "stagingtwoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#4CAF50")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+  markerDef.append("marker")
+        .attr("id", "nurseryoneway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#FFEB3B")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
+  markerDef.append("marker")
+        .attr("id", "nurserytwoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#FFEB3B")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+  markerDef.append("marker")
+        .attr("id", "incubatoroneway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#E91E63")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
+  markerDef.append("marker")
+        .attr("id", "incubatortwoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#E91E63")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
       .append("path")
         .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
 
@@ -342,10 +424,10 @@ function refresh() {
 
 function addMarker(d) {
   if(d.direction === "<>") {
-    return "url(#twoway)";
+    return "url(#" + d.stage + "twoway)";
   }
   else if (d.direction === ">") {
-    return "url(#oneway)";
+    return "url(#" + d.stage + "oneway)";
   }
   else {
     return "";
