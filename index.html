@@ -88,7 +88,15 @@ div.tooltip {
   position: absolute;
 }
 
-#checkmark {
+#clearFilter {
+  background-color: #ffd1d1;
+}
+
+#clearFilter:hover, #clearFilter:focus {
+  background-color: #ffbcbc;
+}
+
+.checkmark {
   float: right;
 }
 
@@ -127,6 +135,7 @@ div.tooltip {
   font: 16px sans-serif;
   cursor: pointer;
   background-color: #f9f9f9;
+  -moz-user-select:none;
 }
 
 .dropdown-content a:hover, .dropdown-content a:focus {
@@ -137,6 +146,7 @@ div.tooltip {
   border-width: 1px 0px 0px 0px;
 }
 
+
 .show {
   display:block;
 }
@@ -146,49 +156,20 @@ div.tooltip {
   </body>
 
 <div id="filter">
-  <button id="filterButton" onclick="toggleShow()" class="dropbtn">Filter: None <i class="fa fa-caret-down"></i></button>
+  <button id="filterButton" onclick="(function(){$('#dropdown').toggle();})();" class="dropbtn">Filter <i class="fa fa-caret-down"></i></button>
   <div id="dropdown" class="dropdown-content">
-    <a id="filterNone" class="dropdown-select" onclick="selectFilter('None')">None <i id="checkmark" class="fa fa-check"></i></a>
     <a id="filterTrunk" class="dropdown-select" onclick="selectFilter('Trunk')">Trunk</a>
     <a id="filterStaging" class="dropdown-select" onclick="selectFilter('Staging')">Staging</a>
     <a id="filterNursery" class="dropdown-select" onclick="selectFilter('Nursery')">Nursery</a>
     <a id="filterIncubator" class="dropdown-select" onclick="selectFilter('Incubator')">Incubator</a>
+    <a id="clearFilter" class="dropdown-select clearFilter" onclick="selectFilter('clearFilter')">Clear Filter</a>
   </div>
 </div>
-
-<script>
-function toggleShow() {
-  document.getElementById("dropdown").classList.toggle("show");
-}
-
-function selectFilter(f) {
-  var filterStr = "Filter: "
-  document.getElementById("filterButton").innerHTML = filterStr + f + " " + '<i class="fa fa-caret-down"></i>';
-  var checkmark = document.getElementById("checkmark");
-  checkmark.parentNode.removeChild(checkmark);
-  document.getElementById("filter" + f).innerHTML = f + '<i id="checkmark" class="fa fa-check">';
-  toggleShow();
-  setFilter(f);
-  refresh();
-}
-
-window.onmousedown = function(event) {
-  if (!event.target.matches('.dropbtn') && !event.target.matches('.dropdown-content') && !event.target.matches('.dropdown-select')) {
-    var dropdowns = document.getElementsByClassName("dropdown-content");
-    for (var i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
-      }
-    }
-  }
-}
-</script>
 
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v0.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="pairviewer.js"></script>

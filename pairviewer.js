@@ -6,7 +6,7 @@ var width = window.innerWidth,
     height = window.innerHeight;
 var viewScale = 1;
 
-var currentFilter = "None";
+var currentFilter = [];
 
 var proj = d3.geo.orthographic()
     .translate([width / 2, height / 2])
@@ -418,10 +418,16 @@ function refresh() {
   for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
     svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
   }
-  if(currentFilter !== "None") {
+  if(currentFilter.length > 0) {
     for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-      if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentFilter.toLowerCase()) {
-        svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+      for(var j = 0; j < currentFilter.length; j++) {
+        if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentFilter[j].toLowerCase()) {
+          svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+        }
+        else {
+          svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+          break;
+        }
       }
     }
   }
@@ -448,13 +454,58 @@ function addMarker(d) {
 }
 
 function setFilter(f) {
-  currentFilter = f;
+  if(f === "reset") {
+    currentFilter = [];
+    return;
+  }
+  if($("#checkmark" + f).length === 0) {
+    $("#filter" + f).html(f + '<i id=checkmark' + f + ' class="fa fa-check checkmark"></i>');
+    currentFilter.push(f);
+  }
+  else {
+    $("#checkmark" + f).remove();
+    currentFilter.splice(currentFilter.indexOf(f),1);
+  }
+}
+
+function selectFilter(f) {
+  if(f === "clearFilter") {
+    $(".checkmark").remove();
+    setFilter("reset");
+  }
+  else {
+    setFilter(f);
+  }
+  refresh();
+}
+
+window.onmousedown = function(event) {
+  if (!event.target.matches('.dropbtn') && !event.target.matches('.dropdown-content')
+      && !event.target.matches('.dropdown-select') && !event.target.matches('.checkmark')) {
+    var dropdowns = $(".dropdown-content");
+    for (var i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (!$(openDropdown).is(":hidden")) {
+        $(openDropdown).toggle();
+      }
+    }
+  }
 }
 
 function fade_at_edge(d) {
-  if(currentFilter !== "None" && d.stage !== currentFilter.toLowerCase()) {
-    return 0;
+  if(currentFilter.length > 0) {
+    var filterReturn = 0;
+    for(var i = 0; i < currentFilter.length; i++) {
+      if(d.stage === currentFilter[i].toLowerCase()) {
+        filterReturn = 1;
+        break;
+      }
+    }
+    if(filterReturn === 0) {
+      return 0;
+    }
   }
+
   var centerPos = proj.invert([width / 2, height / 2]),
 
       arc = d3.geo.greatArc(),
