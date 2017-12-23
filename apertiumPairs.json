@@ -69,8 +69,6 @@
 ,
 	{"stems": 52, "repo": "incubator", "created": "2014-02-09", "last_updated": "2014-06-09", "lg2": "rus", "lg1": "isl", "direction": "<>"}
 ,
-	{"stems": 1, "repo": "incubator", "created": "?", "last_updated": "2014-01-07", "lg2": "ita", "lg1": "ita", "direction": "?"}
-,
 	{"stems": 5408, "repo": "incubator", "created": "2013-10-17", "last_updated": "2014-08-29", "lg2": "kaa", "lg1": "kaz", "direction": "<>"}
 ,
 	{"stems": 145, "repo": "incubator", "created": "2013-05-10", "last_updated": "2014-06-09", "lg2": "uzb", "lg1": "kir", "direction": "<>"}

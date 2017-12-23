@@ -2,10 +2,8 @@
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
 
-
-
-var width = window.innerWidth, //These intial values are the only ones that work, not too sure why
-    height = window.innerHeight; // Something might be hardcoded somewhere else
+var width = window.innerWidth,
+    height = window.innerHeight;
 var viewScale = 1;
 
 
@@ -49,16 +47,14 @@ var codeToLangTable = {};
 var svg = d3.select("body").append("svg")
   .attr("width", width)
   .attr("height", height);
-//svg.on("mousewheel",mousewheel)
 svg.style("background", "#311B92");
+
 window.addEventListener("resize", resize);
 var zoomBehavior = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', function () {
-  //console.log("zoom", d3.event.scale);
- // alert("zoom");
   zoom(d3.event.scale/viewScale);
-
 });
 svg.call(zoomBehavior);
+
 function resize() {
   var off = proj([0, 0]);
   var off2 = sky([0, 0]);
@@ -103,6 +99,111 @@ function ready(error, world, places, points) {
         .attr("offset","100%").attr("stop-color", "#000")
         .attr("stop-opacity","0")
 
+  var markerDef = svg.append("defs");
+  markerDef.append("marker")
+        .attr("id", "trunkoneway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#CDDC39")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
+  markerDef.append("marker")
+        .attr("id", "trunktwoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#CDDC39")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+  markerDef.append("marker")
+        .attr("id", "stagingoneway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#4CAF50")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
+  markerDef.append("marker")
+        .attr("id", "stagingtwoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#4CAF50")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+  markerDef.append("marker")
+        .attr("id", "nurseryoneway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#FFEB3B")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
+  markerDef.append("marker")
+        .attr("id", "nurserytwoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#FFEB3B")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+  markerDef.append("marker")
+        .attr("id", "incubatoroneway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#E91E63")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M 1 1 L 3 2 L 1 3 Z");
+  markerDef.append("marker")
+        .attr("id", "incubatortwoway")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", "2.5")
+        .attr("refY", "2")
+        .attr("markerWidth", "20")
+        .attr("markerHeight", "20")
+        .attr("orient", "auto")
+        .style("fill", "#E91E63")
+        .style("stroke", "black")
+        .style("stroke-width", "0.3px")
+      .append("path")
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
 
   svg.append("circle")
     .attr("cx", width / 2).attr("cy", height / 2)
@@ -115,21 +216,7 @@ function ready(error, world, places, points) {
     .datum(topojson.object(world, world.objects.land))
     .attr("class", "land")
     .attr("d", path).style("fill", "white");
-/*
-  svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
-    .attr("r", proj.scale())
-    .attr("class","noclicks")
-    .attr("id", "circle2")
-    .style("fill", "url(#globe_highlight)");
 
-  svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
-    .attr("r", proj.scale())
-    .attr("class","noclicks")
-    .attr("id", "circle3")
-    .style("fill", "url(#globe_shading)");
-*/
   svg.append("path")
     .datum(borders)
     .attr("class", "mesh")
@@ -200,7 +287,8 @@ function ready(error, world, places, points) {
     links.push({
       source: s,
       target: t,
-      stage: a.repo
+      stage: a.repo,
+      direction: a.direction
     });
   });
 
@@ -326,12 +414,24 @@ function refresh() {
   // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
 
   position_labels();
-
   svg.selectAll(".flyer")
     .attr("d", function (d) { return swoosh(flying_arc(d)) })
+    .attr("marker-mid", function (d) {return addMarker(d)})
     .attr("opacity", function (d) {
       return fade_at_edge(d)
     });
+}
+
+function addMarker(d) {
+  if(d.direction === "<>") {
+    return "url(#" + d.stage + "twoway)";
+  }
+  else if (d.direction === ">") {
+    return "url(#" + d.stage + "oneway)";
+  }
+  else {
+    return "";
+  }
 }
 
 function fade_at_edge(d) {
@@ -382,10 +482,9 @@ svg.call(d3.behavior.drag()
 );
 
 
-
-  window.addEventListener('touchmove',
-    function (e) {
-  e.preventDefault();
-    }
-  , false);
+window.addEventListener('touchmove',
+  function (e) {
+    e.preventDefault();
+  }
+, false);
 zoom(1);
