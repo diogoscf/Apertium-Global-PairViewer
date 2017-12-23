@@ -6,6 +6,7 @@ var width = window.innerWidth,
     height = window.innerHeight;
 var viewScale = 1;
 
+var currentFilter = "None";
 
 var proj = d3.geo.orthographic()
     .translate([width / 2, height / 2])
@@ -295,7 +296,7 @@ function ready(error, world, places, points) {
 
   // build geoJSON features from links array
   links.forEach(function(e,i,a) {
-    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }}
+    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage}
     arcLines.push(feature)
   })
 
@@ -304,6 +305,7 @@ function ready(error, world, places, points) {
     .enter().append("path")
       .attr("class","arc")
       .attr("d",path)
+      .attr("stage", function(d) {return d.stage})
 
   svg.append("g").attr("class","flyers")
     .selectAll("path").data(links)
@@ -413,6 +415,17 @@ function refresh() {
   svg.selectAll(".arc").attr("d", path);
   // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
 
+  for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+    svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+  }
+  if(currentFilter !== "None") {
+    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+      if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentFilter.toLowerCase()) {
+        svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+      }
+    }
+  }
+
   position_labels();
   svg.selectAll(".flyer")
     .attr("d", function (d) { return swoosh(flying_arc(d)) })
@@ -434,7 +447,14 @@ function addMarker(d) {
   }
 }
 
+function setFilter(f) {
+  currentFilter = f;
+}
+
 function fade_at_edge(d) {
+  if(currentFilter !== "None" && d.stage !== currentFilter.toLowerCase()) {
+    return 0;
+  }
   var centerPos = proj.invert([width / 2, height / 2]),
 
       arc = d3.geo.greatArc(),
