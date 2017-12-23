@@ -125,7 +125,7 @@ function ready(error, world, places, points) {
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
-        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 2.5 1 L 4.5 2 L 2.5 3 L 2.5 1");
   markerDef.append("marker")
         .attr("id", "stagingoneway")
         .attr("viewBox", "0 -5 10 10")
@@ -151,7 +151,7 @@ function ready(error, world, places, points) {
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
-        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 2.5 1 L 4.5 2 L 2.5 3 L 2.5 1");
   markerDef.append("marker")
         .attr("id", "nurseryoneway")
         .attr("viewBox", "0 -5 10 10")
@@ -177,7 +177,7 @@ function ready(error, world, places, points) {
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
-        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 2.5 1 L 4.5 2 L 2.5 3 L 2.5 1");
   markerDef.append("marker")
         .attr("id", "incubatoroneway")
         .attr("viewBox", "0 -5 10 10")
@@ -203,7 +203,7 @@ function ready(error, world, places, points) {
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
-        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 3 1 L 5 2 L 3 3 L 3 1");
+        .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 2.5 1 L 4.5 2 L 2.5 3 L 2.5 1");
 
   svg.append("circle")
     .attr("cx", width / 2).attr("cy", height / 2)
