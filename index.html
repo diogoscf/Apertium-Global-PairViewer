@@ -33,12 +33,6 @@ body {
   opacity:.2;
 }
 
-.labels {
-    font: 8px sans-serif;
-    fill: black;
-    opacity: .5;
-}
-
 .noclicks { pointer-events:none; }
 
 .point {  opacity:.6; }
@@ -96,14 +90,11 @@ div.tooltip {
   background-color: #ffbcbc;
 }
 
-.checkmark {
-  float: right;
-}
-
-.dropbtn {
+#settings {
+  position: absolute;
   background-color: #4CAF50;
   color: white;
-  width: 160px;
+  width: 144px;
   padding-top: 12px;
   padding-bottom: 12px;
   font-size: 16px;
@@ -111,6 +102,46 @@ div.tooltip {
   cursor: pointer;
   text-align: left;
   padding-left: 16px;
+  font: 16px sans-serif;
+}
+
+#pointCheckbox {
+  margin: 0px;
+  cursor: pointer;
+}
+
+.checkmark {
+  float: right;
+}
+
+#disablePoints {
+  background-color: #4CAF50;
+  color: white;
+  width: 144px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding-left: 16px;
+  font: 16px sans-serif;
+  margin-top: 45px;
+  -moz-user-select:none;
+}
+
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  width: 144px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding-left: 16px;
+  font: 16px sans-serif;
 }
 
 .dropbtn:hover, .dropbtn:focus {
@@ -123,7 +154,9 @@ div.tooltip {
   min-width: 160px;
   overflow: auto;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+  z-index: 2;
+  left: 160px;
+  top: 0px;
 }
 
 .dropdown-content a {
@@ -146,25 +179,73 @@ div.tooltip {
   border-width: 1px 0px 0px 0px;
 }
 
-
 .show {
   display:block;
+}
+
+.sidenav {
+  height: 100%;
+  width: 160px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: -160px;
+  background-color: #dddddd;
+  padding-top: 40px;
+  transition: 0.5s;
+}
+
+.closebtn {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  font-size: 36px;
+  margin-left: 50px;
+  text-decoration: none;
+  color: #ff5151;
+  display: block;
+  cursor: pointer;
+}
+
+.closebtn:hover, .closebtn:focus {
+  color: #f21a1a;
 }
 </style>
 </head>
 <body>
   </body>
 
-<div id="filter">
-  <button id="filterButton" onclick="(function(){$('#dropdown').toggle();})();" class="dropbtn">Filter <i class="fa fa-caret-down"></i></button>
-  <div id="dropdown" class="dropdown-content">
-    <a id="filterTrunk" class="dropdown-select" onclick="selectFilter('Trunk')">Trunk</a>
-    <a id="filterStaging" class="dropdown-select" onclick="selectFilter('Staging')">Staging</a>
-    <a id="filterNursery" class="dropdown-select" onclick="selectFilter('Nursery')">Nursery</a>
-    <a id="filterIncubator" class="dropdown-select" onclick="selectFilter('Incubator')">Incubator</a>
-    <a id="clearFilter" class="dropdown-select clearFilter" onclick="selectFilter('clearFilter')">Clear Filter</a>
+<div onclick="openNav()" id="settings"><i class="fa fa-cog" aria-hidden="true"></i> Settings </div>
+
+<div id="sidenav" class="sidenav">
+  <a class="closebtn" onclick="closeNav()">&times;</a>
+  <div id="filter">
+    <div id="filterButton" onclick="(function(){$('#dropdown').toggle();})();" class="dropbtn">Filter By Repo <i class="fa fa-caret-right"></i></div>
+    <div id="dropdown" class="dropdown-content">
+      <a id="filterTrunk" class="dropdown-select" onclick="selectFilter('Trunk')">Trunk</a>
+      <a id="filterStaging" class="dropdown-select" onclick="selectFilter('Staging')">Staging</a>
+      <a id="filterNursery" class="dropdown-select" onclick="selectFilter('Nursery')">Nursery</a>
+      <a id="filterIncubator" class="dropdown-select" onclick="selectFilter('Incubator')">Incubator</a>
+      <a id="clearFilter" class="dropdown-select clearFilter" onclick="selectFilter('clearFilter')">Clear Filter</a>
+    </div>
   </div>
+  <div onclick="checkPoints()" id="disablePoints"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()" checked></input> Unused Points</div>
 </div>
+
+<script>
+function openNav() {
+  $("#sidenav").css("left", "0px");
+}
+
+function closeNav() {
+  $("#sidenav").css("left", "-160px");
+}
+
+function checkPoints() {
+  $("#pointCheckbox").prop("checked", !$("#pointCheckbox").prop("checked"));
+  handleUnusedPoints();
+}
+</script>
 
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>

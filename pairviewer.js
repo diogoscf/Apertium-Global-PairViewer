@@ -230,6 +230,7 @@ function ready(error, world, places, points) {
         .selectAll("text").data(points.point_data)
       .enter().append("text")
       .attr("class", "label")
+      .attr("coordinate", function(d) {return d.geometry.coordinates})
       .text(function(d) { return d.tag })
       .on("mouseover", function(d) { //Hovering over labels for tooltip
             div.transition()
@@ -251,6 +252,7 @@ function ready(error, world, places, points) {
     .enter().append("path")
       .attr("class", "point")
       .attr("d", path)
+      .attr("coordinate", function(d) {return d.geometry.coordinates;})
       .on("mouseover", function(d) { //Also added hovering over points for tooltip
             div.transition()
                 .duration(200)
@@ -414,25 +416,9 @@ function refresh() {
   svg.selectAll(".mesh").attr("d", path);
   svg.selectAll(".arc").attr("d", path);
   // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
-
-  for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-    svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
-  }
-  if(currentFilter.length > 0) {
-    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-      for(var j = 0; j < currentFilter.length; j++) {
-        if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentFilter[j].toLowerCase()) {
-          svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
-        }
-        else {
-          svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
-          break;
-        }
-      }
-    }
-  }
-
+  
   position_labels();
+
   svg.selectAll(".flyer")
     .attr("d", function (d) { return swoosh(flying_arc(d)) })
     .attr("marker-mid", function (d) {return addMarker(d)})
@@ -453,32 +439,48 @@ function addMarker(d) {
   }
 }
 
-function setFilter(f) {
-  if(f === "reset") {
-    currentFilter = [];
-    return;
-  }
-  if($("#checkmark" + f).length === 0) {
-    $("#filter" + f).html(f + '<i id=checkmark' + f + ' class="fa fa-check checkmark"></i>');
-    currentFilter.push(f);
-  }
-  else {
-    $("#checkmark" + f).remove();
-    currentFilter.splice(currentFilter.indexOf(f),1);
-  }
+function setPoints(o1,o2) {
+  svg.selectAll(".point").style("opacity", o1);
+  svg.selectAll(".label").style("opacity", o2);
 }
 
+// Update globe and filter array
 function selectFilter(f) {
   if(f === "clearFilter") {
     $(".checkmark").remove();
-    setFilter("reset");
+    currentFilter = [];
   }
   else {
-    setFilter(f);
+    if($("#checkmark" + f).length === 0) {
+      $("#filter" + f).html(f + '<i id=checkmark' + f + ' class="fa fa-check checkmark"></i>');
+      currentFilter.push(f);
+    }
+    else {
+      $("#checkmark" + f).remove();
+      currentFilter.splice(currentFilter.indexOf(f),1);
+    } 
   }
+  for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+    svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+  }
+  if(currentFilter.length > 0) {
+    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+      for(var j = 0; j < currentFilter.length; j++) {
+        if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentFilter[j].toLowerCase()) {
+          svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+        }
+        else {
+          svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+          break;
+        }
+      }
+    }
+  }
+  handleUnusedPoints();
   refresh();
 }
 
+// Click anywhere besides dropdown causes it to disappear
 window.onmousedown = function(event) {
   if (!event.target.matches('.dropbtn') && !event.target.matches('.dropdown-content')
       && !event.target.matches('.dropdown-select') && !event.target.matches('.checkmark')) {
@@ -490,6 +492,71 @@ window.onmousedown = function(event) {
       }
     }
   }
+}
+
+function handleUnusedPoints() {
+  if($("#pointCheckbox").prop("checked") === false) {
+    setPoints(0,0);
+  }
+  else {
+    setPoints(0.6,0.9);
+  }
+
+  svg.selectAll(".flyer")
+  .attr("opacity", function (d) {
+    if(currentFilter.length > 0) {
+      var filterReturn = 0;
+      for(var i = 0; i < currentFilter.length; i++) {
+        if(d.stage === currentFilter[i].toLowerCase()) {
+          filterReturn = 1;
+          var dsource = String(d.source[0])+","+String(d.source[1]);
+          var dtarget = String(d.target[0])+","+String(d.target[1]);
+          for(var j = 0; j < svg.selectAll(".point")[0].length; j++) {
+            if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dsource) {
+              svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+            }
+            if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dtarget) {
+              svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+            }
+          }
+          for(var k = 0; k < svg.selectAll(".label")[0].length; k++) {
+            if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dsource) {
+              svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+            }
+            if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dtarget) {
+              svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+            }
+          }
+          break;
+        }
+      }
+      if(filterReturn === 0) {
+        return 0;
+      }
+    }
+    else {
+      var dsource = String(d.source[0])+","+String(d.source[1]);
+      var dtarget = String(d.target[0])+","+String(d.target[1]);
+      for(var j = 0; j < svg.selectAll(".point")[0].length; j++) {
+        if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dsource) {
+          svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+        }
+        if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dtarget) {
+          svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+        }
+      }
+      for(var k = 0; k < svg.selectAll(".label")[0].length; k++) {
+        if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dsource) {
+          svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+        }
+        if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dtarget) {
+          svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+        }
+      }
+    }
+    return fade_at_edge(d);
+  });
+  refresh();
 }
 
 function fade_at_edge(d) {
