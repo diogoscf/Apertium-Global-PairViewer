@@ -33,12 +33,6 @@ body {
   opacity:.2;
 }
 
-.labels {
-    font: 8px sans-serif;
-    fill: black;
-    opacity: .5;
-}
-
 .noclicks { pointer-events:none; }
 
 .point {  opacity:.6; }
@@ -83,14 +77,145 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
 }
+
+#filter {
+  position: relative;
+}
+
+#resetFilter {
+  background-color: #ffd1d1;
+}
+
+#resetFilter:hover, #clearFilter:focus {
+  background-color: #ffbcbc;
+}
+
+.greenButton {
+  position: relative;
+  background-color: #4CAF50;
+  color: white;
+  width: 144px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding-left: 16px;
+  font: 16px sans-serif;
+  -moz-user-select:none;
+  opacity: 0.95;
+}
+
+#settings {
+  position: absolute;
+}
+
+#pointCheckbox {
+  margin: 0px;
+  cursor: pointer;
+  vertical-align: 2px;
+}
+
+.checkmark {
+  float: right;
+}
+
+#disablePoints {
+  margin-top: 3px;
+}
+
+.greenButton:hover, .greenButton:focus {
+  background-color: #3e8e41;
+}
+
+.dropdown-content {
+  display: none;
+  position: relative;
+  min-width: 160px;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-style: solid;
+  font: 16px sans-serif;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  -moz-user-select:none;
+}
+
+.dropdown-content a:hover, .dropdown-content a:focus {
+  background-color: #eaeaea;
+}
+
+.dropdown-select {
+  border-width: 1px 0px 0px 0px;
+}
+
+.show {
+  display:block;
+}
+
+.sidenav {
+  height: 100%;
+  width: 160px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: -160px;
+  background-color: #dddddd;
+  padding-top: 40px;
+  transition: 0.5s;
+}
+
+.closebtn {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  font-size: 36px;
+  margin-left: 50px;
+  text-decoration: none;
+  color: #ff5151;
+  display: block;
+  cursor: pointer;
+}
+
+.closebtn:hover, .closebtn:focus {
+  color: #f21a1a;
+}
 </style>
 </head>
 <body>
   </body>
+
+<div onclick="openNav()" id="settings" class="greenButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings </div>
+
+<div id="sidenav" class="sidenav eP">
+  <a class="closebtn" onclick="closeNav()">&times;</a>
+  <div id="filter">
+    <div id="filterButton" onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
+    <div id="dropdown" class="dropdown-content">
+      <a id="filterTrunk" class="dropdown-select" onclick="selectFilter('Trunk')">Trunk</a>
+      <a id="filterStaging" class="dropdown-select" onclick="selectFilter('Staging')">Staging</a>
+      <a id="filterNursery" class="dropdown-select" onclick="selectFilter('Nursery')">Nursery</a>
+      <a id="filterIncubator" class="dropdown-select" onclick="selectFilter('Incubator')">Incubator</a>
+      <a id="resetFilter" class="dropdown-select resetFilter" onclick="selectFilter('resetFilter')">Reset Filter</a>
+    </div>
+  </div>
+  <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()" checked></input> Unused Points</div>
+</div>
+
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v0.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
-<script src="pairviewer.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="pairviewer.js"></script>
 </html>

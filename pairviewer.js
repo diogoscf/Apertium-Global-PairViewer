@@ -6,6 +6,7 @@ var width = window.innerWidth,
     height = window.innerHeight;
 var viewScale = 1;
 
+var currentFilter = [];
 
 var proj = d3.geo.orthographic()
     .translate([width / 2, height / 2])
@@ -54,6 +55,7 @@ var zoomBehavior = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', functio
   zoom(d3.event.scale/viewScale);
 });
 svg.call(zoomBehavior);
+d3.select("svg").on("dblclick.zoom", null);
 
 function resize() {
   var off = proj([0, 0]);
@@ -229,6 +231,7 @@ function ready(error, world, places, points) {
         .selectAll("text").data(points.point_data)
       .enter().append("text")
       .attr("class", "label")
+      .attr("coordinate", function(d) {return d.geometry.coordinates})
       .text(function(d) { return d.tag })
       .on("mouseover", function(d) { //Hovering over labels for tooltip
             div.transition()
@@ -250,6 +253,7 @@ function ready(error, world, places, points) {
     .enter().append("path")
       .attr("class", "point")
       .attr("d", path)
+      .attr("coordinate", function(d) {return d.geometry.coordinates;})
       .on("mouseover", function(d) { //Also added hovering over points for tooltip
             div.transition()
                 .duration(200)
@@ -295,7 +299,7 @@ function ready(error, world, places, points) {
 
   // build geoJSON features from links array
   links.forEach(function(e,i,a) {
-    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }}
+    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage}
     arcLines.push(feature)
   })
 
@@ -304,6 +308,7 @@ function ready(error, world, places, points) {
     .enter().append("path")
       .attr("class","arc")
       .attr("d",path)
+      .attr("stage", function(d) {return d.stage})
 
   svg.append("g").attr("class","flyers")
     .selectAll("path").data(links)
@@ -412,8 +417,9 @@ function refresh() {
   svg.selectAll(".mesh").attr("d", path);
   svg.selectAll(".arc").attr("d", path);
   // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
-
+  
   position_labels();
+
   svg.selectAll(".flyer")
     .attr("d", function (d) { return swoosh(flying_arc(d)) })
     .attr("marker-mid", function (d) {return addMarker(d)})
@@ -434,7 +440,160 @@ function addMarker(d) {
   }
 }
 
+function setPoints(o1,o2) {
+  svg.selectAll(".point").style("opacity", o1);
+  svg.selectAll(".label").style("opacity", o2);
+}
+
+// Update globe and filter array
+function selectFilter(f) {
+  if(f === "resetFilter") {
+    $(".checkmark").remove();
+    currentFilter = [];
+  }
+  else {
+    if($("#checkmark" + f).length === 0) {
+      $("#filter" + f).html(f + '<i id=checkmark' + f + ' class="fa fa-check checkmark"></i>');
+      currentFilter.push(f);
+    }
+    else {
+      $("#checkmark" + f).remove();
+      currentFilter.splice(currentFilter.indexOf(f),1);
+    } 
+  }
+  for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+    svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+  }
+  if(currentFilter.length > 0) {
+    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+      for(var j = 0; j < currentFilter.length; j++) {
+        if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentFilter[j].toLowerCase()) {
+          svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+        }
+        else {
+          svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+          break;
+        }
+      }
+    }
+  }
+  handleUnusedPoints();
+  refresh();
+}
+
+$(".eP").click(function(e) {
+    e.stopPropagation();
+});
+
+$("body,html").click(function(e){
+  if ($("#sidenav").css("left") === "0px"){
+    closeNav();
+  }
+});
+
+function openNav() {
+  $("#sidenav").css("left", "0px");
+}
+
+function closeNav() {
+  $("#sidenav").css("left", "-160px");
+}
+
+function toggleDropdown(t, id) {
+  $(id).toggle();
+  if($(id).css("display") === "none") {
+    t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-right"></i>';
+  }
+  else {
+    t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-down"></i>';
+  }
+}
+
+function checkPoints() {
+  $("#pointCheckbox").prop("checked", !$("#pointCheckbox").prop("checked"));
+  handleUnusedPoints();
+}
+
+
+function handleUnusedPoints() {
+  if($("#pointCheckbox").prop("checked") === false) {
+    setPoints(0,0);
+  }
+  else {
+    setPoints(0.6,0.9);
+  }
+
+  svg.selectAll(".flyer")
+  .attr("opacity", function (d) {
+    if(currentFilter.length > 0) {
+      var filterReturn = 0;
+      for(var i = 0; i < currentFilter.length; i++) {
+        if(d.stage === currentFilter[i].toLowerCase()) {
+          filterReturn = 1;
+          var dsource = String(d.source[0])+","+String(d.source[1]);
+          var dtarget = String(d.target[0])+","+String(d.target[1]);
+          for(var j = 0; j < svg.selectAll(".point")[0].length; j++) {
+            if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dsource) {
+              svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+            }
+            if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dtarget) {
+              svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+            }
+          }
+          for(var k = 0; k < svg.selectAll(".label")[0].length; k++) {
+            if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dsource) {
+              svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+            }
+            if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dtarget) {
+              svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+            }
+          }
+          break;
+        }
+      }
+      if(filterReturn === 0) {
+        return 0;
+      }
+    }
+    else {
+      var dsource = String(d.source[0])+","+String(d.source[1]);
+      var dtarget = String(d.target[0])+","+String(d.target[1]);
+      for(var j = 0; j < svg.selectAll(".point")[0].length; j++) {
+        if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dsource) {
+          svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+        }
+        if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dtarget) {
+          svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+        }
+      }
+      for(var k = 0; k < svg.selectAll(".label")[0].length; k++) {
+        if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dsource) {
+          svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+        }
+        if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dtarget) {
+          svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+        }
+      }
+    }
+    return fade_at_edge(d);
+  });
+  refresh();
+}
+
 function fade_at_edge(d) {
+  if(currentFilter.length > 0) {
+    var filterReturn = 0;
+    for(var i = 0; i < currentFilter.length; i++) {
+      if(d.stage === currentFilter[i].toLowerCase()) {
+        filterReturn = 1;
+        break;
+      }
+    }
+    if(filterReturn === 0) {
+      return 0;
+    }
+  }
+
   var centerPos = proj.invert([width / 2, height / 2]),
 
       arc = d3.geo.greatArc(),
