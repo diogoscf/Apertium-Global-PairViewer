@@ -79,19 +79,19 @@ div.tooltip {
 }
 
 #filter {
-  position: absolute;
+  position: relative;
 }
 
-#clearFilter {
+#resetFilter {
   background-color: #ffd1d1;
 }
 
-#clearFilter:hover, #clearFilter:focus {
+#resetFilter:hover, #clearFilter:focus {
   background-color: #ffbcbc;
 }
 
-#settings {
-  position: absolute;
+.greenButton {
+  position: relative;
   background-color: #4CAF50;
   color: white;
   width: 144px;
@@ -103,11 +103,18 @@ div.tooltip {
   text-align: left;
   padding-left: 16px;
   font: 16px sans-serif;
+  -moz-user-select:none;
+  opacity: 0.95;
+}
+
+#settings {
+  position: absolute;
 }
 
 #pointCheckbox {
   margin: 0px;
   cursor: pointer;
+  vertical-align: 2px;
 }
 
 .checkmark {
@@ -115,48 +122,20 @@ div.tooltip {
 }
 
 #disablePoints {
-  background-color: #4CAF50;
-  color: white;
-  width: 144px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  padding-left: 16px;
-  font: 16px sans-serif;
-  margin-top: 45px;
-  -moz-user-select:none;
+  margin-top: 3px;
 }
 
-.dropbtn {
-  background-color: #4CAF50;
-  color: white;
-  width: 144px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  padding-left: 16px;
-  font: 16px sans-serif;
-}
-
-.dropbtn:hover, .dropbtn:focus {
+.greenButton:hover, .greenButton:focus {
   background-color: #3e8e41;
 }
 
 .dropdown-content {
   display: none;
-  position: absolute;
+  position: relative;
   min-width: 160px;
   overflow: auto;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 2;
-  left: 160px;
-  top: 0px;
 }
 
 .dropdown-content a {
@@ -215,37 +194,22 @@ div.tooltip {
 <body>
   </body>
 
-<div onclick="openNav()" id="settings"><i class="fa fa-cog" aria-hidden="true"></i> Settings </div>
+<div onclick="openNav()" id="settings" class="greenButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings </div>
 
-<div id="sidenav" class="sidenav">
+<div id="sidenav" class="sidenav eP">
   <a class="closebtn" onclick="closeNav()">&times;</a>
   <div id="filter">
-    <div id="filterButton" onclick="(function(){$('#dropdown').toggle();})();" class="dropbtn">Filter By Repo <i class="fa fa-caret-right"></i></div>
+    <div id="filterButton" onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
     <div id="dropdown" class="dropdown-content">
       <a id="filterTrunk" class="dropdown-select" onclick="selectFilter('Trunk')">Trunk</a>
       <a id="filterStaging" class="dropdown-select" onclick="selectFilter('Staging')">Staging</a>
       <a id="filterNursery" class="dropdown-select" onclick="selectFilter('Nursery')">Nursery</a>
       <a id="filterIncubator" class="dropdown-select" onclick="selectFilter('Incubator')">Incubator</a>
-      <a id="clearFilter" class="dropdown-select clearFilter" onclick="selectFilter('clearFilter')">Clear Filter</a>
+      <a id="resetFilter" class="dropdown-select resetFilter" onclick="selectFilter('resetFilter')">Reset Filter</a>
     </div>
   </div>
-  <div onclick="checkPoints()" id="disablePoints"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()" checked></input> Unused Points</div>
+  <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()" checked></input> Unused Points</div>
 </div>
-
-<script>
-function openNav() {
-  $("#sidenav").css("left", "0px");
-}
-
-function closeNav() {
-  $("#sidenav").css("left", "-160px");
-}
-
-function checkPoints() {
-  $("#pointCheckbox").prop("checked", !$("#pointCheckbox").prop("checked"));
-  handleUnusedPoints();
-}
-</script>
 
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>

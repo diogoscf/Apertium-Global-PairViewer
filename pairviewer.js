@@ -55,6 +55,7 @@ var zoomBehavior = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', functio
   zoom(d3.event.scale/viewScale);
 });
 svg.call(zoomBehavior);
+d3.select("svg").on("dblclick.zoom", null);
 
 function resize() {
   var off = proj([0, 0]);
@@ -446,7 +447,7 @@ function setPoints(o1,o2) {
 
 // Update globe and filter array
 function selectFilter(f) {
-  if(f === "clearFilter") {
+  if(f === "resetFilter") {
     $(".checkmark").remove();
     currentFilter = [];
   }
@@ -480,19 +481,39 @@ function selectFilter(f) {
   refresh();
 }
 
-// Click anywhere besides dropdown causes it to disappear
-window.onmousedown = function(event) {
-  if (!event.target.matches('.dropbtn') && !event.target.matches('.dropdown-content')
-      && !event.target.matches('.dropdown-select') && !event.target.matches('.checkmark')) {
-    var dropdowns = $(".dropdown-content");
-    for (var i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (!$(openDropdown).is(":hidden")) {
-        $(openDropdown).toggle();
-      }
-    }
+$(".eP").click(function(e) {
+    e.stopPropagation();
+});
+
+$("body,html").click(function(e){
+  if ($("#sidenav").css("left") === "0px"){
+    closeNav();
+  }
+});
+
+function openNav() {
+  $("#sidenav").css("left", "0px");
+}
+
+function closeNav() {
+  $("#sidenav").css("left", "-160px");
+}
+
+function toggleDropdown(t, id) {
+  $(id).toggle();
+  if($(id).css("display") === "none") {
+    t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-right"></i>';
+  }
+  else {
+    t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-down"></i>';
   }
 }
+
+function checkPoints() {
+  $("#pointCheckbox").prop("checked", !$("#pointCheckbox").prop("checked"));
+  handleUnusedPoints();
+}
+
 
 function handleUnusedPoints() {
   if($("#pointCheckbox").prop("checked") === false) {
