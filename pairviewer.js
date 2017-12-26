@@ -462,20 +462,14 @@ function setPoints(o1,o2) {
 
 // Update globe and repo filter array
 function selectRepoFilter(f) {
-  if(f === "resetFilter") {
-    $(".checkmark").remove();
-    currentRepoFilter = [];
+  if($("#checkmark" + f).length === 0) {
+    $("#filter" + f).html(f + '<i id=checkmark' + f + ' class="fa fa-check checkmark"></i>');
+    currentRepoFilter.push(f);
   }
   else {
-    if($("#checkmark" + f).length === 0) {
-      $("#filter" + f).html(f + '<i id=checkmark' + f + ' class="fa fa-check checkmark"></i>');
-      currentRepoFilter.push(f);
-    }
-    else {
-      $("#checkmark" + f).remove();
-      currentRepoFilter.splice(currentRepoFilter.indexOf(f),1);
-    } 
-  }
+    $("#checkmark" + f).remove();
+    currentRepoFilter.splice(currentRepoFilter.indexOf(f),1);
+  } 
   filterArcs();
   refresh();
   handleUnusedPoints();
@@ -483,22 +477,30 @@ function selectRepoFilter(f) {
 
 // Update point filter and globe
 function filterPoint(p) {
-  if(p === "resetFilter") {
-    $(".checkmarkPoint").remove();
-    $("#pointSearch")[0].value = "";
-    filterSearchPoints();
-    currentPointFilter = [];
+  if($("#checkmarkPoint" + p).length === 0) {
+    $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmarkPoint"></i>');
+    currentPointFilter.push(p);
   }
   else {
-    if($("#checkmarkPoint" + p).length === 0) {
-      $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmarkPoint"></i>');
-      currentPointFilter.push(p);
-    }
-    else {
-      $("#checkmarkPoint" + p).remove();
-      currentPointFilter.splice(currentPointFilter.indexOf(p),1);
-    }
+    $("#checkmarkPoint" + p).remove();
+    currentPointFilter.splice(currentPointFilter.indexOf(p),1);
   }
+  filterArcs();
+  refresh();
+  handleUnusedPoints();
+}
+
+function resetFilters() {
+  $(".checkmark").remove();
+  currentRepoFilter = [];
+
+  $(".checkmarkPoint").remove();
+  $("#pointSearch")[0].value = "";
+  filterSearchPoints();
+  currentPointFilter = [];
+
+  $("#pointCheckbox").prop("checked", true);
+
   filterArcs();
   refresh();
   handleUnusedPoints();
@@ -555,7 +557,7 @@ function openNav() {
 }
 
 function closeNav() {
-  $("#sidenav").css("left", "-160px");
+  $("#sidenav").css("left", "-180px");
 }
 
 function toggleDropdown(t, id) {
@@ -565,6 +567,15 @@ function toggleDropdown(t, id) {
   }
   else {
     t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-down"></i>';
+  }
+  if(id === "#pointDropdown") {
+    if($(id).css("display") !== "none") {
+      $('#pointFilter').css('flex', '1 1 auto');
+      $('#pointDropdown').css('display','flex');
+    }
+    else {
+      $('#pointFilter').css('flex', '0 0 auto');
+    }
   }
 }
 
