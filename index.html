@@ -131,7 +131,7 @@ div.tooltip {
   margin-top: 3px;
 }
 
-.checkmark {
+.fa-check {
   float: right;
 }
 
@@ -207,27 +207,19 @@ div.tooltip {
   <div class="filter">
     <div onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
     <div id="dropdown" class="dropdown-content">
-      <a id="filterTrunk" class="dropdown-select" onclick="selectFilter('Trunk')">Trunk</a>
-      <a id="filterStaging" class="dropdown-select" onclick="selectFilter('Staging')">Staging</a>
-      <a id="filterNursery" class="dropdown-select" onclick="selectFilter('Nursery')">Nursery</a>
-      <a id="filterIncubator" class="dropdown-select" onclick="selectFilter('Incubator')">Incubator</a>
-      <a id="resetFilter" class="dropdown-select resetFilter" onclick="selectFilter('resetFilter')">Reset Filter</a>
+      <a id="filterTrunk" class="dropdown-select" onclick="selectRepoFilter('Trunk')">Trunk</a>
+      <a id="filterStaging" class="dropdown-select" onclick="selectRepoFilter('Staging')">Staging</a>
+      <a id="filterNursery" class="dropdown-select" onclick="selectRepoFilter('Nursery')">Nursery</a>
+      <a id="filterIncubator" class="dropdown-select" onclick="selectRepoFilter('Incubator')">Incubator</a>
+      <a id="resetFilter" class="dropdown-select resetFilter" onclick="selectRepoFilter('resetFilter')">Reset Filter</a>
     </div>
   </div>
   <div class="filter">
     <div onclick="toggleDropdown(this,'#pointDropdown');" class="eP greenButton">Filter By Point <i class="fa fa-caret-right"></i></div>
     <div id="pointDropdown" class="dropdown-content">
-      <input type="text" placeholder="Search.." id="pointSearch" onkeyup="">
-      <div id="pointList">
-        <a id="point-eng" class="dropdown-select" onclick="filterPoint('eng')">eng</a>
-        <a id="point-eng" class="dropdown-select" onclick="filterPoint('eng')">eng</a>
-        <a id="point-eng" class="dropdown-select" onclick="filterPoint('eng')">eng</a>
-        <a id="point-eng" class="dropdown-select" onclick="filterPoint('eng')">eng</a>
-        <a id="point-eng" class="dropdown-select" onclick="filterPoint('eng')">eng</a>
-        <a id="point-eng" class="dropdown-select" onclick="filterPoint('eng')">eng</a>
-        <a id="point-eng" class="dropdown-select" onclick="filterPoint('eng')">eng</a>
-      </div>
-      <a id="resetFilter" class="dropdown-select resetFilter" onclick="selectFilter('resetFilter')">Reset Filter</a>
+      <input type="text" placeholder="Search.." id="pointSearch" onkeyup="filterSearchPoints()">
+      <div id="pointList"></div>
+      <a id="resetFilter" class="dropdown-select resetFilter" onclick="filterPoint('resetFilter')">Reset Filter</a>
     </div>
   </div>
   <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()" checked></input> Unused Points</div>

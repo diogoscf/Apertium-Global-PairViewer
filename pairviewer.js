@@ -6,7 +6,8 @@ var width = window.innerWidth,
     height = window.innerHeight;
 var viewScale = 1;
 
-var currentFilter = [];
+var currentRepoFilter = [];
+var currentPointFilter = [];
 
 var proj = d3.geo.orthographic()
     .translate([width / 2, height / 2])
@@ -291,6 +292,8 @@ function ready(error, world, places, points) {
     links.push({
       source: s,
       target: t,
+      sourceTag: a.lg2,
+      targetTag: a.lg1,
       stage: a.repo,
       direction: a.direction
     });
@@ -299,7 +302,7 @@ function ready(error, world, places, points) {
 
   // build geoJSON features from links array
   links.forEach(function(e,i,a) {
-    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage}
+    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag }
     arcLines.push(feature)
   })
 
@@ -309,6 +312,8 @@ function ready(error, world, places, points) {
       .attr("class","arc")
       .attr("d",path)
       .attr("stage", function(d) {return d.stage})
+      .attr("sourceTag", function(d) {return d.sourceTag})
+      .attr("targetTag", function(d) {return d.targetTag})
 
   svg.append("g").attr("class","flyers")
     .selectAll("path").data(links)
@@ -316,6 +321,16 @@ function ready(error, world, places, points) {
     .attr("class","flyer")
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
     .style("stroke", function(d) { return chooseColor(d) })
+
+  // Populate the filter point list
+  for(var i = 0; i < points.point_data.length; i++) {
+    var newPoint = $("<a>")
+      .attr("id", "point" + points.point_data[i].tag)
+      .attr("class", "dropdown-select")
+      .attr("onclick", "filterPoint('" + points.point_data[i].tag  + "')")
+      .text(points.point_data[i].tag)
+    $("#pointList").append(newPoint);
+  }
 
   refresh();
 }
@@ -445,29 +460,58 @@ function setPoints(o1,o2) {
   svg.selectAll(".label").style("opacity", o2);
 }
 
-// Update globe and filter array
-function selectFilter(f) {
+// Update globe and repo filter array
+function selectRepoFilter(f) {
   if(f === "resetFilter") {
     $(".checkmark").remove();
-    currentFilter = [];
+    currentRepoFilter = [];
   }
   else {
     if($("#checkmark" + f).length === 0) {
       $("#filter" + f).html(f + '<i id=checkmark' + f + ' class="fa fa-check checkmark"></i>');
-      currentFilter.push(f);
+      currentRepoFilter.push(f);
     }
     else {
       $("#checkmark" + f).remove();
-      currentFilter.splice(currentFilter.indexOf(f),1);
+      currentRepoFilter.splice(currentRepoFilter.indexOf(f),1);
     } 
   }
+  filterArcs();
+  refresh();
+  handleUnusedPoints();
+}
+
+// Update point filter and globe
+function filterPoint(p) {
+  if(p === "resetFilter") {
+    $(".checkmarkPoint").remove();
+    $("#pointSearch")[0].value = "";
+    filterSearchPoints();
+    currentPointFilter = [];
+  }
+  else {
+    if($("#checkmarkPoint" + p).length === 0) {
+      $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmarkPoint"></i>');
+      currentPointFilter.push(p);
+    }
+    else {
+      $("#checkmarkPoint" + p).remove();
+      currentPointFilter.splice(currentPointFilter.indexOf(p),1);
+    }
+  }
+  filterArcs();
+  refresh();
+  handleUnusedPoints();
+}
+
+function filterArcs() {
   for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
     svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
   }
-  if(currentFilter.length > 0) {
+  if(currentRepoFilter.length > 0) {
     for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-      for(var j = 0; j < currentFilter.length; j++) {
-        if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentFilter[j].toLowerCase()) {
+      for(var j = 0; j < currentRepoFilter.length; j++) {
+        if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentRepoFilter[j].toLowerCase()) {
           svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
         }
         else {
@@ -477,8 +521,23 @@ function selectFilter(f) {
       }
     }
   }
-  handleUnusedPoints();
-  refresh();
+  if(currentPointFilter.length > 0) {
+    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+      if(svg.selectAll(".arc")[0][i].getAttribute("opacity") === "0") {
+        continue;
+      }
+      var filterReturn = 0;
+      for(var j = 0; j < currentPointFilter.length; j++) {
+        if(svg.selectAll(".arc")[0][i].getAttribute("sourceTag") === currentPointFilter[j] || svg.selectAll(".arc")[0][i].getAttribute("targetTag") === currentPointFilter[j]) {
+          filterReturn = 1;
+          break;
+        }
+      }
+      if(filterReturn === 0) {
+        svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+      }
+    }
+  }
 }
 
 $(".eP").click(function(e) {
@@ -514,6 +573,18 @@ function checkPoints() {
   handleUnusedPoints();
 }
 
+function filterSearchPoints() {
+  var searchValue = $("#pointSearch")[0].value;
+  var points = $("#pointList")[0].children;
+  for(var i = 0; i < points.length; i++) {
+    if($(points[i]).text().substring(0,searchValue.length).toUpperCase() !== searchValue.toUpperCase()) {
+      $(points[i]).css("display","none");
+    }
+    else {
+      $(points[i]).css("display","");
+    }
+  }
+}
 
 function handleUnusedPoints() {
   if($("#pointCheckbox").prop("checked") === false) {
@@ -521,41 +592,12 @@ function handleUnusedPoints() {
   }
   else {
     setPoints(0.6,0.9);
+    return;
   }
 
   svg.selectAll(".flyer")
   .attr("opacity", function (d) {
-    if(currentFilter.length > 0) {
-      var filterReturn = 0;
-      for(var i = 0; i < currentFilter.length; i++) {
-        if(d.stage === currentFilter[i].toLowerCase()) {
-          filterReturn = 1;
-          var dsource = String(d.source[0])+","+String(d.source[1]);
-          var dtarget = String(d.target[0])+","+String(d.target[1]);
-          for(var j = 0; j < svg.selectAll(".point")[0].length; j++) {
-            if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dsource) {
-              svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
-            }
-            if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dtarget) {
-              svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
-            }
-          }
-          for(var k = 0; k < svg.selectAll(".label")[0].length; k++) {
-            if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dsource) {
-              svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
-            }
-            if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dtarget) {
-              svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
-            }
-          }
-          break;
-        }
-      }
-      if(filterReturn === 0) {
-        return 0;
-      }
-    }
-    else {
+    if(this.getAttribute("opacity") !== "0") {
       var dsource = String(d.source[0])+","+String(d.source[1]);
       var dtarget = String(d.target[0])+","+String(d.target[1]);
       for(var j = 0; j < svg.selectAll(".point")[0].length; j++) {
@@ -576,15 +618,29 @@ function handleUnusedPoints() {
       }
     }
     return fade_at_edge(d);
-  });
+  })
+
   refresh();
 }
 
 function fade_at_edge(d) {
-  if(currentFilter.length > 0) {
+  if(currentRepoFilter.length > 0) {
     var filterReturn = 0;
-    for(var i = 0; i < currentFilter.length; i++) {
-      if(d.stage === currentFilter[i].toLowerCase()) {
+    for(var i = 0; i < currentRepoFilter.length; i++) {
+      if(d.stage === currentRepoFilter[i].toLowerCase()) {
+        filterReturn = 1;
+        break;
+      }
+    }
+    if(filterReturn === 0) {
+      return 0;
+    }
+  }
+
+  if(currentPointFilter.length > 0) {
+    var filterReturn = 0;
+    for(var i = 0; i < currentPointFilter.length; i++) {
+      if(d.sourceTag === currentPointFilter[i] || d.targetTag === currentPointFilter[i]) {
         filterReturn = 1;
         break;
       }
