@@ -78,16 +78,39 @@ div.tooltip {
     pointer-events: none;
 }
 
-#filter {
-  position: relative;
-}
-
 #resetFilter {
   background-color: #ffd1d1;
 }
 
 #resetFilter:hover, #clearFilter:focus {
   background-color: #ffbcbc;
+}
+
+#settings {
+  position: absolute;
+  margin-top: 0px;
+}
+
+#pointCheckbox {
+  margin: 0px;
+  cursor: pointer;
+  vertical-align: 2px;
+}
+
+#pointSearch {
+  font-size: 16px;
+  padding: 12px 16px;
+  border: none;
+  width: 128px
+}
+
+#pointList {
+  max-height: 168px;
+  overflow: auto;
+}
+
+.filter {
+  position: relative;
 }
 
 .greenButton {
@@ -105,24 +128,11 @@ div.tooltip {
   font: 16px sans-serif;
   -moz-user-select:none;
   opacity: 0.95;
-}
-
-#settings {
-  position: absolute;
-}
-
-#pointCheckbox {
-  margin: 0px;
-  cursor: pointer;
-  vertical-align: 2px;
-}
-
-.checkmark {
-  float: right;
-}
-
-#disablePoints {
   margin-top: 3px;
+}
+
+.fa-check {
+  float: right;
 }
 
 .greenButton:hover, .greenButton:focus {
@@ -146,20 +156,16 @@ div.tooltip {
   border-style: solid;
   font: 16px sans-serif;
   cursor: pointer;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   -moz-user-select:none;
 }
 
 .dropdown-content a:hover, .dropdown-content a:focus {
-  background-color: #eaeaea;
+  background-color: #e8e8e8;
 }
 
 .dropdown-select {
   border-width: 1px 0px 0px 0px;
-}
-
-.show {
-  display:block;
 }
 
 .sidenav {
@@ -198,14 +204,22 @@ div.tooltip {
 
 <div id="sidenav" class="sidenav eP">
   <a class="closebtn" onclick="closeNav()">&times;</a>
-  <div id="filter">
-    <div id="filterButton" onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
+  <div class="filter">
+    <div onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
     <div id="dropdown" class="dropdown-content">
-      <a id="filterTrunk" class="dropdown-select" onclick="selectFilter('Trunk')">Trunk</a>
-      <a id="filterStaging" class="dropdown-select" onclick="selectFilter('Staging')">Staging</a>
-      <a id="filterNursery" class="dropdown-select" onclick="selectFilter('Nursery')">Nursery</a>
-      <a id="filterIncubator" class="dropdown-select" onclick="selectFilter('Incubator')">Incubator</a>
-      <a id="resetFilter" class="dropdown-select resetFilter" onclick="selectFilter('resetFilter')">Reset Filter</a>
+      <a id="filterTrunk" class="dropdown-select" onclick="selectRepoFilter('Trunk')">Trunk</a>
+      <a id="filterStaging" class="dropdown-select" onclick="selectRepoFilter('Staging')">Staging</a>
+      <a id="filterNursery" class="dropdown-select" onclick="selectRepoFilter('Nursery')">Nursery</a>
+      <a id="filterIncubator" class="dropdown-select" onclick="selectRepoFilter('Incubator')">Incubator</a>
+      <a id="resetFilter" class="dropdown-select resetFilter" onclick="selectRepoFilter('resetFilter')">Reset Filter</a>
+    </div>
+  </div>
+  <div class="filter">
+    <div onclick="toggleDropdown(this,'#pointDropdown');" class="eP greenButton">Filter By Point <i class="fa fa-caret-right"></i></div>
+    <div id="pointDropdown" class="dropdown-content">
+      <input type="text" placeholder="Search.." id="pointSearch" onkeyup="filterSearchPoints()">
+      <div id="pointList"></div>
+      <a id="resetFilter" class="dropdown-select resetFilter" onclick="filterPoint('resetFilter')">Reset Filter</a>
     </div>
   </div>
   <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()" checked></input> Unused Points</div>
