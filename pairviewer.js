@@ -323,16 +323,22 @@ function ready(error, world, places, points) {
     .style("stroke", function(d) { return chooseColor(d) })
 
   // Populate the filter point list
+  var alphaPointList = [];
   for(var i = 0; i < points.point_data.length; i++) {
+    alphaPointList.push(points.point_data[i].tag);
+  }
+  alphaPointList.sort();
+  for(var i = 0; i < alphaPointList.length; i++) {
     var newPoint = $("<a>")
-      .attr("id", "point" + points.point_data[i].tag)
+      .attr("id", "point" + alphaPointList[i])
       .attr("class", "dropdown-select")
-      .attr("onclick", "filterPoint('" + points.point_data[i].tag  + "')")
-      .text(points.point_data[i].tag)
+      .attr("onclick", "filterPoint('" + alphaPointList[i] + "')")
+      .text(alphaPointList[i])
     $("#pointList").append(newPoint);
   }
 
   refresh();
+  handleUnusedPoints();
 }
 
 //Position and hiding labels
@@ -499,7 +505,7 @@ function resetFilters() {
   filterSearchPoints();
   currentPointFilter = [];
 
-  $("#pointCheckbox").prop("checked", true);
+  $("#pointCheckbox").prop("checked", false);
 
   filterArcs();
   refresh();
