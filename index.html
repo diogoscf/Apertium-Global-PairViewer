@@ -90,24 +90,27 @@ div.tooltip {
   vertical-align: 2px;
 }
 
+#pointSearchIcon {
+  position: absolute;
+  top: 11px;
+  left: 13px;
+  font-size: 18px;
+}
+
 #pointSearch {
   font-size: 16px;
   padding: 12px 16px;
+  padding-left: 40px;
   border: none;
   width: 100%;
   box-sizing: border-box;
 }
 
 #pointList {
-  min-height: 84px;
   overflow: auto;
-  position: absolute;
-  height: 100%;
+  position: relative;
   width: 100%;
-}
-
-#pointDropdown {
-  min-height: 130px;
+  min-height: 42px;
 }
 
 .filter {
@@ -180,10 +183,7 @@ div.tooltip {
   top: 0;
   left: -180px;
   background-color: #dddddd;
-  //padding-top: 40px;
   transition: 0.5s;
-  display: flex;
-  flex-direction: column;
 }
 
 .closebtn {
@@ -219,7 +219,6 @@ div.tooltip {
 <div onclick="openNav()" id="settings" class="greenButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings </div>
 
 <div id="sidenav" class="sidenav eP">
-  <!-- <a class="closebtn" onclick="closeNav()">&times;</a> -->
   <div class="filter">
     <div onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
     <div id="dropdown" class="dropdown-content">
@@ -229,16 +228,15 @@ div.tooltip {
       <a id="filterIncubator" class="dropdown-select" onclick="selectRepoFilter('Incubator')">Incubator</a>
     </div>
   </div>
-  <div id="pointFilter" class="filter" style="display: flex;flex-direction: column;">
+  <div id="pointFilter" class="filter">
     <div onclick="toggleDropdown(this,'#pointDropdown');" class="eP greenButton">Filter By Language <i class="fa fa-caret-right"></i></div>
-    <div id="pointDropdown" class="dropdown-content" style="flex: 1 1 auto;flex-direction: column;">
+    <div id="pointDropdown" class="dropdown-content">
+      <i id="pointSearchIcon" class="fa fa-search"></i>
       <input type="text" placeholder="Search.." id="pointSearch" onkeyup="filterSearchPoints()">
-      <div style="flex: 1 1 auto;position: relative;">
-        <div id="pointList"></div>
-      </div>
+      <div id="pointList"></div>
     </div>
   </div>
-  <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()" checked></input> Unused Languages</div>
+  <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()"></input> Unused Languages</div>
   <div class="greenButton resetFilter" onclick="resetFilters()">Reset to Defaults</div>
 </div>
 

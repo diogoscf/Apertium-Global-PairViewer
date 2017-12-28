@@ -70,6 +70,12 @@ function resize() {
   
     svg.selectAll("circle").attr("r", width / 4).attr("cx", width / 2).attr("cy", height / 2);
   zoom(1);
+
+  var sidenavHeight = $("#sidenav").css("height");
+  var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
+  var offset = $("#dropdown").css("display")==="none" ? 222 : 390;
+  var total = val - offset >= 0 ? val - offset : 0;
+  $("#pointList").css("max-height", (total) + "px");
 }
 
 queue()
@@ -254,7 +260,8 @@ function ready(error, world, places, points) {
     .enter().append("path")
       .attr("class", "point")
       .attr("d", path)
-      .attr("coordinate", function(d) {return d.geometry.coordinates;})
+      .attr("coordinate", function(d) {return d.geometry.coordinates})
+      .attr("tag", function(d) { return d.tag })
       .on("mouseover", function(d) { //Also added hovering over points for tooltip
             div.transition()
                 .duration(200)
@@ -323,16 +330,22 @@ function ready(error, world, places, points) {
     .style("stroke", function(d) { return chooseColor(d) })
 
   // Populate the filter point list
+  var alphaPointList = [];
   for(var i = 0; i < points.point_data.length; i++) {
+    alphaPointList.push(points.point_data[i].tag);
+  }
+  alphaPointList.sort();
+  for(var i = 0; i < alphaPointList.length; i++) {
     var newPoint = $("<a>")
-      .attr("id", "point" + points.point_data[i].tag)
+      .attr("id", "point" + alphaPointList[i])
       .attr("class", "dropdown-select")
-      .attr("onclick", "filterPoint('" + points.point_data[i].tag  + "')")
-      .text(points.point_data[i].tag)
+      .attr("onclick", "filterPoint('" + alphaPointList[i] + "')")
+      .text(alphaPointList[i])
     $("#pointList").append(newPoint);
   }
 
   refresh();
+  handleUnusedPoints();
 }
 
 //Position and hiding labels
@@ -499,7 +512,7 @@ function resetFilters() {
   filterSearchPoints();
   currentPointFilter = [];
 
-  $("#pointCheckbox").prop("checked", true);
+  $("#pointCheckbox").prop("checked", false);
 
   filterArcs();
   refresh();
@@ -568,15 +581,11 @@ function toggleDropdown(t, id) {
   else {
     t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-down"></i>';
   }
-  if(id === "#pointDropdown") {
-    if($(id).css("display") !== "none") {
-      $('#pointFilter').css('flex', '1 1 auto');
-      $('#pointDropdown').css('display','flex');
-    }
-    else {
-      $('#pointFilter').css('flex', '0 0 auto');
-    }
-  }
+  var sidenavHeight = $("#sidenav").css("height");
+  var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
+  var offset = $("#dropdown").css("display")==="none" ? 222 : 390;
+  var total = val - offset >= 0 ? val - offset : 0;
+  $("#pointList").css("max-height", (total) + "px");
 }
 
 function checkPoints() {
@@ -587,13 +596,21 @@ function checkPoints() {
 function filterSearchPoints() {
   var searchValue = $("#pointSearch")[0].value;
   var points = $("#pointList")[0].children;
+  var searchEmpty = 0;
   for(var i = 0; i < points.length; i++) {
     if($(points[i]).text().substring(0,searchValue.length).toUpperCase() !== searchValue.toUpperCase()) {
       $(points[i]).css("display","none");
     }
     else {
       $(points[i]).css("display","");
+      searchEmpty = 1;
     }
+  }
+  if(searchEmpty === 0) {
+    $("#pointList").css("min-height",0);
+  }
+  if(searchEmpty === 1 || searchValue === "") {
+    $("#pointList").css("min-height",42);
   }
 }
 
@@ -631,6 +648,16 @@ function handleUnusedPoints() {
     return fade_at_edge(d);
   })
 
+  for(var i = 0; i < svg.selectAll(".point")[0].length; i++) {
+    if(currentPointFilter.indexOf(svg.selectAll(".point")[0][i].getAttribute("tag")) !== -1) {
+      svg.selectAll(".point")[0][i].setAttribute("style", "opacity: 0.6");
+    }
+  }
+  for(var i = 0; i < svg.selectAll(".label")[0].length; i++) {
+    if(currentPointFilter.indexOf(svg.selectAll(".label")[0][i].innerHTML) !== -1) {
+      svg.selectAll(".label")[0][i].setAttribute("style", "opacity: 0.9");
+    }
+  }
   refresh();
 }
 
