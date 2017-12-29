@@ -89,7 +89,6 @@ function ready(error, world, places, points) {
       borders = topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; });
       // grid = graticule(); currently lat lon lines not used, can uncomment to use
 
-
   var ocean_fill = svg.append("defs").append("radialGradient")
         .attr("id", "ocean_fill")
         .attr("cx", "75%")
@@ -493,6 +492,7 @@ function filterPoint(p) {
   if($("#checkmarkPoint" + p).length === 0) {
     $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmarkPoint"></i>');
     currentPointFilter.push(p);
+    rotateToPoint(p);
   }
   else {
     $("#checkmarkPoint" + p).remove();
@@ -715,6 +715,24 @@ function location_along_arc(start, end, loc) {
   return interpolator(loc)
 }
 
+function rotateToPoint(p) {
+  var rotate = proj.rotate();
+  var coords;
+  for(var i = 0; i < svg.selectAll(".point")[0].length; i++) {
+    if(svg.selectAll(".point")[0][i].getAttribute("tag") === p) {
+      coords = svg.selectAll(".point")[0][i].getAttribute("coordinate");
+    }
+  }
+  var q = coords.split(',');
+  d3.transition().duration(2500).tween("rotate", function() {
+    var r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1]), rotate[2]]);
+    return function(t) {
+      proj.rotate(r(t));
+      sky.rotate(r(t));
+      refresh();
+    }
+  })
+}
 
 // modified from http://bl.ocks.org/KoGor/5994804
 var sens = 0.25;
