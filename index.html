@@ -228,7 +228,15 @@ div.tooltip {
       <a id="filterIncubator" class="dropdown-select" onclick="selectRepoFilter('Incubator')">Incubator</a>
     </div>
   </div>
-  <div id="pointFilter" class="filter">
+  <div class="filter">
+    <div onclick="toggleDropdown(this,'#dirDropdown');" class="eP greenButton">Filter By Direction <i class="fa fa-caret-right"></i></div>
+    <div id="dirDropdown" class="dropdown-content">
+      <a id="dirBi" class="dropdown-select" onclick="selectDirFilter('Bi')">Bidirectional</a>
+      <a id="dirUni" class="dropdown-select" onclick="selectDirFilter('Uni')">Unidirectional</a>
+      <a id="dirUnknown" class="dropdown-select" onclick="selectDirFilter('Unknown')">Unknown</a>
+    </div>
+  </div>
+  <div class="filter">
     <div onclick="toggleDropdown(this,'#pointDropdown');" class="eP greenButton">Filter By Language <i class="fa fa-caret-right"></i></div>
     <div id="pointDropdown" class="dropdown-content">
       <i id="pointSearchIcon" class="fa fa-search"></i>

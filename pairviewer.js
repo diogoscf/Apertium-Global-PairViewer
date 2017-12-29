@@ -9,6 +9,7 @@ var width = window.innerWidth > window.innerHeight ? window.innerHeight : window
 
 var currentRepoFilter = [];
 var currentPointFilter = [];
+var currentDirFilter = [];
 
 var proj = d3.geo.orthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
@@ -481,10 +482,25 @@ function selectRepoFilter(f) {
   handleUnusedPoints();
 }
 
+// Update direction filter and globe
+function selectDirFilter(dir) {
+  if($("#checkmarkDir" + dir).length === 0) {
+    $("#dir" + dir).html(dir + '<i id=checkmarkDir' + dir + ' class="fa fa-check checkmark"></i>');
+    currentDirFilter.push(dir);
+  }
+  else {
+    $("#checkmarkDir" + dir).remove();
+    currentDirFilter.splice(currentDirFilter.indexOf(dir),1);
+  }
+  filterArcs();
+  refresh();
+  handleUnusedPoints();
+}
+
 // Update point filter and globe
 function filterPoint(p) {
   if($("#checkmarkPoint" + p).length === 0) {
-    $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmarkPoint"></i>');
+    $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmark"></i>');
     currentPointFilter.push(p);
     rotateToPoint(p);
   }
@@ -499,12 +515,13 @@ function filterPoint(p) {
 
 function resetFilters() {
   $(".checkmark").remove();
+  
   currentRepoFilter = [];
+  currentPointFilter = [];
+  currentDirFilter = [];
 
-  $(".checkmarkPoint").remove();
   $("#pointSearch")[0].value = "";
   filterSearchPoints();
-  currentPointFilter = [];
 
   $("#pointCheckbox").prop("checked", false);
 
