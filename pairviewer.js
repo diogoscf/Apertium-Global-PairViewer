@@ -326,7 +326,7 @@ function ready(error, world, places, points) {
 
   // build geoJSON features from links array
   links.forEach(function(e,i,a) {
-    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag }
+    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag, "direction": e.direction }
     arcLines.push(feature)
   })
 
@@ -338,6 +338,7 @@ function ready(error, world, places, points) {
       .attr("stage", function(d) {return d.stage})
       .attr("sourceTag", function(d) {return d.sourceTag})
       .attr("targetTag", function(d) {return d.targetTag})
+      .attr("direction", function(d) {return d.direction})
 
   svg.append("g").attr("class","flyers")
     .selectAll("path").data(links)
@@ -564,6 +565,24 @@ function filterArcs() {
       }
     }
   }
+  if(currentDirFilter.length > 0) {
+    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+      if(svg.selectAll(".arc")[0][i].getAttribute("opacity") === "0") {
+        continue;
+      }
+      var filterReturn = 0;
+      for(var j = 0; j < currentDirFilter.length; j++) {
+        if((svg.selectAll(".arc")[0][i].getAttribute("direction") === "<>" && currentDirFilter[j] === "Bidirectional") || (svg.selectAll(".arc")[0][i].getAttribute("direction") === ">" && currentDirFilter[j] === "Unidirectional") || (currentDirFilter[j] === "Unknown" && svg.selectAll(".arc")[0][i].getAttribute("direction") !== "<>" && svg.selectAll(".arc")[0][i].getAttribute("direction") !== ">")) {
+          filterReturn = 1;
+          break;
+        }
+      }
+      if(filterReturn === 0) {
+        svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+      }
+    }
+  }
+
 }
 
 $(".eP").click(function(e) {
@@ -699,7 +718,20 @@ function fade_at_edge(d) {
     }
   }
 
-  var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
+  if(currentDirFilter.length > 0) {
+    var filterReturn = 0;
+    for(var i = 0; i < currentDirFilter.length; i++) {
+      if((d.direction === "<>" && currentDirFilter[i] === "Bidirectional") || (d.direction === ">" && currentDirFilter[i] === "Unidirectional") || (currentDirFilter[i] === "Unknown" && d.direction !== "<>" && d.direction !== ">")) {
+        filterReturn = 1;
+        break;
+      }
+    }
+    if(filterReturn === 0) {
+      return 0;
+    }
+  }
+
+  var centerPos = proj.invert([width / 2, height / 2]),
 
       arc = d3.geo.greatArc(),
       start, end;
