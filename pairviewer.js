@@ -91,7 +91,7 @@ function resize() {
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = $("#dropdown").css("display")==="none" ? 222 : 390;
+  var offset = 267;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -604,6 +604,13 @@ function closeNav() {
 }
 
 function toggleDropdown(t, id) {
+  if($(id).css("display") === "none") {
+    $(".dropdown-content").css("display", "none");
+    for(var i = 0; i < $(".dropdown-content").length; i++) {
+      var filterButton = $(".dropdown-content")[i].previousElementSibling;
+      filterButton.innerHTML = filterButton.innerHTML.slice(0,filterButton.innerHTML.indexOf("<")) + '<i class="fa fa-caret-right"></i>';
+    }
+  }
   $(id).toggle();
   if($(id).css("display") === "none") {
     t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-right"></i>';
@@ -613,7 +620,7 @@ function toggleDropdown(t, id) {
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = $("#dropdown").css("display")==="none" ? 222 : 390;
+  var offset = 267;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
