@@ -853,7 +853,7 @@ function zoomed() {
     proj.rotate(o0);
     sky.rotate(o0);
   }
-
+  sens = 0.25/zoom.scale()*1330;
   refresh();
 }
 
