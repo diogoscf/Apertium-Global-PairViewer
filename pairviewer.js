@@ -731,7 +731,7 @@ function fade_at_edge(d) {
     }
   }
 
-  var centerPos = proj.invert([width / 2, height / 2]),
+  var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
 
       arc = d3.geo.greatArc(),
       start, end;
