@@ -810,7 +810,7 @@ function zoomed() {
 
 function resetZoom() {
   var scale = zoom.scale();
-  var initial = 3;
+  var initial = 2;
   var defaultScale = Math.min(initial*fixedHeight,initial*fixedWidth);
 
   d3.transition().duration(150).tween("zoom", function () {
