@@ -2,20 +2,22 @@
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
 
+var fixedWidth = window.innerWidth,
+    fixedHeight = window.innerHeight;
+
 var width = window.innerWidth,
     height = window.innerHeight;
-var viewScale = 1;
 
 var currentRepoFilter = [];
 var currentPointFilter = [];
 
 var proj = d3.geo.orthographic()
-    .translate([width / 2, height / 2])
+    .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 4);
 
 var sky = d3.geo.orthographic()
-    .translate([width / 2, height / 2])
+    .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 3);
 
@@ -47,29 +49,45 @@ var codeToLangTable = {};
 // var graticule = d3.geo.graticule();
 
 var svg = d3.select("body").append("svg")
-  .attr("width", width)
-  .attr("height", height);
+  .attr("width", fixedWidth)
+  .attr("height", fixedHeight);
 svg.style("background", "#311B92");
 
 window.addEventListener("resize", resize);
-var zoomBehavior = d3.behavior.zoom ().scaleExtent ([0.5, 8]).on('zoom', function () {
-  zoom(d3.event.scale/viewScale);
-});
-svg.call(zoomBehavior);
+
+var zoom = d3.behavior.zoom(true)
+    .scale(proj.scale())
+    .scaleExtent([100, 50000])
+    .on("zoom", zoomed);
+
+svg.call(zoom);
 d3.select("svg").on("dblclick.zoom", null);
 
 function resize() {
-  var off = proj([0, 0]);
-  var off2 = sky([0, 0]);
-  width = window.innerWidth;
-  height = window.innerHeight;
-  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
-  proj = proj.translate([-off[0], -off[1]]).translate([width / 2, height / 2]);
-  sky = sky.translate([-off2[0], -off2[1]]).translate([width / 2, height / 2]);
-  path = path.projection(proj).pointRadius(3);
+  fixedWidth = window.innerWidth;
+  fixedHeight = window.innerHeight;
+  svg.attr("width", fixedWidth).attr("height", fixedHeight);
+
+  sky = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(width / 3);
+
+  proj = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(width / 4);
+
+  path = d3.geo.path().projection(proj).pointRadius(3);
+
+  svg.selectAll("circle").attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2);
   
-    svg.selectAll("circle").attr("r", width / 4).attr("cx", width / 2).attr("cy", height / 2);
-  zoom(1);
+  if(o0) {
+    proj.rotate(o0);
+    sky.rotate(o0);
+  }
+
+  refresh();
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
@@ -214,7 +232,7 @@ function ready(error, world, places, points) {
         .attr("d", "M0 2 L 2 1 L 2 3 L 0 2 M 2.5 1 L 4.5 2 L 2.5 3 L 2.5 1");
 
   svg.append("circle")
-    .attr("cx", width / 2).attr("cy", height / 2)
+    .attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
     .attr("id", "circle1")
@@ -349,7 +367,7 @@ function ready(error, world, places, points) {
 
 //Position and hiding labels
 function position_labels() {
-  var centerPos = proj.invert([width/2, height/2]);
+  var centerPos = proj.invert([fixedWidth/2, fixedHeight/2]);
   var arc = d3.geo.greatArc();
 
   svg.selectAll(".label")
@@ -392,29 +410,6 @@ function chooseColor(d) {
     color = "#9C27B0"
   }
   return color;
-}
-
-
-
-function zoom(factor) {
-  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
-  width = window.innerWidth;
-  height = window.innerHeight;
-  
-  if (factor > 0) {
-    viewScale = viewScale * factor;
-  }
-  var vH = height * viewScale;
-  var vW = width * viewScale;
-  var vM = Math.min(vW, vH);
-  sky = sky.scale(vM / 3);
-
-  proj = proj.scale(vM / 4);
-
-  path = path.projection(proj).pointRadius(3);
-
-  svg.selectAll("circle").attr("r", vM / 4);
-  refresh();
 }
 
 function flying_arc(pts) {
@@ -688,7 +683,7 @@ function fade_at_edge(d) {
     }
   }
 
-  var centerPos = proj.invert([width / 2, height / 2]),
+  var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
 
       arc = d3.geo.greatArc(),
       start, end;
@@ -758,4 +753,114 @@ window.addEventListener('touchmove',
     e.preventDefault();
   }
 , false);
-zoom(1);
+
+// Zooms by interpolating
+function zoomIn() {
+  var scale = zoom.scale();
+
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, scale * 1.2);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
+}
+
+function zoomOut() {
+  var scale = zoom.scale();
+
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, scale / 1.2);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
+}
+
+function initialzoom() {
+  var scale = zoom.scale();
+
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, scale * 7);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
+}
+
+// Start off slightly zoomed-in
+initialzoom();
+
+function zoomed() {
+  var scale = zoom.scale();
+  width = scale;
+
+  proj = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(scale / 4);
+
+  sky = d3.geo.orthographic()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(scale / 3);
+
+  path = d3.geo.path().projection(proj).pointRadius(3);
+
+  svg.selectAll("circle").attr("r", scale / 4);
+
+  if(o0) {
+    proj.rotate(o0);
+    sky.rotate(o0);
+  }
+
+  refresh();
+}
+
+function resetZoom() {
+  var scale = zoom.scale();
+  var defaultScale = 3360;
+
+  d3.transition().duration(150).tween("zoom", function () {
+    var interpolate_scale = d3.interpolate(scale, defaultScale);
+    return function (t) {
+      zoom.scale(interpolate_scale(t));
+      zoomed();
+    };
+  });
+}
+
+// Zoom-in with + key and zoom-out with - key and reset with 0
+window.onkeydown = function(e) {
+  if (navigator.userAgent.search("Chrome") >= 0) {
+    if(e.keyCode === 187) {
+      e.preventDefault();
+      zoomIn();
+    }
+    if(e.keyCode === 189) {
+      e.preventDefault();
+      zoomOut();
+    }
+    if(e.keyCode === 48) {
+      e.preventDefault();
+      resetZoom();
+    }
+  }
+  else if (navigator.userAgent.search("Firefox") >= 0) {
+    if(e.keyCode === 61) {
+      e.preventDefault();
+      zoomIn();
+    }
+    if(e.keyCode === 173) {
+      e.preventDefault();
+      zoomOut();
+    }
+    if(e.keyCode === 48) {
+      e.preventDefault();
+      resetZoom();
+    }
+  }
+};
