@@ -719,10 +719,11 @@ function rotateToPoint(p) {
   }
   var q = coords.split(',');
   d3.transition().duration(2500).tween("rotate", function() {
-    var r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1]), rotate[2]]);
+    var r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
     return function(t) {
       proj.rotate(r(t));
       sky.rotate(r(t));
+      o0 = proj.rotate();
       refresh();
     }
   })
@@ -736,8 +737,8 @@ svg.call(d3.behavior.drag()
     .on("drag", function() {
       var rotate = proj.rotate();
       var ydir = -d3.event.y * sens;
-      ydir = ydir > 40 ? 40 : // Affects maximum turn (upper and lower limit)
-                  ydir < -40 ? -40 :
+      ydir = ydir > 70 ? 70 : // Affects maximum turn (upper and lower limit)
+                  ydir < -70 ? -70 :
                   ydir;
       proj.rotate([d3.event.x * sens, ydir, rotate[2]]);
       sky.rotate([d3.event.x * sens, ydir, rotate[2]]);
@@ -778,20 +779,8 @@ function zoomOut() {
   });
 }
 
-function initialzoom() {
-  var scale = zoom.scale();
-
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, scale * 7);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
-}
-
 // Start off slightly zoomed-in
-initialzoom();
+resetZoom();
 
 function zoomed() {
   var scale = zoom.scale();
@@ -821,7 +810,8 @@ function zoomed() {
 
 function resetZoom() {
   var scale = zoom.scale();
-  var defaultScale = 3360;
+  var initial = 3;
+  var defaultScale = Math.min(initial*fixedHeight,initial*fixedWidth);
 
   d3.transition().duration(150).tween("zoom", function () {
     var interpolate_scale = d3.interpolate(scale, defaultScale);
