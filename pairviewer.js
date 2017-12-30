@@ -5,8 +5,7 @@
 var fixedWidth = window.innerWidth,
     fixedHeight = window.innerHeight;
 
-var width = window.innerWidth,
-    height = window.innerHeight;
+var width = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
 
 var currentRepoFilter = [];
 var currentPointFilter = [];
