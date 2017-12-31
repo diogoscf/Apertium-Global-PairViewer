@@ -9,8 +9,8 @@ def filterPairs(filename, languages):
     count = 1
     for line in pairFile:
         line = line.strip().split()
-        lang1 = line[9][1:4]
-        lang2 = line[11][1:4]
+        lang1 = line[3][1:4]
+        lang2 = line[1][1:4]
         if lang1 in languages and lang2 in languages:
             #getting rid of last comma
             line[-1] = line[-1][:-1]
