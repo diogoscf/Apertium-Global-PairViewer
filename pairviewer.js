@@ -9,6 +9,7 @@ var width = window.innerWidth > window.innerHeight ? window.innerHeight : window
 
 var currentRepoFilter = [];
 var currentPointFilter = [];
+var currentDirFilter = [];
 
 var proj = d3.geo.orthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
@@ -90,7 +91,7 @@ function resize() {
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = $("#dropdown").css("display")==="none" ? 222 : 390;
+  var offset = 267;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -325,7 +326,7 @@ function ready(error, world, places, points) {
 
   // build geoJSON features from links array
   links.forEach(function(e,i,a) {
-    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag }
+    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag, "direction": e.direction }
     arcLines.push(feature)
   })
 
@@ -337,6 +338,7 @@ function ready(error, world, places, points) {
       .attr("stage", function(d) {return d.stage})
       .attr("sourceTag", function(d) {return d.sourceTag})
       .attr("targetTag", function(d) {return d.targetTag})
+      .attr("direction", function(d) {return d.direction})
 
   svg.append("g").attr("class","flyers")
     .selectAll("path").data(links)
@@ -481,10 +483,25 @@ function selectRepoFilter(f) {
   handleUnusedPoints();
 }
 
+// Update direction filter and globe
+function selectDirFilter(dir) {
+  if($("#checkmarkDir" + dir).length === 0) {
+    $("#dir" + dir).html(dir + '<i id=checkmarkDir' + dir + ' class="fa fa-check checkmark"></i>');
+    currentDirFilter.push(dir);
+  }
+  else {
+    $("#checkmarkDir" + dir).remove();
+    currentDirFilter.splice(currentDirFilter.indexOf(dir),1);
+  }
+  filterArcs();
+  refresh();
+  handleUnusedPoints();
+}
+
 // Update point filter and globe
 function filterPoint(p) {
   if($("#checkmarkPoint" + p).length === 0) {
-    $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmarkPoint"></i>');
+    $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmark"></i>');
     currentPointFilter.push(p);
     rotateToPoint(p);
   }
@@ -499,12 +516,13 @@ function filterPoint(p) {
 
 function resetFilters() {
   $(".checkmark").remove();
+  
   currentRepoFilter = [];
+  currentPointFilter = [];
+  currentDirFilter = [];
 
-  $(".checkmarkPoint").remove();
   $("#pointSearch")[0].value = "";
   filterSearchPoints();
-  currentPointFilter = [];
 
   $("#pointCheckbox").prop("checked", false);
 
@@ -547,6 +565,24 @@ function filterArcs() {
       }
     }
   }
+  if(currentDirFilter.length > 0) {
+    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+      if(svg.selectAll(".arc")[0][i].getAttribute("opacity") === "0") {
+        continue;
+      }
+      var filterReturn = 0;
+      for(var j = 0; j < currentDirFilter.length; j++) {
+        if((svg.selectAll(".arc")[0][i].getAttribute("direction") === "<>" && currentDirFilter[j] === "Bidirectional") || (svg.selectAll(".arc")[0][i].getAttribute("direction") === ">" && currentDirFilter[j] === "Unidirectional") || (currentDirFilter[j] === "Unknown" && svg.selectAll(".arc")[0][i].getAttribute("direction") !== "<>" && svg.selectAll(".arc")[0][i].getAttribute("direction") !== ">")) {
+          filterReturn = 1;
+          break;
+        }
+      }
+      if(filterReturn === 0) {
+        svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
+      }
+    }
+  }
+
 }
 
 $(".eP").click(function(e) {
@@ -568,6 +604,13 @@ function closeNav() {
 }
 
 function toggleDropdown(t, id) {
+  if($(id).css("display") === "none") {
+    $(".dropdown-content").css("display", "none");
+    for(var i = 0; i < $(".dropdown-content").length; i++) {
+      var filterButton = $(".dropdown-content")[i].previousElementSibling;
+      filterButton.innerHTML = filterButton.innerHTML.slice(0,filterButton.innerHTML.indexOf("<")) + '<i class="fa fa-caret-right"></i>';
+    }
+  }
   $(id).toggle();
   if($(id).css("display") === "none") {
     t.innerHTML = t.innerHTML.slice(0,t.innerHTML.indexOf("<")) + '<i class="fa fa-caret-right"></i>';
@@ -577,7 +620,7 @@ function toggleDropdown(t, id) {
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = $("#dropdown").css("display")==="none" ? 222 : 390;
+  var offset = 267;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -673,6 +716,19 @@ function fade_at_edge(d) {
     var filterReturn = 0;
     for(var i = 0; i < currentPointFilter.length; i++) {
       if(d.sourceTag === currentPointFilter[i] || d.targetTag === currentPointFilter[i]) {
+        filterReturn = 1;
+        break;
+      }
+    }
+    if(filterReturn === 0) {
+      return 0;
+    }
+  }
+
+  if(currentDirFilter.length > 0) {
+    var filterReturn = 0;
+    for(var i = 0; i < currentDirFilter.length; i++) {
+      if((d.direction === "<>" && currentDirFilter[i] === "Bidirectional") || (d.direction === ">" && currentDirFilter[i] === "Unidirectional") || (currentDirFilter[i] === "Unknown" && d.direction !== "<>" && d.direction !== ">")) {
         filterReturn = 1;
         break;
       }
@@ -804,7 +860,7 @@ function zoomed() {
     proj.rotate(o0);
     sky.rotate(o0);
   }
-
+  sens = 0.25/zoom.scale()*1330;
   refresh();
 }
 
