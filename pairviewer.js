@@ -319,7 +319,8 @@ function ready(error, world, places, points) {
       sourceTag: a.lg2,
       targetTag: a.lg1,
       stage: a.repo,
-      direction: a.direction
+      direction: a.direction,
+      filtered: "true" // If filtered is true, make flyer visible.
     });
   });
 
@@ -479,6 +480,7 @@ function selectRepoFilter(f) {
     currentRepoFilter.splice(currentRepoFilter.indexOf(f),1);
   } 
   filterArcs();
+  filterFlyers();
   refresh();
   handleUnusedPoints();
 }
@@ -494,6 +496,7 @@ function selectDirFilter(dir) {
     currentDirFilter.splice(currentDirFilter.indexOf(dir),1);
   }
   filterArcs();
+  filterFlyers();
   refresh();
   handleUnusedPoints();
 }
@@ -510,6 +513,7 @@ function filterPoint(p) {
     currentPointFilter.splice(currentPointFilter.indexOf(p),1);
   }
   filterArcs();
+  filterFlyers();
   refresh();
   handleUnusedPoints();
 }
@@ -525,8 +529,10 @@ function resetFilters() {
   filterSearchPoints();
 
   $("#pointCheckbox").prop("checked", false);
+  $("#fullDepthCheckbox").prop("checked", false);
 
   filterArcs();
+  filterFlyers();
   refresh();
   handleUnusedPoints();
 }
@@ -582,7 +588,52 @@ function filterArcs() {
       }
     }
   }
+}
 
+function filterFlyers() {
+  svg.selectAll(".flyer")
+    .attr("opacity", function (d) {
+      d.filtered = "true";
+      if(currentRepoFilter.length > 0) {
+        var filterReturn = 0;
+        for(var i = 0; i < currentRepoFilter.length; i++) {
+          if(d.stage === currentRepoFilter[i].toLowerCase()) {
+            filterReturn = 1;
+            break;
+          }
+        }
+        if(filterReturn === 0) {
+          d.filtered = "false";
+        }
+      }
+
+      if(currentPointFilter.length > 0) {
+        var filterReturn = 0;
+        for(var i = 0; i < currentPointFilter.length; i++) {
+          if(d.sourceTag === currentPointFilter[i] || d.targetTag === currentPointFilter[i]) {
+            filterReturn = 1;
+            break;
+          }
+        }
+        if(filterReturn === 0) {
+          d.filtered = "false";
+        }
+      }
+
+      if(currentDirFilter.length > 0) {
+        var filterReturn = 0;
+        for(var i = 0; i < currentDirFilter.length; i++) {
+          if((d.direction === "<>" && currentDirFilter[i] === "Bidirectional") || (d.direction === ">" && currentDirFilter[i] === "Unidirectional") || (currentDirFilter[i] === "Unknown" && d.direction !== "<>" && d.direction !== ">")) {
+            filterReturn = 1;
+            break;
+          }
+        }
+        if(filterReturn === 0) {
+          d.filtered = "false";
+        }
+      }
+      fade_at_edge(d);
+    });
 }
 
 $(".eP").click(function(e) {
@@ -628,6 +679,10 @@ function toggleDropdown(t, id) {
 function checkPoints() {
   $("#pointCheckbox").prop("checked", !$("#pointCheckbox").prop("checked"));
   handleUnusedPoints();
+}
+
+function fullDepth() {
+  $("#fullDepthCheckbox").prop("checked", !$("#fullDepthCheckbox").prop("checked"));
 }
 
 function filterSearchPoints() {
@@ -699,43 +754,8 @@ function handleUnusedPoints() {
 }
 
 function fade_at_edge(d) {
-  if(currentRepoFilter.length > 0) {
-    var filterReturn = 0;
-    for(var i = 0; i < currentRepoFilter.length; i++) {
-      if(d.stage === currentRepoFilter[i].toLowerCase()) {
-        filterReturn = 1;
-        break;
-      }
-    }
-    if(filterReturn === 0) {
+  if(d.filtered === "false") {
       return 0;
-    }
-  }
-
-  if(currentPointFilter.length > 0) {
-    var filterReturn = 0;
-    for(var i = 0; i < currentPointFilter.length; i++) {
-      if(d.sourceTag === currentPointFilter[i] || d.targetTag === currentPointFilter[i]) {
-        filterReturn = 1;
-        break;
-      }
-    }
-    if(filterReturn === 0) {
-      return 0;
-    }
-  }
-
-  if(currentDirFilter.length > 0) {
-    var filterReturn = 0;
-    for(var i = 0; i < currentDirFilter.length; i++) {
-      if((d.direction === "<>" && currentDirFilter[i] === "Bidirectional") || (d.direction === ">" && currentDirFilter[i] === "Unidirectional") || (currentDirFilter[i] === "Unknown" && d.direction !== "<>" && d.direction !== ">")) {
-        filterReturn = 1;
-        break;
-      }
-    }
-    if(filterReturn === 0) {
-      return 0;
-    }
   }
 
   var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
@@ -860,7 +880,7 @@ function zoomed() {
     proj.rotate(o0);
     sky.rotate(o0);
   }
-  sens = 0.25/zoom.scale()*1330;
+  sens = 0.25/zoom.scale()*750;
   refresh();
 }
 

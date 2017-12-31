@@ -84,7 +84,7 @@ div.tooltip {
   width: 180px;
 }
 
-#pointCheckbox {
+.checkbox {
   margin: 0px;
   cursor: pointer;
   vertical-align: 2px;
@@ -244,7 +244,8 @@ div.tooltip {
       <div id="pointList"></div>
     </div>
   </div>
-  <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" id="pointCheckbox" onclick="checkPoints()"></input> Unused Languages</div>
+  <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" class="checkbox" id="pointCheckbox" onclick="checkPoints()"></input> Unused Languages</div>
+  <div onclick="fullDepth()" id="fullDepth" class="greenButton eP"><input type="checkbox" class="checkbox" id="fullDepthCheckbox" onclick="fullDepth()"></input> Full Depth Filtering</div>
   <div class="greenButton resetFilter" onclick="resetFilters()">Reset to Defaults</div>
 </div>
 
