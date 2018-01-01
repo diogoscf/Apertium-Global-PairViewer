@@ -11,6 +11,8 @@ var currentRepoFilter = [];
 var currentPointFilter = [];
 var currentDirFilter = [];
 
+var visitMap = new Map();
+
 var proj = d3.geo.orthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
@@ -91,7 +93,7 @@ function resize() {
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 267;
+  var offset = 312;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -345,6 +347,8 @@ function ready(error, world, places, points) {
     .selectAll("path").data(links)
     .enter().append("path")
     .attr("class","flyer")
+    .attr("sourceTag", function(d) { return d.sourceTag })
+    .attr("targetTag", function(d) { return d.targetTag })
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
     .style("stroke", function(d) { return chooseColor(d) })
 
@@ -478,9 +482,9 @@ function selectRepoFilter(f) {
   else {
     $("#checkmark" + f).remove();
     currentRepoFilter.splice(currentRepoFilter.indexOf(f),1);
-  } 
-  filterArcs();
-  filterFlyers();
+  }
+
+  filterArcsAndFlyers(); 
   refresh();
   handleUnusedPoints();
 }
@@ -495,8 +499,8 @@ function selectDirFilter(dir) {
     $("#checkmarkDir" + dir).remove();
     currentDirFilter.splice(currentDirFilter.indexOf(dir),1);
   }
-  filterArcs();
-  filterFlyers();
+
+  filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
 }
@@ -512,8 +516,8 @@ function filterPoint(p) {
     $("#checkmarkPoint" + p).remove();
     currentPointFilter.splice(currentPointFilter.indexOf(p),1);
   }
-  filterArcs();
-  filterFlyers();
+
+  filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
 }
@@ -531,69 +535,63 @@ function resetFilters() {
   $("#pointCheckbox").prop("checked", false);
   $("#fullDepthCheckbox").prop("checked", false);
 
-  filterArcs();
-  filterFlyers();
+  filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
 }
 
-function filterArcs() {
+function filterArc(s,t) {
   for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-    svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
-  }
-  if(currentRepoFilter.length > 0) {
-    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-      for(var j = 0; j < currentRepoFilter.length; j++) {
-        if(svg.selectAll(".arc")[0][i].getAttribute("stage") !== currentRepoFilter[j].toLowerCase()) {
-          svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
-        }
-        else {
-          svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
-          break;
-        }
-      }
-    }
-  }
-  if(currentPointFilter.length > 0) {
-    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-      if(svg.selectAll(".arc")[0][i].getAttribute("opacity") === "0") {
-        continue;
-      }
-      var filterReturn = 0;
-      for(var j = 0; j < currentPointFilter.length; j++) {
-        if(svg.selectAll(".arc")[0][i].getAttribute("sourceTag") === currentPointFilter[j] || svg.selectAll(".arc")[0][i].getAttribute("targetTag") === currentPointFilter[j]) {
-          filterReturn = 1;
-          break;
-        }
-      }
-      if(filterReturn === 0) {
-        svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
-      }
-    }
-  }
-  if(currentDirFilter.length > 0) {
-    for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-      if(svg.selectAll(".arc")[0][i].getAttribute("opacity") === "0") {
-        continue;
-      }
-      var filterReturn = 0;
-      for(var j = 0; j < currentDirFilter.length; j++) {
-        if((svg.selectAll(".arc")[0][i].getAttribute("direction") === "<>" && currentDirFilter[j] === "Bidirectional") || (svg.selectAll(".arc")[0][i].getAttribute("direction") === ">" && currentDirFilter[j] === "Unidirectional") || (currentDirFilter[j] === "Unknown" && svg.selectAll(".arc")[0][i].getAttribute("direction") !== "<>" && svg.selectAll(".arc")[0][i].getAttribute("direction") !== ">")) {
-          filterReturn = 1;
-          break;
-        }
-      }
-      if(filterReturn === 0) {
-        svg.selectAll(".arc")[0][i].setAttribute("opacity",0);
-      }
+    if(svg.selectAll(".arc")[0][i].getAttribute("sourceTag") === s && svg.selectAll(".arc")[0][i].getAttribute("targetTag") === t) {
+      svg.selectAll(".arc")[0][i].setAttribute("opacity", 0);
+      break;
     }
   }
 }
 
-function filterFlyers() {
+function filterArcsAndFlyers() {
+  for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
+    svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+  }
+
+  if($("#fullDepthCheckbox").prop("checked") === true) {
+    for(var i = 0; i < svg.selectAll(".point")[0].length; i++) {
+      visitMap.set(svg.selectAll(".point")[0][i].getAttribute("tag"), false);
+    }
+    for(var i = 0; i < currentPointFilter.length; i++) {
+      dfs(currentPointFilter[i]);
+    }
+  }
+
   svg.selectAll(".flyer")
     .attr("opacity", function (d) {
-      d.filtered = "true";
+      if($("#fullDepthCheckbox").prop("checked") === false || currentPointFilter.length === 0) {
+        d.filtered = "true";
+      }
+      else {
+        if(d.filtered === "temp") {
+          d.filtered = "true";
+        }
+        else {
+          d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
+        }
+      }
+
+      if(currentPointFilter.length > 0 && $("#fullDepthCheckbox").prop("checked") === false) {
+        var filterReturn = 0;
+        for(var i = 0; i < currentPointFilter.length; i++) {
+          if(d.sourceTag === currentPointFilter[i] || d.targetTag === currentPointFilter[i]) {
+            filterReturn = 1;
+            break;
+          }
+        }
+        if(filterReturn === 0) {
+          d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
+        }
+      }
+
       if(currentRepoFilter.length > 0) {
         var filterReturn = 0;
         for(var i = 0; i < currentRepoFilter.length; i++) {
@@ -604,19 +602,7 @@ function filterFlyers() {
         }
         if(filterReturn === 0) {
           d.filtered = "false";
-        }
-      }
-
-      if(currentPointFilter.length > 0) {
-        var filterReturn = 0;
-        for(var i = 0; i < currentPointFilter.length; i++) {
-          if(d.sourceTag === currentPointFilter[i] || d.targetTag === currentPointFilter[i]) {
-            filterReturn = 1;
-            break;
-          }
-        }
-        if(filterReturn === 0) {
-          d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
         }
       }
 
@@ -630,9 +616,29 @@ function filterFlyers() {
         }
         if(filterReturn === 0) {
           d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
         }
       }
-      fade_at_edge(d);
+      return fade_at_edge(d);
+    });
+}
+
+function dfs(curr) {
+  if(visitMap.get(curr) === true) {
+    return;
+  }
+  visitMap.set(curr,true);
+   svg.selectAll(".flyer")
+    .attr("opacity", function (d) {
+      if(d.sourceTag === curr) {
+        d.filtered = "temp";
+        dfs(d.targetTag);
+      }
+      else if(d.targetTag === curr) {
+        d.filtered = "temp";
+        dfs(d.sourceTag);
+      }
+      return fade_at_edge(d);
     });
 }
 
@@ -671,7 +677,7 @@ function toggleDropdown(t, id) {
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 267;
+  var offset = 312;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -683,6 +689,9 @@ function checkPoints() {
 
 function fullDepth() {
   $("#fullDepthCheckbox").prop("checked", !$("#fullDepthCheckbox").prop("checked"));
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
 }
 
 function filterSearchPoints() {
@@ -880,7 +889,7 @@ function zoomed() {
     proj.rotate(o0);
     sky.rotate(o0);
   }
-  sens = 0.25/zoom.scale()*750;
+  sens = 0.25/zoom.scale()*900;
   refresh();
 }
 
