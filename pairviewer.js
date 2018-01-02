@@ -13,25 +13,36 @@ var currentDirFilter = [];
 
 var visitMap = new Map();
 
-var proj = d3.geo.orthographic()
+var proj = d3.geoOrthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 4);
 
-var sky = d3.geo.orthographic()
+var sky = d3.geoOrthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
     .scale(width / 3);
 
 
 // Point radius can be updated here
-var path = d3.geo.path().projection(proj).pointRadius(3);
+var path = d3.geoPath().projection(proj).pointRadius(3);
 
+/*var swoosh = d3.line()
+      .x(function(d) { return d[0] })
+      .y(function(d) { return d[1] })
+      .curve(d3.curveCardinal.tension(.0));*/
+
+// This is the v3 version of the above.
+// For some reason, the v3 produces the nice
+// parabolic curves for the flyers, while
+// the v4 are too pointy. This is the only reason
+// the d3 v3 cdn is still in the index.html.
 var swoosh = d3.svg.line()
       .x(function(d) { return d[0] })
       .y(function(d) { return d[1] })
       .interpolate("cardinal")
       .tension(.0);
+
 
 var links = [],
     arcLines = [];
@@ -57,12 +68,15 @@ svg.style("background", "#311B92");
 
 window.addEventListener("resize", resize);
 
-var zoom = d3.behavior.zoom(true)
-    .scale(proj.scale())
+var zoom = d3.zoom()
     .scaleExtent([100, 50000])
     .on("zoom", zoomed);
 
-svg.call(zoom);
+svg.call(zoom)
+    .on("mousedown.zoom", null)
+    .on("touchstart.zoom", null)
+    .on("touchmove.zoom", null)
+    .on("touchend.zoom", null);
 d3.select("svg").on("dblclick.zoom", null);
 
 function resize() {
@@ -70,17 +84,17 @@ function resize() {
   fixedHeight = window.innerHeight;
   svg.attr("width", fixedWidth).attr("height", fixedHeight);
 
-  sky = d3.geo.orthographic()
+  sky = d3.geoOrthographic()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(width / 3);
 
-  proj = d3.geo.orthographic()
+  proj = d3.geoOrthographic()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(width / 4);
 
-  path = d3.geo.path().projection(proj).pointRadius(3);
+  path = d3.geoPath().projection(proj).pointRadius(3);
 
   svg.selectAll("circle").attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2);
   
@@ -374,7 +388,6 @@ function ready(error, world, places, points) {
 //Position and hiding labels
 function position_labels() {
   var centerPos = proj.invert([fixedWidth/2, fixedHeight/2]);
-  var arc = d3.geo.greatArc();
 
   svg.selectAll(".label")
     .attr("label-anchor",function(d) {
@@ -391,7 +404,7 @@ function position_labels() {
       return "translate(" + (x+offset) + "," + (y-2) + ")"
     })
     .style("display",function(d) {
-      var d = arc.distance({source: d.geometry.coordinates, target: centerPos});
+      var d = d3.geoDistance(d.geometry.coordinates, centerPos);
       return (d > 1.57) ? 'none' : 'inline';
     })
 
@@ -541,22 +554,22 @@ function resetFilters() {
 }
 
 function filterArc(s,t) {
-  for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-    if(svg.selectAll(".arc")[0][i].getAttribute("sourceTag") === s && svg.selectAll(".arc")[0][i].getAttribute("targetTag") === t) {
-      svg.selectAll(".arc")[0][i].setAttribute("opacity", 0);
+  for(var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+    if(svg.selectAll(".arc")._groups[0][i].getAttribute("sourceTag") === s && svg.selectAll(".arc")._groups[0][i].getAttribute("targetTag") === t) {
+      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 0);
       break;
     }
   }
 }
 
 function filterArcsAndFlyers() {
-  for(var i = 0; i < svg.selectAll(".arc")[0].length; i++) {
-    svg.selectAll(".arc")[0][i].setAttribute("opacity",1);
+  for(var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+    svg.selectAll(".arc")._groups[0][i].setAttribute("opacity",1);
   }
 
   if($("#fullDepthCheckbox").prop("checked") === true) {
-    for(var i = 0; i < svg.selectAll(".point")[0].length; i++) {
-      visitMap.set(svg.selectAll(".point")[0][i].getAttribute("tag"), false);
+    for(var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+      visitMap.set(svg.selectAll(".point")._groups[0][i].getAttribute("tag"), false);
     }
     for(var i = 0; i < currentPointFilter.length; i++) {
       dfs(currentPointFilter[i]);
@@ -729,34 +742,36 @@ function handleUnusedPoints() {
     if(this.getAttribute("opacity") !== "0") {
       var dsource = String(d.source[0])+","+String(d.source[1]);
       var dtarget = String(d.target[0])+","+String(d.target[1]);
-      for(var j = 0; j < svg.selectAll(".point")[0].length; j++) {
-        if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dsource) {
-          svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+      var points = svg.selectAll(".point")._groups[0];
+      for(var j = 0; j < points.length; j++) {
+        if(points[j].getAttribute("coordinate") === dsource) {
+          points[j].setAttribute("style", "opacity: 0.6");
         }
-        if(svg.selectAll(".point")[0][j].getAttribute("coordinate") === dtarget) {
-          svg.selectAll(".point")[0][j].setAttribute("style", "opacity: 0.6");
+        if(points[j].getAttribute("coordinate") === dtarget) {
+          points[j].setAttribute("style", "opacity: 0.6");
         }
       }
-      for(var k = 0; k < svg.selectAll(".label")[0].length; k++) {
-        if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dsource) {
-          svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+      var labels = svg.selectAll(".label")._groups[0];
+      for(var k = 0; k < labels.length; k++) {
+        if(labels[k].getAttribute("coordinate") === dsource) {
+          labels[k].setAttribute("style", "opacity: 0.9");
         }
-        if(svg.selectAll(".label")[0][k].getAttribute("coordinate") === dtarget) {
-          svg.selectAll(".label")[0][k].setAttribute("style", "opacity: 0.9");
+        if(labels[k].getAttribute("coordinate") === dtarget) {
+          labels[k].setAttribute("style", "opacity: 0.9");
         }
       }
     }
     return fade_at_edge(d);
   })
 
-  for(var i = 0; i < svg.selectAll(".point")[0].length; i++) {
-    if(currentPointFilter.indexOf(svg.selectAll(".point")[0][i].getAttribute("tag")) !== -1) {
-      svg.selectAll(".point")[0][i].setAttribute("style", "opacity: 0.6");
+  for(var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+    if(currentPointFilter.indexOf(svg.selectAll(".point")._groups[0][i].getAttribute("tag")) !== -1) {
+      svg.selectAll(".point")._groups[0][i].setAttribute("style", "opacity: 0.6");
     }
   }
-  for(var i = 0; i < svg.selectAll(".label")[0].length; i++) {
-    if(currentPointFilter.indexOf(svg.selectAll(".label")[0][i].innerHTML) !== -1) {
-      svg.selectAll(".label")[0][i].setAttribute("style", "opacity: 0.9");
+  for(var i = 0; i < svg.selectAll(".label")._groups[0].length; i++) {
+    if(currentPointFilter.indexOf(svg.selectAll(".label")._groups[0][i].innerHTML) !== -1) {
+      svg.selectAll(".label")._groups[0][i].setAttribute("style", "opacity: 0.9");
     }
   }
   refresh();
@@ -768,8 +783,6 @@ function fade_at_edge(d) {
   }
 
   var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
-
-      arc = d3.geo.greatArc(),
       start, end;
   // function is called on 2 different data structures..
   if (d.source) {
@@ -781,25 +794,25 @@ function fade_at_edge(d) {
     end = d.coordinates2;
   }
 
-  var start_dist = 1.57 - arc.distance({source: start, target: centerPos}),
-      end_dist = 1.57 - arc.distance({source: end, target: centerPos});
+  var start_dist = 1.57 - d3.geoDistance(start, centerPos),
+      end_dist = 1.57 - d3.geoDistance(end, centerPos);
 
-  var fade = d3.scale.linear().domain([-.1,0]).range([0,.1])
+  var fade = d3.scaleLinear().domain([-.1,0]).range([0,.1])
   var dist = start_dist < end_dist ? start_dist : end_dist;
   return fade(dist)
 }
 
 function location_along_arc(start, end, loc) {
-  var interpolator = d3.geo.interpolate(start,end);
+  var interpolator = d3.geoInterpolate(start,end);
   return interpolator(loc)
 }
 
 function rotateToPoint(p) {
   var rotate = proj.rotate();
   var coords;
-  for(var i = 0; i < svg.selectAll(".point")[0].length; i++) {
-    if(svg.selectAll(".point")[0][i].getAttribute("tag") === p) {
-      coords = svg.selectAll(".point")[0][i].getAttribute("coordinate");
+  for(var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+    if(svg.selectAll(".point")._groups[0][i].getAttribute("tag") === p) {
+      coords = svg.selectAll(".point")._groups[0][i].getAttribute("coordinate");
     }
   }
   var q = coords.split(',');
@@ -814,24 +827,110 @@ function rotateToPoint(p) {
   })
 }
 
-// modified from http://bl.ocks.org/KoGor/5994804
-var sens = 0.25;
+// modified from http://bl.ocks.org/tlfrd/df1f1f705c7940a6a7c0dca47041fec8
 var o0;
-svg.call(d3.behavior.drag()
-    .origin(function() { var r = proj.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
-    .on("drag", function() {
-      var rotate = proj.rotate();
-      var ydir = -d3.event.y * sens;
-      ydir = ydir > 70 ? 70 : // Affects maximum turn (upper and lower limit)
-                  ydir < -70 ? -70 :
-                  ydir;
-      proj.rotate([d3.event.x * sens, ydir, rotate[2]]);
-      sky.rotate([d3.event.x * sens, ydir, rotate[2]]);
-      o0 = proj.rotate();
-      refresh();
-    })
+
+/********** versor.js **********/
+var acos = Math.acos,
+    asin = Math.asin,
+    atan2 = Math.atan2,
+    cos = Math.cos,
+    max = Math.max,
+    min = Math.min,
+    PI = Math.PI,
+    sin = Math.sin,
+    sqrt = Math.sqrt,
+    radians = PI / 180,
+    degrees = 180 / PI;
+
+// Returns the unit quaternion for the given Euler rotation angles [λ, φ, γ].
+function versor(e) {
+  var l = e[0] / 2 * radians, sl = sin(l), cl = cos(l), // λ / 2
+      p = e[1] / 2 * radians, sp = sin(p), cp = cos(p), // φ / 2
+      g = e[2] / 2 * radians, sg = sin(g), cg = cos(g); // γ / 2
+  return [
+    cl * cp * cg + sl * sp * sg,
+    sl * cp * cg - cl * sp * sg,
+    cl * sp * cg + sl * cp * sg,
+    cl * cp * sg - sl * sp * cg
+  ];
+}
+
+// Returns Cartesian coordinates [x, y, z] given spherical coordinates [λ, φ].
+versor.cartesian = function(e) {
+  var l = e[0] * radians, p = e[1] * radians, cp = cos(p);
+  return [cp * cos(l), cp * sin(l), sin(p)];
+};
+
+// Returns the Euler rotation angles [λ, φ, γ] for the given quaternion.
+versor.rotation = function(q) {
+  return [
+    atan2(2 * (q[0] * q[1] + q[2] * q[3]), 1 - 2 * (q[1] * q[1] + q[2] * q[2])) * degrees,
+    asin(max(-1, min(1, 2 * (q[0] * q[2] - q[3] * q[1])))) * degrees,
+    atan2(2 * (q[0] * q[3] + q[1] * q[2]), 1 - 2 * (q[2] * q[2] + q[3] * q[3])) * degrees
+  ];
+};
+
+// Returns the quaternion to rotate between two cartesian points on the sphere.
+versor.delta = function(v0, v1) {
+  var w = cross(v0, v1), l = sqrt(dot(w, w));
+  if (!l) return [1, 0, 0, 0];
+  var t = acos(max(-1, min(1, dot(v0, v1)))) / 2, s = sin(t); // t = θ / 2
+  return [cos(t), w[2] / l * s, -w[1] / l * s, w[0] / l * s];
+};
+
+// Returns the quaternion that represents q0 * q1.
+versor.multiply = function(q0, q1) {
+  return [
+    q0[0] * q1[0] - q0[1] * q1[1] - q0[2] * q1[2] - q0[3] * q1[3],
+    q0[0] * q1[1] + q0[1] * q1[0] + q0[2] * q1[3] - q0[3] * q1[2],
+    q0[0] * q1[2] - q0[1] * q1[3] + q0[2] * q1[0] + q0[3] * q1[1],
+    q0[0] * q1[3] + q0[1] * q1[2] - q0[2] * q1[1] + q0[3] * q1[0]
+  ];
+};
+
+function cross(v0, v1) {
+  return [
+    v0[1] * v1[2] - v0[2] * v1[1],
+    v0[2] * v1[0] - v0[0] * v1[2],
+    v0[0] * v1[1] - v0[1] * v1[0]
+  ];
+}
+
+function dot(v0, v1) {
+  return v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
+}
+
+/********** end of versor.js **********/
+
+svg.call(d3.drag()
+  .on("start", dragstarted)
+  .on("drag", dragged)
+  .on("end",dragended)
 );
 
+var v0,r0,q0;
+
+function dragstarted() {
+  svg.on('.zoom', null);
+  v0 = versor.cartesian(proj.invert(d3.mouse(this)));
+  r0 = proj.rotate();
+  q0 = versor(r0);
+}
+
+function dragged() {
+  var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this)));
+  var q1 = versor.multiply(q0, versor.delta(v0, v1));
+  var r1 = versor.rotation(q1);
+  proj.rotate(r1);
+  sky.rotate(r1);
+  refresh();
+}
+
+function dragended() {
+  o0 = proj.rotate();
+  svg.call(zoom);
+}
 
 window.addEventListener('touchmove',
   function (e) {
@@ -839,49 +938,37 @@ window.addEventListener('touchmove',
   }
 , false);
 
-// Zooms by interpolating
+// Zooms by twice or half
 function zoomIn() {
-  var scale = zoom.scale();
-
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, scale * 1.2);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
+  svg.transition()
+    .duration(500)
+    .call(zoom.scaleBy, 2);
 }
 
 function zoomOut() {
-  var scale = zoom.scale();
-
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, scale / 1.2);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
+  svg.transition()
+    .duration(500)
+    .call(zoom.scaleBy, 0.5);
 }
 
-// Start off slightly zoomed-in
+// Start off zoomed based off of window size
 resetZoom();
 
 function zoomed() {
-  var scale = zoom.scale();
+  var scale = d3.event.transform.k;
   width = scale;
 
-  proj = d3.geo.orthographic()
+  proj = d3.geoOrthographic()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(scale / 4);
 
-  sky = d3.geo.orthographic()
+  sky = d3.geoOrthographic()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(scale / 3);
 
-  path = d3.geo.path().projection(proj).pointRadius(3);
+  path = d3.geoPath().projection(proj).pointRadius(3);
 
   svg.selectAll("circle").attr("r", scale / 4);
 
@@ -889,22 +976,15 @@ function zoomed() {
     proj.rotate(o0);
     sky.rotate(o0);
   }
-  sens = 0.25/zoom.scale()*900;
+
   refresh();
 }
 
+// Resets zoom to fit window size
 function resetZoom() {
-  var scale = zoom.scale();
   var initial = 2;
-  var defaultScale = Math.min(initial*fixedHeight,initial*fixedWidth);
-
-  d3.transition().duration(150).tween("zoom", function () {
-    var interpolate_scale = d3.interpolate(scale, defaultScale);
-    return function (t) {
-      zoom.scale(interpolate_scale(t));
-      zoomed();
-    };
-  });
+  svg.transition()
+    .call( zoom.transform, d3.zoomIdentity.scale(Math.min(initial*fixedHeight,initial*fixedWidth)));
 }
 
 // Zoom-in with + key and zoom-out with - key and reset with 0
