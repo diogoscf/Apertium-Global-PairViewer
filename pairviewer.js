@@ -70,13 +70,12 @@ window.addEventListener("resize", resize);
 
 var zoom = d3.zoom()
     .scaleExtent([100, 50000])
-    .on("zoom", zoomed);
+    .on("start",zoomstart)
+    .on("zoom", zoomed)
+    .on("end",zoomend);
 
-svg.call(zoom)
-    .on("mousedown.zoom", null)
-    .on("touchstart.zoom", null)
-    .on("touchmove.zoom", null)
-    .on("touchend.zoom", null);
+svg.call(zoom);
+
 d3.select("svg").on("dblclick.zoom", null);
 
 function resize() {
@@ -903,34 +902,7 @@ function dot(v0, v1) {
 
 /********** end of versor.js **********/
 
-svg.call(d3.drag()
-  .on("start", dragstarted)
-  .on("drag", dragged)
-  .on("end",dragended)
-);
-
 var v0,r0,q0;
-
-function dragstarted() {
-  svg.on('.zoom', null);
-  v0 = versor.cartesian(proj.invert(d3.mouse(this)));
-  r0 = proj.rotate();
-  q0 = versor(r0);
-}
-
-function dragged() {
-  var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this)));
-  var q1 = versor.multiply(q0, versor.delta(v0, v1));
-  var r1 = versor.rotation(q1);
-  proj.rotate(r1);
-  sky.rotate(r1);
-  refresh();
-}
-
-function dragended() {
-  o0 = proj.rotate();
-  svg.call(zoom);
-}
 
 window.addEventListener('touchmove',
   function (e) {
@@ -954,30 +926,51 @@ function zoomOut() {
 // Start off zoomed based off of window size
 resetZoom();
 
+function zoomstart() {
+  v0 = versor.cartesian(proj.invert(d3.mouse(this)));
+  r0 = proj.rotate();
+  q0 = versor(r0);
+}
+
 function zoomed() {
   var scale = d3.event.transform.k;
-  width = scale;
+  if(width === scale) {
+    // If not zooming, rotating.
+    var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this)));
+    var q1 = versor.multiply(q0, versor.delta(v0, v1));
+    var r1 = versor.rotation(q1);
+    proj.rotate(r1);
+    sky.rotate(r1);
+    refresh();
+  }
+  else {
+    width = scale;
 
-  proj = d3.geoOrthographic()
+    proj = d3.geoOrthographic()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(scale / 4);
 
-  sky = d3.geoOrthographic()
+    sky = d3.geoOrthographic()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
       .scale(scale / 3);
 
-  path = d3.geoPath().projection(proj).pointRadius(3);
+    path = d3.geoPath().projection(proj).pointRadius(3);
 
-  svg.selectAll("circle").attr("r", scale / 4);
+    svg.selectAll("circle").attr("r", scale / 4);
 
-  if(o0) {
-    proj.rotate(o0);
-    sky.rotate(o0);
+    if(o0) {
+      proj.rotate(o0);
+      sky.rotate(o0);
+    }
+
+    refresh();
   }
+}
 
-  refresh();
+function zoomend() {
+  o0 = proj.rotate();
 }
 
 // Resets zoom to fit window size
