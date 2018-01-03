@@ -27,21 +27,10 @@ var sky = d3.geoOrthographic()
 // Point radius can be updated here
 var path = d3.geoPath().projection(proj).pointRadius(3);
 
-/*var swoosh = d3.line()
+var swoosh = d3.line()
       .x(function(d) { return d[0] })
       .y(function(d) { return d[1] })
-      .curve(d3.curveCardinal.tension(.0));*/
-
-// This is the v3 version of the above.
-// For some reason, the v3 produces the nice
-// parabolic curves for the flyers, while
-// the v4 are too pointy. This is the only reason
-// the d3 v3 cdn is still in the index.html.
-var swoosh = d3.svg.line()
-      .x(function(d) { return d[0] })
-      .y(function(d) { return d[1] })
-      .interpolate("cardinal")
-      .tension(.0);
+      .curve(d3.curveCardinal.tension(-1.3));
 
 
 var links = [],
@@ -96,7 +85,7 @@ function resize() {
   path = d3.geoPath().projection(proj).pointRadius(3);
 
   svg.selectAll("circle").attr("cx", fixedWidth / 2).attr("cy", fixedHeight / 2);
-  
+
   if(o0) {
     proj.rotate(o0);
     sky.rotate(o0);
@@ -438,7 +427,7 @@ function flying_arc(pts) {
   var result = [ proj(source),
                  sky(mid),
                  proj(target)]
-  
+
   return result;
 }
 
@@ -457,7 +446,7 @@ function refresh() {
   svg.selectAll(".mesh").attr("d", path);
   svg.selectAll(".arc").attr("d", path);
   // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
-  
+
   position_labels();
 
   svg.selectAll(".flyer")
@@ -496,7 +485,7 @@ function selectRepoFilter(f) {
     currentRepoFilter.splice(currentRepoFilter.indexOf(f),1);
   }
 
-  filterArcsAndFlyers(); 
+  filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
 }
@@ -536,7 +525,7 @@ function filterPoint(p) {
 
 function resetFilters() {
   $(".checkmark").remove();
-  
+
   currentRepoFilter = [];
   currentPointFilter = [];
   currentDirFilter = [];
