@@ -1,6 +1,8 @@
 {
 "type": "FeatureCollection",
 "point_data": [
+	{"type": "Feature", "tag": "sco", "geometry": { "type": "Point", "coordinates": [-2.5, 57.4]} } 
+,
 	{"type": "Feature", "tag": "scn", "geometry": { "type": "Point", "coordinates": [14.0, 37.0]} } 
 ,
 	{"type": "Feature", "tag": "mfe", "geometry": { "type": "Point", "coordinates": [57.5, -20.2]} } 
@@ -35,6 +37,8 @@
 ,
 	{"type": "Feature", "tag": "dan", "geometry": { "type": "Point", "coordinates": [11.5, 55.5]} } 
 ,
+	{"type": "Feature", "tag": "nog", "geometry": { "type": "Point", "coordinates": [46.4, 43.9]} } 
+,
 	{"type": "Feature", "tag": "nob", "geometry": { "type": "Point", "coordinates": [11.0, 60.0]} } 
 ,
 	{"type": "Feature", "tag": "ces", "geometry": { "type": "Point", "coordinates": [15.0, 49.0]} } 
@@ -57,15 +61,21 @@
 ,
 	{"type": "Feature", "tag": "guj", "geometry": { "type": "Point", "coordinates": [72.0, 23.0]} } 
 ,
-	{"type": "Feature", "tag": "afr", "geometry": { "type": "Point", "coordinates": [22.0, -32.0]} } 
+	{"type": "Feature", "tag": "fkv", "geometry": { "type": "Point", "coordinates": [26.4, 70.1]} } 
 ,
 	{"type": "Feature", "tag": "crh", "geometry": { "type": "Point", "coordinates": [34.4, 45.3]} } 
+,
+	{"type": "Feature", "tag": "mhr", "geometry": { "type": "Point", "coordinates": [50.9, 57.9]} } 
 ,
 	{"type": "Feature", "tag": "bak", "geometry": { "type": "Point", "coordinates": [56.0, 54.0]} } 
 ,
 	{"type": "Feature", "tag": "tel", "geometry": { "type": "Point", "coordinates": [78.0, 21.0]} } 
 ,
 	{"type": "Feature", "tag": "mdf", "geometry": { "type": "Point", "coordinates": [44.0, 54.0]} } 
+,
+	{"type": "Feature", "tag": "snd", "geometry": { "type": "Point", "coordinates": [68.1, 26.5]} } 
+,
+	{"type": "Feature", "tag": "olo", "geometry": { "type": "Point", "coordinates": [32.7, 61.6]} } 
 ,
 	{"type": "Feature", "tag": "ara", "geometry": { "type": "Point", "coordinates": [36.0, 28.0]} } 
 ,
@@ -77,11 +87,17 @@
 ,
 	{"type": "Feature", "tag": "est", "geometry": { "type": "Point", "coordinates": [26.0, 59.0]} } 
 ,
+	{"type": "Feature", "tag": "pes", "geometry": { "type": "Point", "coordinates": [59.2, 35.5]} } 
+,
+	{"type": "Feature", "tag": "smn", "geometry": { "type": "Point", "coordinates": [27.7, 68.7]} } 
+,
 	{"type": "Feature", "tag": "kum", "geometry": { "type": "Point", "coordinates": [47.5, 42.7]} } 
 ,
 	{"type": "Feature", "tag": "kmr", "geometry": { "type": "Point", "coordinates": [42.5, 37.5]} } 
 ,
 	{"type": "Feature", "tag": "sme", "geometry": { "type": "Point", "coordinates": [23.0, 69.0]} } 
+,
+	{"type": "Feature", "tag": "sma", "geometry": { "type": "Point", "coordinates": [11.6, 63.2]} } 
 ,
 	{"type": "Feature", "tag": "ast", "geometry": { "type": "Point", "coordinates": [-6.0, 43.0]} } 
 ,
@@ -94,6 +110,10 @@
 	{"type": "Feature", "tag": "tuk", "geometry": { "type": "Point", "coordinates": [60.0, 40.0]} } 
 ,
 	{"type": "Feature", "tag": "rus", "geometry": { "type": "Point", "coordinates": [39.0, 57.0]} } 
+,
+	{"type": "Feature", "tag": "rup", "geometry": { "type": "Point", "coordinates": [20.0, 40.0]} } 
+,
+	{"type": "Feature", "tag": "vro", "geometry": { "type": "Point", "coordinates": [27.0, 57.9]} } 
 ,
 	{"type": "Feature", "tag": "asm", "geometry": { "type": "Point", "coordinates": [91.77, 26.14]} } 
 ,
@@ -115,6 +135,8 @@
 ,
 	{"type": "Feature", "tag": "srp", "geometry": { "type": "Point", "coordinates": [21.0, 44.0]} } 
 ,
+	{"type": "Feature", "tag": "sjo", "geometry": { "type": "Point", "coordinates": [81.1, 43.7]} } 
+,
 	{"type": "Feature", "tag": "isl", "geometry": { "type": "Point", "coordinates": [-19.0, 64.0]} } 
 ,
 	{"type": "Feature", "tag": "mvi", "geometry": { "type": "Point", "coordinates": [125.3, 24.8]} } 
@@ -129,6 +151,8 @@
 ,
 	{"type": "Feature", "tag": "pol", "geometry": { "type": "Point", "coordinates": [20.0, 52.0]} } 
 ,
+	{"type": "Feature", "tag": "afr", "geometry": { "type": "Point", "coordinates": [22.0, -32.0]} } 
+,
 	{"type": "Feature", "tag": "tgk", "geometry": { "type": "Point", "coordinates": [71.0, 39.0]} } 
 ,
 	{"type": "Feature", "tag": "bre", "geometry": { "type": "Point", "coordinates": [-3.4, 48.3]} } 
@@ -140,6 +164,8 @@
 	{"type": "Feature", "tag": "fra", "geometry": { "type": "Point", "coordinates": [2.5, 47.0]} } 
 ,
 	{"type": "Feature", "tag": "mkd", "geometry": { "type": "Point", "coordinates": [22.0, 41.5]} } 
+,
+	{"type": "Feature", "tag": "swa", "geometry": { "type": "Point", "coordinates": [32.0, 0.3]} } 
 ,
 	{"type": "Feature", "tag": "wad", "geometry": { "type": "Point", "coordinates": [132.5, -1.5]} } 
 ,
@@ -159,6 +185,8 @@
 ,
 	{"type": "Feature", "tag": "hun", "geometry": { "type": "Point", "coordinates": [20.0, 47.0]} } 
 ,
+	{"type": "Feature", "tag": "smj", "geometry": { "type": "Point", "coordinates": [17.4, 67.5]} } 
+,
 	{"type": "Feature", "tag": "bul", "geometry": { "type": "Point", "coordinates": [35.0, 43.0]} } 
 ,
 	{"type": "Feature", "tag": "bua", "geometry": { "type": "Point", "coordinates": [109.0, 53.0]} } 
@@ -166,6 +194,8 @@
 	{"type": "Feature", "tag": "cym", "geometry": { "type": "Point", "coordinates": [-4.0, 52.5]} } 
 ,
 	{"type": "Feature", "tag": "udm", "geometry": { "type": "Point", "coordinates": [52.0, 57.0]} } 
+,
+	{"type": "Feature", "tag": "ben", "geometry": { "type": "Point", "coordinates": [87.3, 23.3]} } 
 ,
 	{"type": "Feature", "tag": "lvs", "geometry": { "type": "Point", "coordinates": [25.0, 57.0]} } 
 ,
@@ -183,11 +213,17 @@
 ,
 	{"type": "Feature", "tag": "jdt", "geometry": { "type": "Point", "coordinates": [47.6, 40.1]} } 
 ,
+	{"type": "Feature", "tag": "zho", "geometry": { "type": "Point", "coordinates": [113.0, 30.8]} } 
+,
 	{"type": "Feature", "tag": "nno", "geometry": { "type": "Point", "coordinates": [7.0, 61.0]} } 
 ,
 	{"type": "Feature", "tag": "sah", "geometry": { "type": "Point", "coordinates": [129.0, 66.0]} } 
 ,
 	{"type": "Feature", "tag": "uig", "geometry": { "type": "Point", "coordinates": [85.0, 41.0]} } 
+,
+	{"type": "Feature", "tag": "myv", "geometry": { "type": "Point", "coordinates": [45.6, 54.5]} } 
+,
+	{"type": "Feature", "tag": "khk", "geometry": { "type": "Point", "coordinates": [106.0, 47.0]} } 
 ,
 	{"type": "Feature", "tag": "spa", "geometry": { "type": "Point", "coordinates": [-3.0, 41.0]} } 
 ,
@@ -221,6 +257,8 @@
 ,
 	{"type": "Feature", "tag": "sqi", "geometry": { "type": "Point", "coordinates": [20.0, 41.0]} } 
 ,
+	{"type": "Feature", "tag": "lat", "geometry": { "type": "Point", "coordinates": [12.0, 41.0]} } 
+,
 	{"type": "Feature", "tag": "kaz", "geometry": { "type": "Point", "coordinates": [73.2, 48.9]} } 
 ,
 	{"type": "Feature", "tag": "tyv", "geometry": { "type": "Point", "coordinates": [94.0, 52.0]} } 
@@ -230,6 +268,12 @@
 	{"type": "Feature", "tag": "urd", "geometry": { "type": "Point", "coordinates": [68.0, 25.0]} } 
 ,
 	{"type": "Feature", "tag": "ckb", "geometry": { "type": "Point", "coordinates": [44.0, 36.0]} } 
+,
+	{"type": "Feature", "tag": "epo", "geometry": { "type": "Point", "coordinates": [0.0, -90.0]} } 
+,
+	{"type": "Feature", "tag": "zul", "geometry": { "type": "Point", "coordinates": [31.3, -28.1]} } 
+,
+	{"type": "Feature", "tag": "mrj", "geometry": { "type": "Point", "coordinates": [46.1, 56.5]} } 
 ,
 	{"type": "Feature", "tag": "tha", "geometry": { "type": "Point", "coordinates": [101.3, 15.6]} } 
 ]
