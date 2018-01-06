@@ -508,10 +508,11 @@ function selectDirFilter(dir) {
 
 // Update point filter and globe
 function filterPoint(p) {
+  var needToRotate = false;
   if($("#checkmarkPoint" + p).length === 0) {
     $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmark"></i>');
     currentPointFilter.push(p);
-    rotateToPoint(p);
+    needToRotate = true;
   }
   else {
     $("#checkmarkPoint" + p).remove();
@@ -521,6 +522,9 @@ function filterPoint(p) {
   filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
+  if(needToRotate) {
+    rotateToPoint(p);
+  }
 }
 
 function resetFilters() {
