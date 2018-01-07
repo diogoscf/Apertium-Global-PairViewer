@@ -809,7 +809,7 @@ function rotateToPoint(p) {
   }
   var q = coords.split(',');
   d3.transition().duration(2500).tween("rotate", function() {
-    var r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
+    var r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1]), rotate[2]]);
     return function(t) {
       proj.rotate(r(t));
       sky.rotate(r(t));
