@@ -13,6 +13,12 @@ var currentDirFilter = [];
 
 var visitMap = new Map();
 
+var TRUNK_COLOR = "#0cff00";
+var STAGING_COLOR = "#ffff00";
+var NURSERY_COLOR = "#ffa500";
+var INCUBATOR_COLOR = "#de1738";
+var UNKNOWN_COLOR = "#9c27b0";
+
 var proj = d3.geoOrthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
@@ -138,7 +144,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#CDDC39")
+        .style("fill", TRUNK_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -151,7 +157,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#CDDC39")
+        .style("fill", TRUNK_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -164,7 +170,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#4CAF50")
+        .style("fill", STAGING_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -177,7 +183,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#4CAF50")
+        .style("fill", STAGING_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -190,7 +196,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#FFEB3B")
+        .style("fill", NURSERY_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -203,7 +209,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#FFEB3B")
+        .style("fill", NURSERY_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -216,7 +222,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#E91E63")
+        .style("fill", INCUBATOR_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -229,7 +235,7 @@ function ready(error, world, places, points) {
         .attr("markerWidth", "20")
         .attr("markerHeight", "20")
         .attr("orient", "auto")
-        .style("fill", "#E91E63")
+        .style("fill", INCUBATOR_COLOR)
         .style("stroke", "black")
         .style("stroke-width", "0.3px")
       .append("path")
@@ -398,22 +404,23 @@ function position_labels() {
 }
 
 // Chooses flyer color based on language pair stage
+// trunk green, staging yellow, nursery orange, incubator red
 function chooseColor(d) {
   var color = "#FF9800";
   if (d.stage == "trunk") {
-    color = "#CDDC39";
+    color = TRUNK_COLOR;
   }
   else if (d.stage == "staging") {
-    color = "#4CAF50";
+    color = STAGING_COLOR;
   }
   else if (d.stage == "nursery") {
-    color = "#FFEB3B";
+    color = NURSERY_COLOR;
   }
   else if (d.stage == "incubator") {
-    color = "#E91E63";
+    color = INCUBATOR_COLOR;
   }
   else {
-    color = "#9C27B0"
+    color = UNKNOWN_COLOR
   }
   return color;
 }
