@@ -920,9 +920,11 @@ function zoomOut() {
 resetZoom();
 
 function zoomstart() {
-  v0 = versor.cartesian(proj.invert(d3.mouse(this)));
-  r0 = proj.rotate();
-  q0 = versor(r0);
+  if (d3.event.sourceEvent) {
+    v0 = versor.cartesian(proj.invert(d3.mouse(this)));
+    r0 = proj.rotate();
+    q0 = versor(r0);
+  }
 }
 
 function zoomed() {
@@ -970,7 +972,7 @@ function zoomend() {
 function resetZoom() {
   var initial = 2;
   svg.transition()
-    .call( zoom.transform, d3.zoomIdentity.scale(Math.min(initial*fixedHeight,initial*fixedWidth)));
+    .call(zoom.transform, d3.zoomIdentity.scale(Math.min(initial*fixedHeight,initial*fixedWidth)));
 }
 
 // Zoom-in with + key and zoom-out with - key and reset with 0
