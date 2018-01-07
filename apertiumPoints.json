@@ -143,7 +143,7 @@
 ,
 	{"type": "Feature", "tag": "hbs", "geometry": { "type": "Point", "coordinates": [19.0, 45.5]} } 
 ,
-	{"type": "Feature", "tag": "tat", "geometry": { "type": "Point", "coordinates": [60.0, 56.0]} } 
+	{"type": "Feature", "tag": "tat", "geometry": { "type": "Point", "coordinates": [49.1, 55.79]} } 
 ,
 	{"type": "Feature", "tag": "por", "geometry": { "type": "Point", "coordinates": [-8.5, 40.0]} } 
 ,
@@ -175,7 +175,7 @@
 ,
 	{"type": "Feature", "tag": "ton", "geometry": { "type": "Point", "coordinates": [-175.2, -21.2]} } 
 ,
-	{"type": "Feature", "tag": "chv", "geometry": { "type": "Point", "coordinates": [47.5, 56.0]} } 
+	{"type": "Feature", "tag": "chv", "geometry": { "type": "Point", "coordinates": [47.0, 56.0]} } 
 ,
 	{"type": "Feature", "tag": "xal", "geometry": { "type": "Point", "coordinates": [44.3, 46.3]} } 
 ,

@@ -95,7 +95,7 @@ function resize() {
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 312;
+  var offset = 355;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -251,7 +251,7 @@ function ready(error, world, defaultplaces, places, points) {
   svg.append("path")
     .datum(borders)
     .attr("class", "mesh")
-    .style("stroke", "#2196F3") // Border color can be changed here
+    .style("stroke", "#808d98") // Border color can be changed here
     .style("fill", "999").style("fill","transparent");
 
 
@@ -578,6 +578,7 @@ function resetFilters() {
 
   $("#pointCheckbox").prop("checked", false);
   $("#fullDepthCheckbox").prop("checked", false);
+  $("#toggleShadowsCheckbox").prop("checked", true);
 
   filterArcsAndFlyers();
   refresh();
@@ -594,10 +595,16 @@ function filterArc(s,t) {
 }
 
 function filterArcsAndFlyers() {
-  for(var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
-    svg.selectAll(".arc")._groups[0][i].setAttribute("opacity",1);
+  if($("#toggleShadowsCheckbox").prop("checked")) {
+    for(var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity",1);
+    }
   }
-
+  else {
+    for(var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity",0);
+    }
+  }
   if($("#fullDepthCheckbox").prop("checked") === true) {
     for(var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
       visitMap.set(svg.selectAll(".point")._groups[0][i].getAttribute("tag"), false);
@@ -728,7 +735,7 @@ function toggleDropdown(t, id) {
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 312;
+  var offset = 355;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -745,11 +752,10 @@ function fullDepth() {
   handleUnusedPoints();
 }
 
-function morePairs() {
-  $("#morePairsCheckbox").prop("checked", !$("#morePairsCheckbox").prop("checked"));
+function toggleShadows() {
+  $("#toggleShadowsCheckbox").prop("checked", !$("#toggleShadowsCheckbox").prop("checked"));
   filterArcsAndFlyers();
   refresh();
-  handleUnusedPoints();
 }
 
 function filterSearchPoints() {
