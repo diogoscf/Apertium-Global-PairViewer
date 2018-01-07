@@ -102,12 +102,11 @@ function resize() {
 
 queue()
     .defer(d3.json, "world-110m.json")
-    .defer(d3.json, "defaultApertiumPairs.json")
     .defer(d3.json, "apertiumPairs.json")
     .defer(d3.json, "apertiumPoints.json")
     .await(ready);
 
-function ready(error, world, defaultplaces, places, points) {
+function ready(error, world, places, points) {
   var land = topojson.object(world, world.objects.land),
       borders = topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; });
       // grid = graticule(); currently lat lon lines not used, can uncomment to use
@@ -308,43 +307,8 @@ function ready(error, world, defaultplaces, places, points) {
 
 
   // Parse default pairs
-  defaultplaces.pairs.forEach(function(a) {
-    var s, t;
-    for(var pointInd = 0; pointInd < points.point_data.length; pointInd++) {
-      if(points.point_data[pointInd].tag === a.lg2) {
-        s = points.point_data[pointInd].geometry.coordinates;
-      }
-      if(points.point_data[pointInd].tag === a.lg1) {
-        t = points.point_data[pointInd].geometry.coordinates;
-      }
-    }
-    links.push({
-      source: s,
-      target: t,
-      sourceTag: a.lg2,
-      targetTag: a.lg1,
-      stage: a.repo,
-      direction: a.direction,
-      filtered: "true", // If filtered is true, make flyer visible.
-      default: "true" // If default is true, show on default.
-    });
-  });
-
-  // Parse more pairs
   places.pairs.forEach(function(a) {
     var s, t;
-
-    var found = 0;
-    for(var l = 0; l < links.length; l++) {
-      if((a.lg2 === links[l].sourceTag && a.lg1 === links[l].targetTag) || (a.lg1 === links[l].sourceTag && a.lg2 === links[l].targetTag)) {
-        found = 1;
-        break;
-      }
-    }
-    if(found === 1) {
-      return;
-    }
-
     for(var pointInd = 0; pointInd < points.point_data.length; pointInd++) {
       if(points.point_data[pointInd].tag === a.lg2) {
         s = points.point_data[pointInd].geometry.coordinates;
@@ -360,14 +324,13 @@ function ready(error, world, defaultplaces, places, points) {
       targetTag: a.lg1,
       stage: a.repo,
       direction: a.direction,
-      filtered: "true", // If filtered is true, make flyer visible.
-      default: "false" // If default is true, show on default.
+      filtered: "true" // If filtered is true, make flyer visible.
     });
   });
 
   // build geoJSON features from links array
   links.forEach(function(e,i,a) {
-    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag, "direction": e.direction, "default": e.default }
+    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag, "direction": e.direction }
     arcLines.push(feature)
   })
 
@@ -380,7 +343,6 @@ function ready(error, world, defaultplaces, places, points) {
       .attr("sourceTag", function(d) { return d.sourceTag })
       .attr("targetTag", function(d) { return d.targetTag })
       .attr("direction", function(d) { return d.direction })
-      .attr("default", function(d) { return d.default })
 
   svg.append("g").attr("class","flyers")
     .selectAll("path").data(links)
@@ -389,7 +351,6 @@ function ready(error, world, defaultplaces, places, points) {
     .attr("sourceTag", function(d) { return d.sourceTag })
     .attr("targetTag", function(d) { return d.targetTag })
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
-    .attr("default", function(d) { return d.default })
     .style("stroke", function(d) { return chooseColor(d) })
 
   // Populate the filter point list
@@ -408,7 +369,6 @@ function ready(error, world, defaultplaces, places, points) {
   }
 
   refresh();
-  handleMorePairs();
   handleUnusedPoints();
 }
 
@@ -670,13 +630,6 @@ function filterArcsAndFlyers() {
           filterArc(d.sourceTag, d.targetTag);
         }
       }
-
-      if(!$("#morePairsCheckbox").prop("checked")) {
-        if(d.default === "false") {
-          d.filtered = "false";
-          filterArc(d.sourceTag, d.targetTag);
-        }
-      }
       return fade_at_edge(d);
     });
 }
@@ -825,20 +778,6 @@ function handleUnusedPoints() {
       svg.selectAll(".label")._groups[0][i].setAttribute("style", "opacity: 0.9");
     }
   }
-  refresh();
-}
-
-function handleMorePairs() {
-  svg.selectAll(".flyer")
-    .attr("opacity", function (d) {
-      if(!$("#morePairsCheckbox").prop("checked")) {
-        if(d.default === "false") {
-          d.filtered = "false";
-          filterArc(d.sourceTag, d.targetTag);
-        }
-      }
-      return fade_at_edge(d);
-    });
   refresh();
 }
 
