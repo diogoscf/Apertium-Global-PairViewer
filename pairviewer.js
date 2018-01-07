@@ -102,11 +102,12 @@ function resize() {
 
 queue()
     .defer(d3.json, "world-110m.json")
+    .defer(d3.json, "defaultApertiumPairs.json")
     .defer(d3.json, "apertiumPairs.json")
     .defer(d3.json, "apertiumPoints.json")
     .await(ready);
 
-function ready(error, world, places, points) {
+function ready(error, world, defaultplaces, places, points) {
   var land = topojson.object(world, world.objects.land),
       borders = topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; });
       // grid = graticule(); currently lat lon lines not used, can uncomment to use
@@ -306,8 +307,8 @@ function ready(error, world, places, points) {
   //       .attr("d", path);
 
 
-
-  places.pairs.forEach(function(a) {
+  // Parse default pairs
+  defaultplaces.pairs.forEach(function(a) {
     var s, t;
     for(var pointInd = 0; pointInd < points.point_data.length; pointInd++) {
       if(points.point_data[pointInd].tag === a.lg2) {
@@ -324,14 +325,49 @@ function ready(error, world, places, points) {
       targetTag: a.lg1,
       stage: a.repo,
       direction: a.direction,
-      filtered: "true" // If filtered is true, make flyer visible.
+      filtered: "true", // If filtered is true, make flyer visible.
+      default: "true" // If default is true, show on default.
     });
   });
 
+  // Parse more pairs
+  places.pairs.forEach(function(a) {
+    var s, t;
+
+    var found = 0;
+    for(var l = 0; l < links.length; l++) {
+      if((a.lg2 === links[l].sourceTag && a.lg1 === links[l].targetTag) || (a.lg1 === links[l].sourceTag && a.lg2 === links[l].targetTag)) {
+        found = 1;
+        break;
+      }
+    }
+    if(found === 1) {
+      return;
+    }
+
+    for(var pointInd = 0; pointInd < points.point_data.length; pointInd++) {
+      if(points.point_data[pointInd].tag === a.lg2) {
+        s = points.point_data[pointInd].geometry.coordinates;
+      }
+      if(points.point_data[pointInd].tag === a.lg1) {
+        t = points.point_data[pointInd].geometry.coordinates;
+      }
+    }
+    links.push({
+      source: s,
+      target: t,
+      sourceTag: a.lg2,
+      targetTag: a.lg1,
+      stage: a.repo,
+      direction: a.direction,
+      filtered: "true", // If filtered is true, make flyer visible.
+      default: "false" // If default is true, show on default.
+    });
+  });
 
   // build geoJSON features from links array
   links.forEach(function(e,i,a) {
-    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag, "direction": e.direction }
+    var feature =  { "type": "Feature", "geometry": { "type": "LineString", "coordinates": [e.source,e.target] }, "stage": e.stage, "sourceTag": e.sourceTag, "targetTag": e.targetTag, "direction": e.direction, "default": e.default }
     arcLines.push(feature)
   })
 
@@ -340,10 +376,11 @@ function ready(error, world, places, points) {
     .enter().append("path")
       .attr("class","arc")
       .attr("d",path)
-      .attr("stage", function(d) {return d.stage})
-      .attr("sourceTag", function(d) {return d.sourceTag})
-      .attr("targetTag", function(d) {return d.targetTag})
-      .attr("direction", function(d) {return d.direction})
+      .attr("stage", function(d) { return d.stage })
+      .attr("sourceTag", function(d) { return d.sourceTag })
+      .attr("targetTag", function(d) { return d.targetTag })
+      .attr("direction", function(d) { return d.direction })
+      .attr("default", function(d) { return d.default })
 
   svg.append("g").attr("class","flyers")
     .selectAll("path").data(links)
@@ -352,6 +389,7 @@ function ready(error, world, places, points) {
     .attr("sourceTag", function(d) { return d.sourceTag })
     .attr("targetTag", function(d) { return d.targetTag })
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
+    .attr("default", function(d) { return d.default })
     .style("stroke", function(d) { return chooseColor(d) })
 
   // Populate the filter point list
@@ -370,6 +408,7 @@ function ready(error, world, places, points) {
   }
 
   refresh();
+  handleMorePairs();
   handleUnusedPoints();
 }
 
@@ -508,10 +547,11 @@ function selectDirFilter(dir) {
 
 // Update point filter and globe
 function filterPoint(p) {
+  var needToRotate = false;
   if($("#checkmarkPoint" + p).length === 0) {
     $("#point" + p).html(p + '<i id=checkmarkPoint' + p + ' class="fa fa-check checkmark"></i>');
     currentPointFilter.push(p);
-    rotateToPoint(p);
+    needToRotate = true;
   }
   else {
     $("#checkmarkPoint" + p).remove();
@@ -521,6 +561,9 @@ function filterPoint(p) {
   filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
+  if(needToRotate) {
+    rotateToPoint(p);
+  }
 }
 
 function resetFilters() {
@@ -620,6 +663,13 @@ function filterArcsAndFlyers() {
           filterArc(d.sourceTag, d.targetTag);
         }
       }
+
+      if(!$("#morePairsCheckbox").prop("checked")) {
+        if(d.default === "false") {
+          d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
+        }
+      }
       return fade_at_edge(d);
     });
 }
@@ -695,6 +745,13 @@ function fullDepth() {
   handleUnusedPoints();
 }
 
+function morePairs() {
+  $("#morePairsCheckbox").prop("checked", !$("#morePairsCheckbox").prop("checked"));
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+}
+
 function filterSearchPoints() {
   var searchValue = $("#pointSearch")[0].value;
   var points = $("#pointList")[0].children;
@@ -765,6 +822,20 @@ function handleUnusedPoints() {
   refresh();
 }
 
+function handleMorePairs() {
+  svg.selectAll(".flyer")
+    .attr("opacity", function (d) {
+      if(!$("#morePairsCheckbox").prop("checked")) {
+        if(d.default === "false") {
+          d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
+        }
+      }
+      return fade_at_edge(d);
+    });
+  refresh();
+}
+
 function fade_at_edge(d) {
   if(d.filtered === "false") {
       return 0;
@@ -805,7 +876,7 @@ function rotateToPoint(p) {
   }
   var q = coords.split(',');
   d3.transition().duration(2500).tween("rotate", function() {
-    var r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
+    var r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1]), rotate[2]]);
     return function(t) {
       proj.rotate(r(t));
       sky.rotate(r(t));
@@ -916,9 +987,11 @@ function zoomOut() {
 resetZoom();
 
 function zoomstart() {
-  v0 = versor.cartesian(proj.invert(d3.mouse(this)));
-  r0 = proj.rotate();
-  q0 = versor(r0);
+  if (d3.event.sourceEvent) {
+    v0 = versor.cartesian(proj.invert(d3.mouse(this)));
+    r0 = proj.rotate();
+    q0 = versor(r0);
+  }
 }
 
 function zoomed() {
@@ -966,7 +1039,7 @@ function zoomend() {
 function resetZoom() {
   var initial = 2;
   svg.transition()
-    .call( zoom.transform, d3.zoomIdentity.scale(Math.min(initial*fixedHeight,initial*fixedWidth)));
+    .call(zoom.transform, d3.zoomIdentity.scale(Math.min(initial*fixedHeight,initial*fixedWidth)));
 }
 
 // Zoom-in with + key and zoom-out with - key and reset with 0
