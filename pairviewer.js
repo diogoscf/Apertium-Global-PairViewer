@@ -13,10 +13,10 @@ var currentDirFilter = [];
 
 var visitMap = new Map();
 
-var TRUNK_COLOR = "#0cff00";
-var STAGING_COLOR = "#ffff00";
-var NURSERY_COLOR = "#ffa500";
-var INCUBATOR_COLOR = "#de1738";
+var TRUNK_COLOR = "#5dff0b";
+var STAGING_COLOR = "#ffd900";
+var NURSERY_COLOR = "#ff5900";
+var INCUBATOR_COLOR = "#cc0000";
 var UNKNOWN_COLOR = "#9c27b0";
 
 var MARKER_SIZE = "20";
@@ -317,52 +317,6 @@ function ready(error, world, places, points) {
     .style("stroke", "#808d98") // Border color can be changed here
     .style("fill", "999").style("fill","transparent");
 
-
-
-  svg.append("g").attr("class","labels")
-        .selectAll("text").data(points.point_data)
-      .enter().append("text")
-      .attr("class", "label")
-      .attr("coordinate", function(d) {return d.geometry.coordinates})
-      .text(function(d) { return d.tag })
-      .on("mouseover", function(d) { //Hovering over labels for tooltip
-            div.transition()
-                .duration(200)
-                .style("opacity", .9);
-
-            div	.html(d.tag + "<br/>" + codeToLanguage(d.tag)) // Looking up full name
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-        .on("mouseout", function(d) {
-            div.transition()
-                .duration(500)
-                .style("opacity", 0);
-        });
-
-  svg.append("g").attr("class","points")
-      .selectAll("text").data(points.point_data)
-    .enter().append("path")
-      .attr("class", "point")
-      .attr("d", path)
-      .attr("coordinate", function(d) {return d.geometry.coordinates})
-      .attr("tag", function(d) { return d.tag })
-      .on("mouseover", function(d) { //Also added hovering over points for tooltip
-            div.transition()
-                .duration(200)
-                .style("opacity", .9);
-
-            div	.html(d.tag + "<br/>" + codeToLanguage(d.tag))
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-        .on("mouseout", function(d) {
-            div.transition()
-                .duration(500)
-                .style("opacity", 0);
-        });
-
-
   // LONG AND LAT LINES, need to uncomment other graticule references to use
   // svg.append("path")
   //       .datum(graticule)
@@ -418,11 +372,66 @@ function ready(error, world, places, points) {
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
     .style("stroke", function(d) { return chooseColor(d) })
     .on("mouseover", function(d) { //Hovering over flyers for tooltip
+            if(d.filtered === "false") {
+              return;
+            }
             div.transition()
                 .duration(200)
                 .style("opacity", .9);
 
-            div .html(d.sourceTag + " - " + d.targetTag + "<br/>" + (d.stems === undefined || d.stems === -1 ? "Unknown" : d.stems))
+            var arrow = d.direction === "<>" ? "↔" : d.direction === ">" ? "→" : "–";
+            var repo = d.stage === undefined ? "Unknown" : d.stage.charAt(0).toUpperCase() + d.stage.slice(1);
+            div .html(d.sourceTag + " " + arrow + " " + d.targetTag + "<br/>" + (d.stems === undefined || d.stems === -1 ? "Unknown" : d.stems) + "<br/>" + repo)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+  // Create labels and points AFTER flyers and arcs so they appear above
+  svg.append("g").attr("class","labels")
+        .selectAll("text").data(points.point_data)
+      .enter().append("text")
+      .attr("class", "label")
+      .attr("coordinate", function(d) {return d.geometry.coordinates})
+      .text(function(d) { return d.tag })
+      .on("mouseover", function(d) { //Hovering over labels for tooltip
+            if($(this).css("opacity") === "0") {
+              return;
+            }
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+
+            div	.html(d.tag + "<br/>" + codeToLanguage(d.tag)) // Looking up full name
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+  svg.append("g").attr("class","points")
+      .selectAll("text").data(points.point_data)
+    .enter().append("path")
+      .attr("class", "point")
+      .attr("d", path)
+      .attr("coordinate", function(d) {return d.geometry.coordinates})
+      .attr("tag", function(d) { return d.tag })
+      .on("mouseover", function(d) { //Also added hovering over points for tooltip
+            if($(this).css("opacity") === "0") {
+              return;
+            }
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+
+            div	.html(d.tag + "<br/>" + codeToLanguage(d.tag))
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
             })
