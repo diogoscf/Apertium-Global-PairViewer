@@ -19,7 +19,7 @@ var NURSERY_COLOR = "#ff5900";
 var INCUBATOR_COLOR = "#cc0000";
 var UNKNOWN_COLOR = "#9c27b0";
 
-var MARKER_SIZE = "20";
+var MARKER_SIZE = "40";
 
 /********* colorbrewing *********/
 var maxStems = 100000;
@@ -199,6 +199,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -212,6 +213,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -225,6 +227,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -238,6 +241,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -251,6 +255,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -264,6 +269,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -277,6 +283,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -290,6 +297,7 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
+        .attr("markerUnits", "userSpaceOnUse")
         .attr("markerWidth", MARKER_SIZE)
         .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
@@ -378,7 +386,7 @@ function ready(error, world, places, points) {
             div.transition()
                 .duration(200)
                 .style("opacity", .9);
-
+            $(this).css("stroke-width", "4px");
             var arrow = d.direction === "<>" ? "↔" : d.direction === ">" ? "→" : "–";
             var repo = d.stage === undefined ? "Unknown" : d.stage.charAt(0).toUpperCase() + d.stage.slice(1);
             div .html(d.sourceTag + " " + arrow + " " + d.targetTag + "<br/>" + (d.stems === undefined || d.stems === -1 ? "Unknown" : d.stems) + "<br/>" + repo)
@@ -389,6 +397,7 @@ function ready(error, world, places, points) {
             div.transition()
                 .duration(500)
                 .style("opacity", 0);
+            $(this).css("stroke-width", "2px");
         });
 
   // Create labels and points AFTER flyers and arcs so they appear above
