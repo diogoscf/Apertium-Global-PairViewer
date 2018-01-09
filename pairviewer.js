@@ -159,7 +159,7 @@ function resize() {
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 355;
+  var offset = 399;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -488,6 +488,23 @@ function position_labels() {
 // Chooses flyer color based on language pair stage
 // trunk green, staging yellow, nursery orange, incubator red
 function chooseColor(d) {
+  if($("#colorStemCheckbox").prop("checked") === false) {
+    if (d.stage == "trunk") {
+      return TRUNK_COLOR;
+    }
+    else if (d.stage == "staging") {
+      return STAGING_COLOR;
+    }
+    else if (d.stage == "nursery") {
+      return NURSERY_COLOR;
+    }
+    else if (d.stage == "incubator") {
+      return INCUBATOR_COLOR;
+    }
+    else {
+      return UNKNOWN_COLOR;
+    }
+  }
   if(d.stems === undefined || d === -1) {
     return UNKNOWN_COLOR;
   }
@@ -509,6 +526,13 @@ function chooseColor(d) {
       .range(translationClassColours)
       (d.stage)[0];
    }
+}
+
+function colorStem() {
+  $("#colorStemCheckbox").prop("checked", !$("#colorStemCheckbox").prop("checked"));
+  svg.selectAll(".flyer")
+    .style("stroke", function (d) { return chooseColor(d) })
+  refresh();
 }
 
 function flying_arc(pts) {
@@ -781,7 +805,7 @@ function toggleDropdown(t, id) {
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 355;
+  var offset = 399;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
