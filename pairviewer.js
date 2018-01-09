@@ -19,6 +19,64 @@ var NURSERY_COLOR = "#ffa500";
 var INCUBATOR_COLOR = "#de1738";
 var UNKNOWN_COLOR = "#9c27b0";
 
+var MARKER_SIZE = "20";
+
+/********* colorbrewing *********/
+var maxStems = 100000;
+// Forbid the 0-9 category (-1)
+var numShades = parseInt(Math.log(maxStems)/Math.LN10) - 1;
+var translationClasses = ["trunk","staging","nursery","incubator"];
+var goldenYellowScale = {
+  4: ["#ffd54c", "#ffc300", "#CC9C00", "#7f6a26"],
+  5: ["#FFF199", "#FFEC70", "#E0C200", "#CCB100", "#B89F00",],
+  6: ["#FFEC70", "#FFE433", "#E0C200", "#CCB100", "#B89F00", "#A38D00"],
+};
+var translationClassColourChoices = [
+  [colorbrewer.BuGn, colorbrewer.Blues, colorbrewer.YlOrRd, colorbrewer.Greys],
+  [colorbrewer.BuGn, colorbrewer.GnBu, colorbrewer.YlOrBr, colorbrewer.PuRd],
+  [colorbrewer.YlGn, colorbrewer.Blues, colorbrewer.PuRd, colorbrewer.Greys],
+  [colorbrewer.YlGn, colorbrewer.Blues, colorbrewer.PuRd, colorbrewer.OrRd],
+  [colorbrewer.YlGn, colorbrewer.YlGnBu, colorbrewer.Oranges, colorbrewer.Reds],
+  [colorbrewer.YlGn, goldenYellowScale, colorbrewer.Oranges, colorbrewer.Reds],
+];
+// Vary only lightness.
+var niceGreen = d3.rgb("#0c0"), niceYellow = d3.rgb("#fc0"), niceOrange = d3.rgb("#f60"), niceRed = d3.rgb("#c00");
+var temp = [];
+[niceGreen, niceYellow, niceOrange, niceRed].forEach(function(c) {
+  var tempp = [];
+  for (i = 0; i < 5; ++i) {
+    tempp.push(c.darker((i - 1)));
+  }
+  temp.push({5: tempp.reverse()});
+});
+translationClassColourChoices.push(temp);
+// Desaturate
+// Actually this has become so complex. A colour theory specialist needs to analyse this.
+var temp = [];
+[d3.hsl(100, 1, 0.5), d3.hsl(51, 1, 0.5), d3.hsl(21, 1, 0.5), d3.hsl(0, 1, 0.4)].forEach(function(c) {
+  var tempp = [];
+  for (i = 0; i < 5; ++i) {
+    var cc = c.brighter(0);
+    if (cc.h == 0) {
+      cc.s = cc.s / (i+0.5);
+      cc.l = cc.l + 0.3 * Math.sqrt(i);
+    }
+    else if (cc.h == 100) {
+      cc.s = cc.s / (2*i + 1);
+      cc.l = cc.l + 0.01 * Math.exp(i + 0.8);
+    }
+    else {
+      cc.s = cc.s / (i+0.5);
+      cc.l *= Math.pow(1.22, i);
+    }
+    tempp.push(cc);
+  }
+  temp.push({5: tempp.reverse()});
+});
+translationClassColourChoices.push(temp);
+var translationClassColours = translationClassColourChoices[7].map(function(e){return e[numShades + 1].slice(1);});
+/********* end of colorbrewing *********/
+
 var proj = d3.geoOrthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
@@ -141,8 +199,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", TRUNK_COLOR)
         .style("stroke", "black")
@@ -154,8 +212,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", TRUNK_COLOR)
         .style("stroke", "black")
@@ -167,8 +225,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", STAGING_COLOR)
         .style("stroke", "black")
@@ -180,8 +238,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", STAGING_COLOR)
         .style("stroke", "black")
@@ -193,8 +251,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", NURSERY_COLOR)
         .style("stroke", "black")
@@ -206,8 +264,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", NURSERY_COLOR)
         .style("stroke", "black")
@@ -219,8 +277,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", INCUBATOR_COLOR)
         .style("stroke", "black")
@@ -232,8 +290,8 @@ function ready(error, world, places, points) {
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", "2.5")
         .attr("refY", "2")
-        .attr("markerWidth", "20")
-        .attr("markerHeight", "20")
+        .attr("markerWidth", MARKER_SIZE)
+        .attr("markerHeight", MARKER_SIZE)
         .attr("orient", "auto")
         .style("fill", INCUBATOR_COLOR)
         .style("stroke", "black")
@@ -329,6 +387,7 @@ function ready(error, world, places, points) {
       sourceTag: a.lg2,
       targetTag: a.lg1,
       stage: a.repo,
+      stems: a.stems,
       direction: a.direction,
       filtered: "true" // If filtered is true, make flyer visible.
     });
@@ -358,6 +417,20 @@ function ready(error, world, places, points) {
     .attr("targetTag", function(d) { return d.targetTag })
     .attr("d", function(d) { return swoosh(flying_arc(d)) })
     .style("stroke", function(d) { return chooseColor(d) })
+    .on("mouseover", function(d) { //Hovering over flyers for tooltip
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+
+            div .html(d.sourceTag + " - " + d.targetTag + "<br/>" + (d.stems === undefined || d.stems === -1 ? "Unknown" : d.stems))
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
   // Populate the filter point list
   var alphaPointList = [];
@@ -406,23 +479,27 @@ function position_labels() {
 // Chooses flyer color based on language pair stage
 // trunk green, staging yellow, nursery orange, incubator red
 function chooseColor(d) {
-  var color = "#FF9800";
-  if (d.stage == "trunk") {
-    color = TRUNK_COLOR;
+  if(d.stems === undefined || d === -1) {
+    return UNKNOWN_COLOR;
   }
-  else if (d.stage == "staging") {
-    color = STAGING_COLOR;
-  }
-  else if (d.stage == "nursery") {
-    color = NURSERY_COLOR;
-  }
-  else if (d.stage == "incubator") {
-    color = INCUBATOR_COLOR;
-  }
-  else {
-    color = UNKNOWN_COLOR
-  }
-  return color;
+  try {
+    // Even if d.stems is a non-numerical String, it does not throw an error...
+    if (isNaN(Math.log(d.stems))) {
+      throw new Error("Node has unknown stem count");
+    }
+    // Shunt <= 99 to colour 0
+    return d3.scaleOrdinal()
+      .domain(translationClasses)
+      .range(translationClassColours)
+      (d.stage)[ ((d.stems <= 99) ? 0 : parseInt(Math.log(d.stems)/Math.LN10) - 1) ];
+    }
+  catch (e) {
+    // Give it the lightest colour if the stem count is unknown
+    return d3.scaleOrdinal()
+      .domain(translationClasses)
+      .range(translationClassColours)
+      (d.stage)[0];
+   }
 }
 
 function flying_arc(pts) {
