@@ -665,7 +665,10 @@ function resetFilters() {
   $("#pointCheckbox").prop("checked", false);
   $("#fullDepthCheckbox").prop("checked", false);
   $("#toggleShadowsCheckbox").prop("checked", true);
+  $("#colorStemCheckbox").prop("checked", true);
 
+  svg.selectAll(".flyer")
+    .style("stroke", function (d) { return chooseColor(d) })
   filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
