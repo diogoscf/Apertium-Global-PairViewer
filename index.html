@@ -33,9 +33,13 @@ body {
   opacity:.2;
 }
 
-.noclicks { pointer-events:none; }
+.noclicks {
+  pointer-events:none;
+}
 
-.point {  opacity:.6; }
+.point {
+  opacity:.6;
+}
 
 .arcs {
   opacity:.1;
@@ -66,16 +70,16 @@ body {
 }
 
 div.tooltip {
-    position: absolute;
-    text-align: center;
-    min-width: 60px;
-    display: inline-block;
-    padding: 2px;
-    font: 12px sans-serif;
-    background: lightsteelblue;
-    border: 0px;
-    border-radius: 8px;
-    pointer-events: none;
+  position: absolute;
+  text-align: center;
+  min-width: 60px;
+  display: inline-block;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
 }
 
 #settings {
@@ -246,11 +250,13 @@ div.tooltip {
   </div>
   <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" class="checkbox" id="pointCheckbox" onclick="checkPoints()"></input> Unused Languages</div>
   <div onclick="fullDepth()" id="fullDepth" class="greenButton eP"><input type="checkbox" class="checkbox" id="fullDepthCheckbox" onclick="fullDepth()"></input> Full Depth Filtering</div>
-  <div onclick="morePairs()" id="morePairs" class="greenButton eP"><input type="checkbox" class="checkbox" id="morePairsCheckbox" onclick="morePairs()"></input> More Pairs</div>
+  <div onclick="toggleShadows()" id="toggleShadows" class="greenButton eP"><input type="checkbox" class="checkbox" id="toggleShadowsCheckbox" onclick="toggleShadows()" checked></input> Shadows</div>
+  <div onclick="colorStem()" id="colorStem" class="greenButton eP"><input type="checkbox" class="checkbox" id="colorStemCheckbox" onclick="colorStem()" checked></input> Color By Stems</div>
   <div class="greenButton resetFilter" onclick="resetFilters()">Reset to Defaults</div>
 </div>
 
   <script src="http://d3js.org/d3.v4.min.js"></script>
+  <script type="text/javascript" src="colorbrewer.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v0.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
