@@ -759,6 +759,11 @@ function filterArcsAndFlyers() {
           filterArc(d.sourceTag, d.targetTag);
         }
       }
+
+      if(d.stems < parseInt($("#stemFilterCount").attr("value"))) {
+        d.filtered = "false";
+        filterArc(d.sourceTag, d.targetTag);
+      }
       return fade_at_edge(d);
     });
 }
@@ -839,6 +844,27 @@ function toggleShadows() {
   filterArcsAndFlyers();
   refresh();
 }
+
+$("#stemFilterSlider").on("input", function() {
+  $("#stemFilterCount").attr("value", this.value);
+});
+
+$("#stemFilterSlider").on("change", function() {
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+});
+
+$("#stemFilterCount").on("change", function() {
+  var val = this.value;
+  val = Math.max(0,val);
+  val = Math.min(100000,val);
+  $(this).attr("value", val);
+  $("#stemFilterSlider").attr("value", this.value);
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+});
 
 function filterSearchPoints() {
   var searchValue = $("#pointSearch")[0].value;
