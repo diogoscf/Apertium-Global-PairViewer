@@ -39,9 +39,11 @@ if __name__ == "__main__":
     apertiumFile.write("{\n")
     apertiumFile.write('"type": "FeatureCollection",\n')
     apertiumFile.write('"pairs": [\n')
-    for line in filtered:
+    for line in filtered[:-1]:
         apertiumFile.write("\t"+line+"\n")
         apertiumFile.write(",\n")
+
+    apertiumFile.write("\t"+filtered[-1]+"\n")
 
     apertiumFile.write("]\n")
     apertiumFile.write("}")
@@ -54,10 +56,17 @@ if __name__ == "__main__":
 
     #writing point coordinates
     apertiumFile2.write('"point_data": [\n')
+    langArr = []
     for code, coords in langDict.items():
-        string = '{"type": "Feature", "tag": "' + code + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(coords) + "} } \n"
+        langArr.append([code,coords]);
+
+    for lang in langArr[:-1]:
+        string = '{"type": "Feature", "tag": "' + lang[0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(lang[1]) + "} } \n"
         apertiumFile2.write("\t"+string)
         apertiumFile2.write(",\n")
+
+    string = '{"type": "Feature", "tag": "' + langArr[-1][0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(langArr[-1][1]) + "} } \n"
+    apertiumFile2.write("\t"+string)
 
     apertiumFile2.write("]\n")
     apertiumFile2.write("}")
