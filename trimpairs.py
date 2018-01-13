@@ -57,15 +57,15 @@ if __name__ == "__main__":
     #writing point coordinates
     apertiumFile2.write('"point_data": [\n')
     langArr = []
-    for code, coords in langDict.items():
-        langArr.append([code,coords]);
+    for code in sorted(langDict.iterkeys()):
+        langArr.append([code,langDict[code]]);
 
     for lang in langArr[:-1]:
-        string = '{"type": "Feature", "tag": "' + lang[0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(lang[1]) + "} } \n"
+        string = '{"type": "Feature", "tag": "' + lang[0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(lang[1]) + "} }\n"
         apertiumFile2.write("\t"+string)
         apertiumFile2.write(",\n")
 
-    string = '{"type": "Feature", "tag": "' + langArr[-1][0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(langArr[-1][1]) + "} } \n"
+    string = '{"type": "Feature", "tag": "' + langArr[-1][0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(langArr[-1][1]) + "} }\n"
     apertiumFile2.write("\t"+string)
 
     apertiumFile2.write("]\n")
