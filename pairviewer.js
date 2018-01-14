@@ -159,7 +159,7 @@ function resize() {
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 443;
+  var offset = 487;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -760,9 +760,19 @@ function filterArcsAndFlyers() {
         }
       }
 
-      if(d.stems < parseInt($("#stemFilterCount").attr("value"))) {
-        d.filtered = "false";
-        filterArc(d.sourceTag, d.targetTag);
+      if($("#unknownStemCheckbox").prop("checked")) {
+        if(!(d.stems === undefined || d.stems === -1)) {
+          if(d.stems < parseInt($("#stemFilterCount").attr("value"))) {
+            d.filtered = "false";
+            filterArc(d.sourceTag, d.targetTag);
+          }
+        }
+      }
+      else {
+        if(d.stems < parseInt($("#stemFilterCount").attr("value"))) {
+          d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
+        }
       }
       return fade_at_edge(d);
     });
@@ -822,7 +832,7 @@ function toggleDropdown(t, id) {
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 443;
+  var offset = 487;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -865,6 +875,13 @@ $("#stemFilterCount").on("change", function() {
   refresh();
   handleUnusedPoints();
 });
+
+function unknownStem() {
+  $("#unknownStemCheckbox").prop("checked", !$("#unknownStemCheckbox").prop("checked"));
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+}
 
 function filterSearchPoints() {
   var searchValue = $("#pointSearch")[0].value;
