@@ -159,7 +159,7 @@ function resize() {
 
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 399;
+  var offset = 487;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -759,6 +759,21 @@ function filterArcsAndFlyers() {
           filterArc(d.sourceTag, d.targetTag);
         }
       }
+
+      if($("#unknownStemCheckbox").prop("checked")) {
+        if(!(d.stems === undefined || d.stems === -1)) {
+          if(d.stems < parseInt($("#stemFilterCount").attr("value"))) {
+            d.filtered = "false";
+            filterArc(d.sourceTag, d.targetTag);
+          }
+        }
+      }
+      else {
+        if(d.stems < parseInt($("#stemFilterCount").attr("value"))) {
+          d.filtered = "false";
+          filterArc(d.sourceTag, d.targetTag);
+        }
+      }
       return fade_at_edge(d);
     });
 }
@@ -817,7 +832,7 @@ function toggleDropdown(t, id) {
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0,sidenavHeight.length-2));
-  var offset = 399;
+  var offset = 487;
   var total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", (total) + "px");
 }
@@ -838,6 +853,34 @@ function toggleShadows() {
   $("#toggleShadowsCheckbox").prop("checked", !$("#toggleShadowsCheckbox").prop("checked"));
   filterArcsAndFlyers();
   refresh();
+}
+
+$("#stemFilterSlider").on("input", function() {
+  $("#stemFilterCount").attr("value", this.value);
+});
+
+$("#stemFilterSlider").on("change", function() {
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+});
+
+$("#stemFilterCount").on("change", function() {
+  var val = this.value;
+  val = Math.max(0,val);
+  val = Math.min(100000,val);
+  $(this).attr("value", val);
+  $("#stemFilterSlider").attr("value", this.value);
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+});
+
+function unknownStem() {
+  $("#unknownStemCheckbox").prop("checked", !$("#unknownStemCheckbox").prop("checked"));
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
 }
 
 function filterSearchPoints() {
