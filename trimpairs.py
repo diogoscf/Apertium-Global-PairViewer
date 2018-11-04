@@ -7,25 +7,34 @@ import json
 
 
 def filterPairs(filename, languages, altCodes):
+    """
+    Filters out any language that is not in
+    the list of valid languages
+    """
+
     pairFile = open(filename, "r")
     filtered = []
     for line in pairFile:
         line = line.strip().split()
-        lang1 = line[3][1:4]
-        lang1_alt = line[3][1:3]
-        lang2 = line[1][1:4]
-        lang2_alt = line[1][1:3]
-        if (
-            lang1 in languages or (
-                lang1_alt in altCodes and altCodes[lang1_alt] in languages
-                )
-            ) and (
-            lang2 in languages or (
-                lang2_alt in altCodes and altCodes[lang2_alt] in languages
-                )
-            ):
+
+        lang1 = line[3][1:-2]
+        lang2 = line[1][1:-2]
+
+        if lang1 in languages and lang2 in languages:
             # Getting rid of last comma
             line[-1] = line[-1][:-1]
+            joined = " ".join(line)
+            filtered.append(joined)
+
+        elif (
+                lang1 in altCodes and altCodes[lang1] in languages
+        ) and (
+                lang2 in altCodes and altCodes[lang2] in languages
+        ):
+            # Getting rid of last comma
+            line[-1] = line[-1][:-1]
+            line[1] = line[1][0] + altCodes[lang2] + line[1][-2:]
+            line[3] = line[3][0] + altCodes[lang1] + line[3][-2:]
             joined = " ".join(line)
             filtered.append(joined)
 
@@ -34,6 +43,11 @@ def filterPairs(filename, languages, altCodes):
 
 
 def getLanguagesWithCoords(filename):
+    """
+    Gets the languages with their coordinates
+    on the Earth
+    """
+
     langFile = open(filename, "r")
     langDict = {}
     for line in langFile:
@@ -45,6 +59,11 @@ def getLanguagesWithCoords(filename):
 
 
 def getAlternateCodes(filename):
+    """
+    Reads the alternate codes for languages from file
+    and then returns a dict of that data
+    """
+
     codeFile = open(filename, 'r')
     codeStr = codeFile.read()
     codeFile.close()
