@@ -3,16 +3,26 @@ Python script used to filter out the pairs in pairs.json.txt that do not contain
 languages with coordinates in the tsv file
 """
 
-def filterPairs(filename, languages):
+import json
+
+
+def filterPairs(filename, languages, altCodes):
     pairFile = open(filename, "r")
     filtered = []
-    count = 1
     for line in pairFile:
         line = line.strip().split()
         lang1 = line[3][1:4]
         lang2 = line[1][1:4]
-        if lang1 in languages and lang2 in languages:
-            #getting rid of last comma
+        if (
+            lang1 in languages or (
+                lang1 in altCodes and altCodes[lang1] in languages
+                )
+            ) and (
+            lang2 in languages or (
+                lang2 in altCodes and altCodes[lang2] in languages
+                )
+            ):
+            # Getting rid of last comma
             line[-1] = line[-1][:-1]
             joined = " ".join(line)
             filtered.append(joined)
@@ -20,8 +30,8 @@ def filterPairs(filename, languages):
     pairFile.close()
     return filtered
 
-def getLanguagesWithCoords(filename):
 
+def getLanguagesWithCoords(filename):
     langFile = open(filename, "r")
     langDict = {}
     for line in langFile:
@@ -31,9 +41,17 @@ def getLanguagesWithCoords(filename):
     langFile.close()
     return langDict
 
+
+def getAlternateCodes(filename):
+    codeFile = open(filename, 'r')
+    codeStr = codeFile.read()
+    codeFile.close()
+    return json.loads(codeStr)
+
 if __name__ == "__main__":
     langDict = getLanguagesWithCoords("apertium-languages.tsv")
-    filtered = filterPairs("pairs.json.txt", langDict)
+    altCodes = getAlternateCodes('codes.json')
+    filtered = filterPairs("pairs.json.txt", langDict, altCodes)
     apertiumFile = open("apertiumPairs.json", "w")
 
     apertiumFile.write("{\n")
@@ -54,11 +72,11 @@ if __name__ == "__main__":
     apertiumFile2.write("{\n")
     apertiumFile2.write('"type": "FeatureCollection",\n')
 
-    #writing point coordinates
+    # Writing point coordinates
     apertiumFile2.write('"point_data": [\n')
     langArr = []
-    for code in sorted(langDict.iterkeys()):
-        langArr.append([code,langDict[code]]);
+    for code in sorted(langDict.keys()):
+        langArr.append([code, langDict[code]])
 
     for lang in langArr[:-1]:
         string = '{"type": "Feature", "tag": "' + lang[0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(lang[1]) + "} }\n"
