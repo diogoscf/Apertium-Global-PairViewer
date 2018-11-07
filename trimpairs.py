@@ -17,28 +17,23 @@ def filter_pairs(filename, languages, altCodes):
     for line in pair_file:
         if '[' in line:
             line = line[1:]
-        elif ']' in line:
+        if ']' in line:
             line = line[:-1]
         line = line.strip().split()
 
         lang1 = line[3][1:-2]
         lang2 = line[1][1:-2]
 
+        if lang1 in altCodes and lang1 not in languages:
+            lang1 = altCodes[lang1]
+        if lang2 in altCodes and lang2 not in languages:
+            lang2 = altCodes[lang2]
+
         if lang1 in languages and lang2 in languages:
             # Getting rid of last comma
             line[-1] = line[-1][:-1]
-            joined = " ".join(line)
-            filtered.append(joined)
-
-        elif (
-            lang1 in altCodes and altCodes[lang1] in languages
-        ) and (
-            lang2 in altCodes and altCodes[lang2] in languages
-        ):
-            # Getting rid of last comma
-            line[-1] = line[-1][:-1]
-            line[1] = line[1][0] + altCodes[lang2] + line[1][-2:]
-            line[3] = line[3][0] + altCodes[lang1] + line[3][-2:]
+            line[1] = line[1][0] + lang2 + line[1][-2:]
+            line[3] = line[3][0] + lang1 + line[3][-2:]
             joined = " ".join(line)
             filtered.append(joined)
 
@@ -104,11 +99,11 @@ if __name__ == "__main__":
         langArr.append([code, langDict[code]])
 
     for lang in langArr[:-1]:
-        string = '{"type": "Feature", "tag": "' + lang[0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(lang[1]) + "} }\n"
+        string = f'{{"type": "Feature", "tag": "{lang[0]}", "geometry": {{ "type": "Point", "coordinates": {lang[1]}}} }}\n'
         apertiumFile2.write("\t" + string)
         apertiumFile2.write(",\n")
 
-    string = '{"type": "Feature", "tag": "' + langArr[-1][0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(langArr[-1][1]) + "} }\n"
+    string = f'{{"type": "Feature", "tag": "{langArr[-1][0]}", "geometry": {{ "type": "Point", "coordinates": {langArr[-1][1]}}} }}\n'
     apertiumFile2.write("\t" + string)
 
     apertiumFile2.write("]\n")
