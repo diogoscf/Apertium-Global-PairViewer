@@ -1,6 +1,8 @@
 {
 "type": "FeatureCollection",
 "pairs": [
+	{"lg1": "afr", "lg2": "nld", "last_updated": "2016-07-23", "created": "2007-09-24", "direction": "<>", "repo": "trunk", "stems": 6263}
+,
 	{"lg1": "arg", "lg2": "cat", "last_updated": "2017-10-27", "created": "2016-01-04", "direction": "<>", "repo": "trunk", "stems": 24267}
 ,
 	{"lg1": "cat", "lg2": "ita", "last_updated": "2017-07-03", "created": "2009-07-17", "direction": "<>", "repo": "trunk", "stems": 9772}
@@ -215,6 +217,8 @@
 ,
 	{"lg1": "eng", "lg2": "mlt", "last_updated": "2011-06-19", "created": "?", "direction": "?", "repo": "incubator", "stems": 814}
 ,
+	{"lg1": "eng", "lg2": "nld", "last_updated": "2011-04-29", "created": "2007-05-20", "direction": "<>", "repo": "incubator", "stems": 3442}
+,
 	{"lg1": "eng", "lg2": "pol", "last_updated": "2015-06-26", "created": "2007-10-08", "direction": "<>", "repo": "incubator", "stems": 6541}
 ,
 	{"lg1": "eng", "lg2": "cat", "last_updated": "2017-12-29", "created": "2016-01-24", "direction": "<>", "repo": "incubator", "stems": 64956}
@@ -237,6 +241,8 @@
 ,
 	{"lg1": "epo", "lg2": "ces", "last_updated": "2011-12-12", "created": "?", "direction": "?", "repo": "incubator", "stems": 1325}
 ,
+	{"lg1": "epo", "lg2": "deu", "last_updated": "2011-12-12", "created": "?", "direction": "?", "repo": "incubator", "stems": 28656}
+,
 	{"lg1": "epo", "lg2": "fin", "last_updated": "2011-12-12", "created": "?", "direction": "?", "repo": "incubator", "stems": 1043}
 ,
 	{"lg1": "epo", "lg2": "heb", "last_updated": "2011-12-12", "created": "?", "direction": "?", "repo": "incubator", "stems": 1505}
@@ -244,6 +250,8 @@
 	{"lg1": "epo", "lg2": "hun", "last_updated": "2013-12-31", "created": "?", "direction": "?", "repo": "incubator", "stems": 31689}
 ,
 	{"lg1": "epo", "lg2": "ita", "last_updated": "2011-12-12", "created": "?", "direction": "?", "repo": "incubator", "stems": 9344}
+,
+	{"lg1": "epo", "lg2": "nld", "last_updated": "2014-01-04", "created": "?", "direction": "?", "repo": "incubator", "stems": 18027}
 ,
 	{"lg1": "epo", "lg2": "pol", "last_updated": "2011-12-12", "created": "?", "direction": "?", "repo": "incubator", "stems": -1}
 ,
@@ -454,6 +462,12 @@
 	{"lg1": "chv", "lg2": "tur", "last_updated": "2014-08-27", "created": "2012-01-03", "direction": "<>", "repo": "incubator", "stems": 100}
 ,
 	{"lg1": "dan", "lg2": "fao", "last_updated": "2009-11-30", "created": "?", "direction": "?", "repo": "incubator", "stems": -1}
+,
+	{"lg1": "deu", "lg2": "eng", "last_updated": "2008-08-02", "created": "?", "direction": "?", "repo": "incubator", "stems": 277331}
+,
+	{"lg1": "eng", "lg2": "deu", "last_updated": "2014-06-09", "created": "2007-04-25", "direction": "<>", "repo": "incubator", "stems": 569}
+,
+	{"lg1": "spa", "lg2": "deu", "last_updated": "2014-06-09", "created": "2012-10-24", "direction": "<>", "repo": "incubator", "stems": 615}
 ,
 	{"lg1": "fao", "lg2": "nob", "last_updated": "2013-06-20", "created": "?", "direction": "?", "repo": "incubator", "stems": -1}
 ,
