@@ -53,6 +53,8 @@
 ,
 	{"type": "Feature", "tag": "dan", "geometry": { "type": "Point", "coordinates": [11.5, 55.5]} }
 ,
+	{"type": "Feature", "tag": "deu", "geometry": { "type": "Point", "coordinates": [9.0, 51.0]} }
+,
 	{"type": "Feature", "tag": "ell", "geometry": { "type": "Point", "coordinates": [22.0, 39.0]} }
 ,
 	{"type": "Feature", "tag": "eng", "geometry": { "type": "Point", "coordinates": [-1.0, 53.0]} }

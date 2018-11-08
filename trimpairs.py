@@ -3,37 +3,75 @@ Python script used to filter out the pairs in pairs.json.txt that do not contain
 languages with coordinates in the tsv file
 """
 
-def filterPairs(filename, languages):
-    pairFile = open(filename, "r")
+import json
+
+
+def filter_pairs(filename, languages, altCodes):
+    """
+    Filters out any language that is not in
+    the list of valid languages
+    """
+
+    pair_file = open(filename, "r")
     filtered = []
-    count = 1
-    for line in pairFile:
+    for line in pair_file:
+        if '[' in line:
+            line = line[1:]
+        if ']' in line:
+            line = line[:-1]
         line = line.strip().split()
-        lang1 = line[3][1:4]
-        lang2 = line[1][1:4]
+
+        lang1 = line[3][1:-2]
+        lang2 = line[1][1:-2]
+
+        if lang1 in altCodes and lang1 not in languages:
+            lang1 = altCodes[lang1]
+        if lang2 in altCodes and lang2 not in languages:
+            lang2 = altCodes[lang2]
+
         if lang1 in languages and lang2 in languages:
-            #getting rid of last comma
+            # Getting rid of last comma
             line[-1] = line[-1][:-1]
+            line[1] = line[1][0] + lang2 + line[1][-2:]
+            line[3] = line[3][0] + lang1 + line[3][-2:]
             joined = " ".join(line)
             filtered.append(joined)
 
-    pairFile.close()
+    pair_file.close()
     return filtered
 
-def getLanguagesWithCoords(filename):
 
-    langFile = open(filename, "r")
+def get_languages_with_coords(filename):
+    """
+    Gets the languages with their coordinates
+    on the Earth
+    """
+
+    lang_file = open(filename, "r")
     langDict = {}
-    for line in langFile:
+    for line in lang_file:
         line = line.strip().split(",")
         lat, lon = float(line[1]), float(line[2])
         langDict[line[0]] = [lon, lat]
-    langFile.close()
+    lang_file.close()
     return langDict
 
+
+def get_alternate_codes(filename):
+    """
+    Reads the alternate codes for languages from file
+    and then returns a dict of that data
+    """
+
+    code_file = open(filename, 'r')
+    code_str = code_file.read()
+    code_file.close()
+    return json.loads(code_str)
+
 if __name__ == "__main__":
-    langDict = getLanguagesWithCoords("apertium-languages.tsv")
-    filtered = filterPairs("pairs.json.txt", langDict)
+    langDict = get_languages_with_coords("apertium-languages.tsv")
+    altCodes = get_alternate_codes('codes.json')
+    filtered = filter_pairs("pairs.json.txt", langDict, altCodes)
     apertiumFile = open("apertiumPairs.json", "w")
 
     apertiumFile.write("{\n")
@@ -54,19 +92,19 @@ if __name__ == "__main__":
     apertiumFile2.write("{\n")
     apertiumFile2.write('"type": "FeatureCollection",\n')
 
-    #writing point coordinates
+    # Writing point coordinates
     apertiumFile2.write('"point_data": [\n')
     langArr = []
-    for code in sorted(langDict.iterkeys()):
-        langArr.append([code,langDict[code]]);
+    for code in sorted(langDict.keys()):
+        langArr.append([code, langDict[code]])
 
     for lang in langArr[:-1]:
-        string = '{"type": "Feature", "tag": "' + lang[0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(lang[1]) + "} }\n"
-        apertiumFile2.write("\t"+string)
+        string = f'{{"type": "Feature", "tag": "{lang[0]}", "geometry": {{ "type": "Point", "coordinates": {lang[1]}}} }}\n'
+        apertiumFile2.write("\t" + string)
         apertiumFile2.write(",\n")
 
-    string = '{"type": "Feature", "tag": "' + langArr[-1][0] + '", ' + '"geometry": { "type": "Point", ' + '"coordinates": ' + str(langArr[-1][1]) + "} }\n"
-    apertiumFile2.write("\t"+string)
+    string = f'{{"type": "Feature", "tag": "{langArr[-1][0]}", "geometry": {{ "type": "Point", "coordinates": {langArr[-1][1]}}} }}\n'
+    apertiumFile2.write("\t" + string)
 
     apertiumFile2.write("]\n")
     apertiumFile2.write("}")
