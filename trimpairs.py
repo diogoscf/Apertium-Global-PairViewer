@@ -5,12 +5,16 @@ languages with coordinates in the tsv file
 
 import json
 
+language_pairs = set()
+
 
 def filter_pairs(filename, languages, altCodes):
     """
     Filters out any language that is not in
     the list of valid languages
     """
+
+    global language_pairs
 
     pair_file = open(filename, "r")
     filtered = []
@@ -30,12 +34,14 @@ def filter_pairs(filename, languages, altCodes):
             lang2 = altCodes[lang2]
 
         if lang1 in languages and lang2 in languages:
-            # Getting rid of last comma
-            line[-1] = line[-1][:-1]
-            line[1] = line[1][0] + lang2 + line[1][-2:]
-            line[3] = line[3][0] + lang1 + line[3][-2:]
-            joined = " ".join(line)
-            filtered.append(joined)
+            if (lang1, lang2) not in language_pairs and (lang2, lang1) not in language_pairs:
+                # Getting rid of last comma
+                line[-1] = line[-1][:-1]
+                line[1] = line[1][0] + lang2 + line[1][-2:]
+                line[3] = line[3][0] + lang1 + line[3][-2:]
+                joined = " ".join(line)
+                filtered.append(joined)
+                language_pairs.add((lang1, lang2))
 
     pair_file.close()
     return filtered

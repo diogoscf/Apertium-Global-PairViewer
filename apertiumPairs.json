@@ -67,11 +67,7 @@
 ,
 	{"lg1": "sme", "lg2": "nob", "last_updated": "2017-12-30", "created": "2010-01-11", "direction": ">", "repo": "trunk", "stems": 79445}
 ,
-	{"lg1": "spa", "lg2": "arg", "last_updated": "2017-10-27", "created": "2015-09-01", "direction": "<>", "repo": "trunk", "stems": 17975}
-,
 	{"lg1": "spa", "lg2": "cat", "last_updated": "2017-12-26", "created": "2007-05-16", "direction": "<>", "repo": "trunk", "stems": 35308}
-,
-	{"lg1": "spa", "lg2": "ita", "last_updated": "2017-08-31", "created": "2007-07-17", "direction": "<>", "repo": "trunk", "stems": 16341}
 ,
 	{"lg1": "srd", "lg2": "ita", "last_updated": "2017-10-24", "created": "2016-04-15", "direction": "<>", "repo": "trunk", "stems": 27295}
 ,
@@ -223,10 +219,6 @@
 ,
 	{"lg1": "eng", "lg2": "pol", "last_updated": "2015-06-26", "created": "2007-10-08", "direction": "<>", "repo": "incubator", "stems": 6541}
 ,
-	{"lg1": "eng", "lg2": "cat", "last_updated": "2017-12-29", "created": "2016-01-24", "direction": "<>", "repo": "incubator", "stems": 64956}
-,
-	{"lg1": "eng", "lg2": "ita", "last_updated": "2017-01-08", "created": "2015-06-09", "direction": "<>", "repo": "incubator", "stems": 22592}
-,
 	{"lg1": "eng", "lg2": "lvs", "last_updated": "2014-06-09", "created": "2011-02-24", "direction": "<>", "repo": "incubator", "stems": 2694}
 ,
 	{"lg1": "eng", "lg2": "pes", "last_updated": "2015-08-11", "created": "2015-08-11", "direction": "<>", "repo": "incubator", "stems": 22455}
@@ -301,8 +293,6 @@
 ,
 	{"lg1": "fra", "lg2": "ron", "last_updated": "2015-06-26", "created": "2015-01-05", "direction": "<>", "repo": "incubator", "stems": 12903}
 ,
-	{"lg1": "gle", "lg2": "eng", "last_updated": "2016-02-01", "created": "2014-12-09", "direction": "<>", "repo": "incubator", "stems": 1598}
-,
 	{"lg1": "guc", "lg2": "spa", "last_updated": "2015-06-26", "created": "2012-11-27", "direction": "<", "repo": "incubator", "stems": 1077}
 ,
 	{"lg1": "guj", "lg2": "hin", "last_updated": "2016-03-23", "created": "2016-03-13", "direction": "<>", "repo": "incubator", "stems": 122}
@@ -318,8 +308,6 @@
 	{"lg1": "ita", "lg2": "ita", "last_updated": "2014-01-07", "created": "?", "direction": "?", "repo": "incubator", "stems": 1}
 ,
 	{"lg1": "ita", "lg2": "nor", "last_updated": "2015-03-17", "created": "2014-05-12", "direction": "", "repo": "incubator", "stems": 115752}
-,
-	{"lg1": "ita", "lg2": "srd", "last_updated": "2013-03-13", "created": "?", "direction": "?", "repo": "incubator", "stems": -1}
 ,
 	{"lg1": "kaz", "lg2": "kaa", "last_updated": "2015-06-26", "created": "2013-10-17", "direction": "<>", "repo": "incubator", "stems": 5408}
 ,
@@ -349,8 +337,6 @@
 ,
 	{"lg1": "lat", "lg2": "ita", "last_updated": "2010-02-10", "created": "?", "direction": "?", "repo": "incubator", "stems": 65}
 ,
-	{"lg1": "lat", "lg2": "eng", "last_updated": "2017-12-18", "created": "2015-01-02", "direction": "<>", "repo": "incubator", "stems": 154}
-,
 	{"lg1": "liv", "lg2": "fin", "last_updated": "2014-06-09", "created": "2013-05-11", "direction": "<>", "repo": "incubator", "stems": 1}
 ,
 	{"lg1": "mal", "lg2": "eng", "last_updated": "2016-01-04", "created": "2013-05-08", "direction": ">", "repo": "incubator", "stems": 9095}
@@ -377,17 +363,11 @@
 ,
 	{"lg1": "olo", "lg2": "fin", "last_updated": "2015-11-08", "created": "2013-05-11", "direction": "<>", "repo": "incubator", "stems": 197}
 ,
-	{"lg1": "pes", "lg2": "eng", "last_updated": "2017-05-08", "created": "2017-03-11", "direction": "", "repo": "incubator", "stems": 6301}
-,
 	{"lg1": "pes", "lg2": "glk", "last_updated": "2014-07-17", "created": "2013-11-06", "direction": ">", "repo": "incubator", "stems": 8}
-,
-	{"lg1": "pol", "lg2": "epo", "last_updated": "2010-10-30", "created": "?", "direction": "?", "repo": "incubator", "stems": 19420}
 ,
 	{"lg1": "pol", "lg2": "hbs", "last_updated": "2014-08-24", "created": "?", "direction": "?", "repo": "incubator", "stems": 136}
 ,
 	{"lg1": "pol", "lg2": "rus", "last_updated": "2017-05-30", "created": "2016-02-19", "direction": "<>", "repo": "incubator", "stems": 25495}
-,
-	{"lg1": "por", "lg2": "cat", "last_updated": "2016-01-22", "created": "2016-01-21", "direction": "<>", "repo": "incubator", "stems": 8029}
 ,
 	{"lg1": "ron", "lg2": "rup", "last_updated": "2013-11-24", "created": "?", "direction": "?", "repo": "incubator", "stems": 402}
 ,
@@ -451,30 +431,6 @@
 ,
 	{"lg1": "zul", "lg2": "ssw", "last_updated": "2014-07-05", "created": "2014-07-05", "direction": "<>", "repo": "incubator", "stems": 2}
 ,
-	{"lg1": "spa", "lg2": "cat", "last_updated": "2014-10-02", "created": "2007-05-16", "direction": "<>", "repo": "trunk", "stems": 33649}
-,
-	{"lg1": "swe", "lg2": "dan", "last_updated": "2014-02-10", "created": "2007-04-25", "direction": "<>", "repo": "trunk", "stems": 7997}
-,
-	{"lg1": "mlt", "lg2": "ara", "last_updated": "2014-10-12", "created": "2012-04-02", "direction": "<>", "repo": "staging", "stems": 7570}
-,
-	{"lg1": "mlt", "lg2": "heb", "last_updated": "2014-06-09", "created": "2011-04-27", "direction": ">", "repo": "staging", "stems": 3634}
-,
-	{"lg1": "pol", "lg2": "ces", "last_updated": "2014-06-09", "created": "2010-01-25", "direction": "<>", "repo": "staging", "stems": 13799}
-,
-	{"lg1": "eng", "lg2": "afr", "last_updated": "2014-06-09", "created": "2007-04-23", "direction": "<>", "repo": "nursery", "stems": 6590}
-,
-	{"lg1": "chv", "lg2": "tur", "last_updated": "2014-08-27", "created": "2012-01-03", "direction": "<>", "repo": "incubator", "stems": 100}
-,
-	{"lg1": "dan", "lg2": "fao", "last_updated": "2009-11-30", "created": "?", "direction": "?", "repo": "incubator", "stems": -1}
-,
-	{"lg1": "deu", "lg2": "eng", "last_updated": "2008-08-02", "created": "?", "direction": "?", "repo": "incubator", "stems": 277331}
-,
-	{"lg1": "eng", "lg2": "deu", "last_updated": "2014-06-09", "created": "2007-04-25", "direction": "<>", "repo": "incubator", "stems": 569}
-,
-	{"lg1": "spa", "lg2": "deu", "last_updated": "2014-06-09", "created": "2012-10-24", "direction": "<>", "repo": "incubator", "stems": 615}
-,
 	{"lg1": "fao", "lg2": "nob", "last_updated": "2013-06-20", "created": "?", "direction": "?", "repo": "incubator", "stems": -1}
-,
-	{"lg1": "pol", "lg2": "rus", "last_updated": "2009-05-02", "created": "?", "direction": "?", "repo": "incubator", "stems": 73}
 ]
 }
