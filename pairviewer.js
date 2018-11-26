@@ -280,18 +280,18 @@ function displayModal(d, pairs) {
     .strength(function (link) { return link.strength });
 
   const simulation = d3.forceSimulation()
-    .force('link', linkForce)
-    .force('charge', d3.forceManyBody().strength(-120))
-    .force('center', d3.forceCenter(width / 2, height / 2));
+    .force("link", linkForce)
+    .force("charge", d3.forceManyBody().strength(-100))
+    .force("center", d3.forceCenter(width / 2, height / 2));
 
-  const dragDrop = d3.drag().on('start', function (node) {
+  const dragDrop = d3.drag().on("start", function (node) {
       node.fx = node.x
       node.fy = node.y
-    }).on('drag', function (node) {
+    }).on("drag", function (node) {
       simulation.alphaTarget(0.7).restart()
       node.fx = d3.event.x
       node.fy = d3.event.y
-    }).on('end', function (node) {
+    }).on("end", function (node) {
       if (!d3.event.active) {
         simulation.alphaTarget(0)
       }
@@ -299,37 +299,37 @@ function displayModal(d, pairs) {
       node.fy = null
     });
 
-  const linkElements = svgContainer.append('g')
-    .selectAll('line')
+  const linkElements = svgContainer.append("g")
+    .selectAll("line")
     .data(connections)
-    .enter().append('line')
-      .attr('stroke-width', d => Math.log(d.stems / 100, 2) * 3)
-      .attr('stroke', d => d.color)
-      .attr('opacity', 0.5);
+    .enter().append("line")
+      .attr("stroke-width", d => Math.log(d.stems / 100, 2) * 3)
+      .attr("stroke", d => d.color)
+      .attr("opacity", 0.5);
 
-  const nodeElements = svgContainer.append('g')
-    .selectAll('circle')
+  const nodeElements = svgContainer.append("g")
+    .selectAll("circle")
     .data(nodes)
-    .enter().append('circle')
-      .attr('r', 30)
-      .attr('fill', d => d.color)
+    .enter().append("circle")
+      .attr("r", 30)
+      .attr("fill", d => d.color)
       .call(dragDrop);
 
-  const textElements = svgContainer.append('g')
-    .selectAll('text')
+  const textElements = svgContainer.append("g")
+    .selectAll("text")
     .data(nodes)
-    .enter().append('text')
+    .enter().append("text")
       .text(node => node.label)
-      .attr('font-size', 15)
-      .attr('dx', -20)
-      .attr('dy', 4);
+      .attr("font-size", 15)
+      .attr("dx", -20)
+      .attr("dy", 4);
 
   simulation.nodes(nodes).on("tick", () => {
     linkElements
-      .attr('x1', link => link.source.x)
-      .attr('y1', link => link.source.y)
-      .attr('x2', link => link.target.x)
-      .attr('y2', link => link.target.y);
+      .attr("x1", link => link.source.x)
+      .attr("y1", link => link.source.y)
+      .attr("x2", link => link.target.x)
+      .attr("y2", link => link.target.y);
     nodeElements
       .attr("cx", node => node.x)
       .attr("cy", node => node.y)
@@ -338,7 +338,30 @@ function displayModal(d, pairs) {
       .attr("y", node => node.y)
   });
 
-  simulation.force('link').links(connections);
+  simulation.force("link").links(connections);
+
+  let stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK"];
+  let legend = svgContainer.selectAll(".legend")
+    .data(stages)
+    .enter().append("g")
+    .attr("transform", function (d, i) {
+      {
+          return "translate(0," + (i * 20 + 10) + ")"
+      }
+    })
+    
+  legend.append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", 10)
+    .attr("height", 10)
+    .style("fill", stage => chooseNodeColor(stage.toLowerCase()))
+
+  legend.append("text")
+    .attr("x", 20)
+    .attr("y", 10)
+    .text(stage => stage)
+    .style("font-size", 15)
 }
 
 queue()
@@ -892,7 +915,7 @@ function setPoints(o1, o2) {
 function selectRepoFilter(f) {
   if ($("#checkmark" + f).length === 0) {
     $("#filter" + f).html(
-      f + "<i id=checkmark" + f + ' class="fa fa-check checkmark"></i>'
+      f + "<i id=checkmark" + f + " class='fa fa-check checkmark'></i>"
     );
     currentRepoFilter.push(f);
   } else {
@@ -909,7 +932,7 @@ function selectRepoFilter(f) {
 function selectDirFilter(dir) {
   if ($("#checkmarkDir" + dir).length === 0) {
     $("#dir" + dir).html(
-      dir + "<i id=checkmarkDir" + dir + ' class="fa fa-check checkmark"></i>'
+      dir + "<i id=checkmarkDir" + dir + " class='fa fa-check checkmark'></i>"
     );
     currentDirFilter.push(dir);
   } else {
@@ -927,7 +950,7 @@ function filterPoint(p) {
   var needToRotate = false;
   if ($("#checkmarkPoint" + p).length === 0) {
     $("#point" + p).html(
-      p + "<i id=checkmarkPoint" + p + ' class="fa fa-check checkmark"></i>'
+      p + "<i id=checkmarkPoint" + p + " class='fa fa-check checkmark'></i>"
     );
     currentPointFilter.push(p);
     needToRotate = true;
@@ -1129,18 +1152,18 @@ function toggleDropdown(t, id) {
       var filterButton = $(".dropdown-content")[i].previousElementSibling;
       filterButton.innerHTML =
         filterButton.innerHTML.slice(0, filterButton.innerHTML.indexOf("<")) +
-        '<i class="fa fa-caret-right"></i>';
+        "<i class='fa fa-caret-right'></i>";
     }
   }
   $(id).toggle();
   if ($(id).css("display") === "none") {
     t.innerHTML =
       t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
-      '<i class="fa fa-caret-right"></i>';
+      "<i class='fa fa-caret-right'></i>";
   } else {
     t.innerHTML =
       t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
-      '<i class="fa fa-caret-down"></i>';
+      "<i class='fa fa-caret-down'></i>";
   }
   var sidenavHeight = $("#sidenav").css("height");
   var val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
