@@ -202,13 +202,13 @@ function getPairs(d) {
 
   for (i = 0; i < links.length; i++) {
     if (links[i].sourceTag === d) {
-      let data = [links[i].targetTag, links[i].stems];
+      let data = [links[i].targetTag, links[i].stems, links[i].stage];
 
       if (data[1] > 0) {
         pairs.push(data);
       }
     } else if (links[i].targetTag === d) {
-      let data = [links[i].sourceTag, links[i].stems];
+      let data = [links[i].sourceTag, links[i].stems, links[i].stage];
 
       if (data[1] > 0) {
         pairs.push(data);
@@ -217,6 +217,20 @@ function getPairs(d) {
   }
 
   return pairs;
+}
+
+function chooseNodeColor(stage) {
+  if (stage === "trunk") {
+    return TRUNK_COLOR;
+  } else if (stage === "staging") {
+    return STAGING_COLOR;
+  } else if (stage === "nursery") {
+    return NURSERY_COLOR;
+  } else if (stage === "incubator") {
+    return INCUBATOR_COLOR;
+  } else {
+    return UNKNOWN_COLOR;
+  }
 }
 
 function displayModal(d, pairs) {
@@ -244,14 +258,87 @@ function displayModal(d, pairs) {
   let heading = document.getElementById("heading");
   heading.innerHTML = codeToLanguage(d);
 
-  let height = window.innerHeight * 0.7;
-  let width = window.innerWidth * 0.8;
+  const height = window.innerHeight * 0.7;
+  const width = window.innerWidth * 0.8;
 
-  var svgContainer = d3
+  const svgContainer = d3
     .select(".modal-body")
     .append("svg")
     .attr("width", width)
     .attr("height", height);
+
+  let nodes = [{id: d, label: codeToLanguage(d), color: "#2196F3"}];
+  let connections = [];
+  for (i = 0; i < pairs.length; i++) {
+    nodes.push({id: pairs[i][0], label: codeToLanguage(pairs[i][0]), color: chooseNodeColor(pairs[i][2])});
+    connections.push({source: d, target: pairs[i][0], stems: pairs[i][1], color: chooseNodeColor(pairs[i][2]), strength: 0.05});
+  }
+
+  const linkForce = d3
+    .forceLink()
+    .id(function (link) { return link.id })
+    .strength(function (link) { return link.strength });
+
+  const simulation = d3.forceSimulation()
+    .force('link', linkForce)
+    .force('charge', d3.forceManyBody().strength(-120))
+    .force('center', d3.forceCenter(width / 2, height / 2));
+
+  const dragDrop = d3.drag().on('start', function (node) {
+      node.fx = node.x
+      node.fy = node.y
+    }).on('drag', function (node) {
+      simulation.alphaTarget(0.7).restart()
+      node.fx = d3.event.x
+      node.fy = d3.event.y
+    }).on('end', function (node) {
+      if (!d3.event.active) {
+        simulation.alphaTarget(0)
+      }
+      node.fx = null
+      node.fy = null
+    });
+
+  const linkElements = svgContainer.append('g')
+    .selectAll('line')
+    .data(connections)
+    .enter().append('line')
+      .attr('stroke-width', d => Math.log(d.stems / 100, 2) * 3)
+      .attr('stroke', d => d.color)
+      .attr('opacity', 0.5);
+
+  const nodeElements = svgContainer.append('g')
+    .selectAll('circle')
+    .data(nodes)
+    .enter().append('circle')
+      .attr('r', 30)
+      .attr('fill', d => d.color)
+      .call(dragDrop);
+
+  const textElements = svgContainer.append('g')
+    .selectAll('text')
+    .data(nodes)
+    .enter().append('text')
+      .text(node => node.label)
+      .attr('font-size', 15)
+      .attr('dx', -20)
+      .attr('dy', 4);
+
+  simulation.nodes(nodes).on("tick", () => {
+    linkElements
+      .attr('x1', link => link.source.x)
+      .attr('y1', link => link.source.y)
+      .attr('x2', link => link.target.x)
+      .attr('y2', link => link.target.y);
+    nodeElements
+      .attr("cx", node => node.x)
+      .attr("cy", node => node.y)
+    textElements
+      .attr("x", node => node.x)
+      .attr("y", node => node.y)
+  });
+
+  simulation.force('link').links(connections);
 }
 
 queue()
@@ -644,6 +731,7 @@ function ready(error, world, places, points) {
     .on("click", function(d) {
       rotateToPoint(d.tag);
       let pairs = getPairs(d.tag);
+      console.log(pairs);
 
       displayModal(d.tag, pairs);
     });
@@ -667,7 +755,7 @@ function ready(error, world, places, points) {
   handleUnusedPoints();
 }
 
-//Position and hiding labels
+// Position and hiding labels
 function position_labels() {
   var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]);
 

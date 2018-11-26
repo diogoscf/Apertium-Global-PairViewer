@@ -21,6 +21,11 @@
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
     font-family: 'Oswald', sans-serif;
+    text-align: center;
+}
+
+#heading {
+    display: inline-block;
 }
 
 /* The Close Button */
