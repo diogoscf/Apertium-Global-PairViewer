@@ -363,10 +363,9 @@ function displayModal(d, pairs) {
 
   simulation.force("link").links(connections);
 
-  const stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK"];
   let legend = svgContainer
     .selectAll(".legend")
-    .data(stages)
+    .data(translationClasses)
     .enter()
     .append("g")
     .attr("transform", function(d, i) {
@@ -381,13 +380,13 @@ function displayModal(d, pairs) {
     .attr("y", 0)
     .attr("width", 10)
     .attr("height", 10)
-    .style("fill", stage => chooseNodeColor(stage.toLowerCase()));
+    .style("fill", stage => chooseNodeColor(stage));
 
   legend
     .append("text")
     .attr("x", 20)
     .attr("y", 10)
-    .text(stage => stage)
+    .text(stage => stage.toUpperCase())
     .style("font-size", 15);
 }
 
