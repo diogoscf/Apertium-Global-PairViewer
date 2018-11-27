@@ -204,15 +204,18 @@ function getPairs(d) {
     if (links[i].sourceTag === d) {
       let data = [links[i].targetTag, links[i].stems, links[i].stage];
 
-      if (data[1] > 0) {
-        pairs.push(data);
+      if (data[1] < 0) {
+        data = [links[i].targetTag, 1, "unknown"];
       }
+      pairs.push(data);
+
     } else if (links[i].targetTag === d) {
       let data = [links[i].sourceTag, links[i].stems, links[i].stage];
 
-      if (data[1] > 0) {
-        pairs.push(data);
+      if (data[1] < 0) {
+        data = [links[i].targetTag, 1, "unknown"];
       }
+      pairs.push(data);
     }
   }
 
@@ -229,7 +232,7 @@ function chooseNodeColor(stage) {
   } else if (stage === "incubator") {
     return INCUBATOR_COLOR;
   } else {
-    return UNKNOWN_COLOR;
+    return "#808080";
   }
 }
 
@@ -345,7 +348,7 @@ function displayModal(d, pairs) {
 
   simulation.force("link").links(connections);
 
-  let stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK"];
+  let stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK", "UNKNOWN"];
   let legend = svgContainer.selectAll(".legend")
     .data(stages)
     .enter().append("g")
