@@ -256,8 +256,7 @@ function displayModal(d, pairs) {
     }
   };
 
-  let heading = document.getElementById("heading");
-  heading.innerHTML = codeToLanguage(d);
+  document.getElementById("heading").innerHTML = codeToLanguage(d);
 
   const height = window.innerHeight * 0.7;
   const width = window.innerWidth * 0.8;
@@ -342,7 +341,7 @@ function displayModal(d, pairs) {
 
   simulation.force("link").links(connections);
 
-  const stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK", "UNKNOWN"];
+  const stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK"];
   let legend = svgContainer.selectAll(".legend")
     .data(stages)
     .enter().append("g")
