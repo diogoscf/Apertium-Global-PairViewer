@@ -1,301 +1,315 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-<style>
-html,body{
-  padding: 0px;
-  margin: 0px;
-  overflow: hidden;
-  width:100%;
-  height:100%;
-}
-body {
-  position: relative
-}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <style>
+      html,body{
+        padding: 0px;
+        margin: 0px;
+        overflow: hidden;
+        width:100%;
+        height:100%;
+      }
+      body {
+        position: relative
+      }
 
-.borders {
-  fill: #000;
-  stroke-opacity: 1;
-}
+      .borders {
+        fill: #000;
+        stroke-opacity: 1;
+      }
 
-.land {
-  fill: #999;
-  stroke-opacity: 1;
-}
+      .land {
+        fill: #999;
+        stroke-opacity: 1;
+      }
 
-.graticule {
-  fill: none;
-  stroke: black;
-  stroke-width:.5;
-  opacity:.2;
-}
+      .graticule {
+        fill: none;
+        stroke: black;
+        stroke-width:.5;
+        opacity:.2;
+      }
 
-.noclicks {
-  pointer-events:none;
-}
+      .noclicks {
+        pointer-events:none;
+      }
 
-.point {
-  opacity:.6;
-}
+      .point {
+        opacity:.6;
+      }
 
-.arcs {
-  opacity:.1;
-  stroke: gray;
-  stroke-width: 3;
-}
-.flyers {
-  stroke-width:1;
-  opacity: .6;
-  stroke: blue;
-}
-.arc, .flyer {
-  stroke-linejoin: round;
-  fill:none;
-}
-.flyer{
-  stroke:#E91E63;
-  stroke-width: 2px;
-}
-  .arc { }
-  .flyer { }
-  .flyer:hover { }
+      .arcs {
+        opacity:.1;
+        stroke: gray;
+        stroke-width: 3;
+      }
+      .flyers {
+        stroke-width:1;
+        opacity: .6;
+        stroke: blue;
+      }
+      .arc, .flyer {
+        stroke-linejoin: round;
+        fill:none;
+      }
+      .flyer{
+        stroke:#E91E63;
+        stroke-width: 2px;
+      }
+        .arc { }
+        .flyer { }
+        .flyer:hover { }
 
-.labels {
-    font: 10px sans-serif;
-    fill: black;
-    opacity: .9;
-}
+      .labels {
+          font: 10px sans-serif;
+          fill: black;
+          opacity: .9;
+      }
 
-div.tooltip {
-  position: absolute;
-  text-align: center;
-  min-width: 60px;
-  display: inline-block;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: lightsteelblue;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
-}
+      div.tooltip {
+        position: absolute;
+        text-align: center;
+        min-width: 60px;
+        display: inline-block;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+      }
 
-#settings {
-  position: absolute;
-  margin-top: 0px;
-  width: 180px;
-}
+      #settings {
+        position: absolute;
+        margin-top: 0px;
+        width: 180px;
+      }
 
-.checkbox {
-  margin: 0px;
-  cursor: pointer;
-  vertical-align: 2px;
-}
+      .checkbox {
+        margin: 0px;
+        cursor: pointer;
+        vertical-align: 2px;
+      }
 
-#pointSearchIcon {
-  position: absolute;
-  top: 11px;
-  left: 13px;
-  font-size: 18px;
-}
+      #pointSearchIcon {
+        position: absolute;
+        top: 11px;
+        left: 13px;
+        font-size: 18px;
+      }
 
-#pointSearch {
-  font-size: 16px;
-  padding: 12px 16px;
-  padding-left: 40px;
-  border: none;
-  width: 100%;
-  box-sizing: border-box;
-}
+      #pointSearch {
+        font-size: 16px;
+        padding: 12px 16px;
+        padding-left: 40px;
+        border: none;
+        width: 100%;
+        box-sizing: border-box;
+      }
 
-#pointList {
-  overflow: auto;
-  position: relative;
-  width: 100%;
-  min-height: 42px;
-}
+      #pointList {
+        overflow: auto;
+        position: relative;
+        width: 100%;
+        min-height: 42px;
+      }
 
-#stemFilterCount {
-  text-align: center;
-  width: 40px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
+      #stemFilterCount {
+        text-align: center;
+        width: 40px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
 
-#stemFilterSlider {
-  margin-left: 12px;
-  width: 105px;
-  margin-right: 2px;
-  vertical-align: middle;
-}
+      #stemFilterSlider {
+        margin-left: 12px;
+        width: 105px;
+        margin-right: 2px;
+        vertical-align: middle;
+      }
 
-.filter {
-  position: relative;
-}
+      .filter {
+        position: relative;
+      }
 
-.greenButton {
-  position: relative;
-  background-color: #4CAF50;
-  color: white;
-  width: 100%;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  padding-left: 12px;
-  font: 16px sans-serif;
-  -moz-user-select:none;
-  opacity: 0.95;
-  margin-top: 3px;
-  box-sizing: border-box;
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
-}
+      .greenButton {
+        position: relative;
+        background-color: #4CAF50;
+        color: white;
+        width: 100%;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        padding-left: 12px;
+        font: 16px sans-serif;
+        -moz-user-select:none;
+        opacity: 0.95;
+        margin-top: 3px;
+        box-sizing: border-box;
+        box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+      }
 
-.fa-check {
-  float: right;
-}
+      .fa-check {
+        float: right;
+      }
 
-.greenButton:hover, .greenButton:focus {
-  background-color: #3e8e41;
-}
+      .greenButton:hover, .greenButton:focus {
+        background-color: #3e8e41;
+      }
 
-.dropdown-content {
-  display: none;
-  position: relative;
-  min-width: 160px;
-  overflow: auto;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 2;
-}
+      .dropdown-content {
+        display: none;
+        position: relative;
+        min-width: 160px;
+        overflow: auto;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 2;
+      }
 
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  border-style: solid;
-  font: 16px sans-serif;
-  cursor: pointer;
-  background-color: #ffffff;
-  border-color: lightgray;
-  -moz-user-select:none;
-}
+      .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        border-style: solid;
+        font: 16px sans-serif;
+        cursor: pointer;
+        background-color: #ffffff;
+        border-color: lightgray;
+        -moz-user-select:none;
+      }
 
-#stemDropdownContent {
-  color: black;
-  padding: 12px 0px;
-  text-decoration: none;
-  display: block;
-  font: 16px sans-serif;
-  cursor: pointer;
-  background-color: #ffffff;
-  -moz-user-select:none;
-}
+      #stemDropdownContent {
+        color: black;
+        padding: 12px 0px;
+        text-decoration: none;
+        display: block;
+        font: 16px sans-serif;
+        cursor: pointer;
+        background-color: #ffffff;
+        -moz-user-select:none;
+      }
 
-.dropdown-content a:hover, .dropdown-content a:focus {
-  background-color: #e8e8e8;
-}
+      .dropdown-content a:hover, .dropdown-content a:focus {
+        background-color: #e8e8e8;
+      }
 
-.dropdown-select {
-  border-width: 1px 0px 0px 0px;
-}
+      .dropdown-select {
+        border-width: 1px 0px 0px 0px;
+      }
 
-.sidenav {
-  height: 100%;
-  width: 180px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: -180px;
-  background-color: #dddddd;
-  transition: 0.5s;
-}
+      .sidenav {
+        height: 100%;
+        width: 180px;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: -180px;
+        background-color: #dddddd;
+        transition: 0.5s;
+      }
 
-.closebtn {
-  position: absolute;
-  top: 0;
-  right: 15px;
-  font-size: 36px;
-  margin-left: 50px;
-  text-decoration: none;
-  color: #ff5151;
-  display: block;
-  cursor: pointer;
-}
+      .closebtn {
+        position: absolute;
+        top: 0;
+        right: 15px;
+        font-size: 36px;
+        margin-left: 50px;
+        text-decoration: none;
+        color: #ff5151;
+        display: block;
+        cursor: pointer;
+      }
 
-.closebtn:hover, .closebtn:focus {
-  color: #f21a1a;
-}
+      .closebtn:hover, .closebtn:focus {
+        color: #f21a1a;
+      }
 
-.resetFilter {
-  background-color: #ee0701 !important;
-  border-color: black !important;
-  color: white !important;
-}
+      .resetFilter {
+        background-color: #ee0701 !important;
+        border-color: black !important;
+        color: white !important;
+      }
 
-.resetFilter:hover, .resetFilter:focus {
-  background-color: #c60500 !important;
-}
-</style>
-</head>
-<body>
+      .resetFilter:hover, .resetFilter:focus {
+        background-color: #c60500 !important;
+      }
+    </style>
+
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="colorbrewer.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+    <link rel="stylesheet" href="modal.css"/>
+  </head>
+
+  <body>
   </body>
 
-<div onclick="openNav()" id="settings" class="greenButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings </div>
+  <div onclick="openNav()" id="settings" class="greenButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings </div>
 
-<div id="sidenav" class="sidenav eP">
-  <div class="filter">
-    <div onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
-    <div id="dropdown" class="dropdown-content">
-      <a id="filterTrunk" class="dropdown-select" onclick="selectRepoFilter('Trunk')">Trunk</a>
-      <a id="filterStaging" class="dropdown-select" onclick="selectRepoFilter('Staging')">Staging</a>
-      <a id="filterNursery" class="dropdown-select" onclick="selectRepoFilter('Nursery')">Nursery</a>
-      <a id="filterIncubator" class="dropdown-select" onclick="selectRepoFilter('Incubator')">Incubator</a>
+  <div id="sidenav" class="sidenav eP">
+    <div class="filter">
+      <div onclick="toggleDropdown(this,'#dropdown');" class="eP greenButton">Filter By Repo <i class="fa fa-caret-right"></i></div>
+      <div id="dropdown" class="dropdown-content">
+        <a id="filterTrunk" class="dropdown-select" onclick="selectRepoFilter('Trunk')">Trunk</a>
+        <a id="filterStaging" class="dropdown-select" onclick="selectRepoFilter('Staging')">Staging</a>
+        <a id="filterNursery" class="dropdown-select" onclick="selectRepoFilter('Nursery')">Nursery</a>
+        <a id="filterIncubator" class="dropdown-select" onclick="selectRepoFilter('Incubator')">Incubator</a>
+      </div>
     </div>
-  </div>
-  <div class="filter">
-    <div onclick="toggleDropdown(this,'#dirDropdown');" class="eP greenButton">Filter By Direction <i class="fa fa-caret-right"></i></div>
-    <div id="dirDropdown" class="dropdown-content">
-      <a id="dirBidirectional" class="dropdown-select" onclick="selectDirFilter('Bidirectional')">Bidirectional</a>
-      <a id="dirUnidirectional" class="dropdown-select" onclick="selectDirFilter('Unidirectional')">Unidirectional</a>
-      <a id="dirUnknown" class="dropdown-select" onclick="selectDirFilter('Unknown')">Unknown</a>
+    <div class="filter">
+      <div onclick="toggleDropdown(this,'#dirDropdown');" class="eP greenButton">Filter By Direction <i class="fa fa-caret-right"></i></div>
+      <div id="dirDropdown" class="dropdown-content">
+        <a id="dirBidirectional" class="dropdown-select" onclick="selectDirFilter('Bidirectional')">Bidirectional</a>
+        <a id="dirUnidirectional" class="dropdown-select" onclick="selectDirFilter('Unidirectional')">Unidirectional</a>
+        <a id="dirUnknown" class="dropdown-select" onclick="selectDirFilter('Unknown')">Unknown</a>
+      </div>
     </div>
-  </div>
-  <div class="filter">
-    <div onclick="toggleDropdown(this,'#pointDropdown');" class="eP greenButton">Filter By Language <i class="fa fa-caret-right"></i></div>
-    <div id="pointDropdown" class="dropdown-content">
-      <i id="pointSearchIcon" class="fa fa-search"></i>
-      <input type="text" placeholder="Search.." id="pointSearch" onkeyup="filterSearchPoints()">
-      <div id="pointList"></div>
+    <div class="filter">
+      <div onclick="toggleDropdown(this,'#pointDropdown');" class="eP greenButton">Filter By Language <i class="fa fa-caret-right"></i></div>
+      <div id="pointDropdown" class="dropdown-content">
+        <i id="pointSearchIcon" class="fa fa-search"></i>
+        <input type="text" placeholder="Search.." id="pointSearch" onkeyup="filterSearchPoints()">
+        <div id="pointList"></div>
+      </div>
     </div>
+    <div class="filter">
+      <div onclick="toggleDropdown(this,'#stemDropdown');" class="eP greenButton">Filter By Stem Count <i class="fa fa-caret-right"></i></div>
+      <div id="stemDropdown" class="dropdown-content">
+        <div id="stemDropdownContent">
+          <input id="stemFilterSlider" type="range" min="0" max="100000" value="0">
+          <input id="stemFilterCount" value="0"></input>
+        </div>
+      </div>
+    </div>
+    <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" class="checkbox" id="pointCheckbox" onclick="checkPoints()"></input> Unused Languages</div>
+    <div onclick="fullDepth()" id="fullDepth" class="greenButton eP"><input type="checkbox" class="checkbox" id="fullDepthCheckbox" onclick="fullDepth()"></input> Full Depth Filtering</div>
+    <div onclick="toggleShadows()" id="toggleShadows" class="greenButton eP"><input type="checkbox" class="checkbox" id="toggleShadowsCheckbox" onclick="toggleShadows()" checked></input> Shadows</div>
+    <div onclick="colorStem()" id="colorStem" class="greenButton eP"><input type="checkbox" class="checkbox" id="colorStemCheckbox" onclick="colorStem()" checked></input> Color By Stems</div>
+    <div onclick="unknownStem()" id="unknownStem" class="greenButton eP"><input type="checkbox" class="checkbox" id="unknownStemCheckbox" onclick="unknownStem()" checked></input> Unknown Stems</div>
+    <div class="greenButton resetFilter" onclick="resetFilters()">Reset to Defaults</div>
   </div>
-  <div class="filter">
-    <div onclick="toggleDropdown(this,'#stemDropdown');" class="eP greenButton">Filter By Stem Count <i class="fa fa-caret-right"></i></div>
-    <div id="stemDropdown" class="dropdown-content">
-      <div id="stemDropdownContent">
-        <input id="stemFilterSlider" type="range" min="0" max="100000" value="0">
-        <input id="stemFilterCount" value="0"></input>
+  <script type="text/javascript" src="pairviewer.js"></script>
+
+  <div id="languageModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-body" id="langDataBody">
+        <div class="modal-header">
+          <span class="close">&times;</span>
+          <h1 id="heading"></h1>
+        </div>
       </div>
     </div>
   </div>
-  <div onclick="checkPoints()" id="disablePoints" class="greenButton eP"><input type="checkbox" class="checkbox" id="pointCheckbox" onclick="checkPoints()"></input> Unused Languages</div>
-  <div onclick="fullDepth()" id="fullDepth" class="greenButton eP"><input type="checkbox" class="checkbox" id="fullDepthCheckbox" onclick="fullDepth()"></input> Full Depth Filtering</div>
-  <div onclick="toggleShadows()" id="toggleShadows" class="greenButton eP"><input type="checkbox" class="checkbox" id="toggleShadowsCheckbox" onclick="toggleShadows()" checked></input> Shadows</div>
-  <div onclick="colorStem()" id="colorStem" class="greenButton eP"><input type="checkbox" class="checkbox" id="colorStemCheckbox" onclick="colorStem()" checked></input> Color By Stems</div>
-  <div onclick="unknownStem()" id="unknownStem" class="greenButton eP"><input type="checkbox" class="checkbox" id="unknownStemCheckbox" onclick="unknownStem()" checked></input> Unknown Stems</div>
-  <div class="greenButton resetFilter" onclick="resetFilters()">Reset to Defaults</div>
-</div>
-
-  <script src="http://d3js.org/d3.v4.min.js"></script>
-  <script type="text/javascript" src="colorbrewer.js"></script>
-  <script src="http://d3js.org/queue.v1.min.js"></script>
-  <script src="http://d3js.org/topojson.v0.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <script src="pairviewer.js"></script>
 </html>
