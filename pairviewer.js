@@ -213,7 +213,7 @@ function getPairs(d) {
       let data = [links[i].sourceTag, links[i].stems, links[i].stage];
 
       if (data[1] < 0) {
-        data = [links[i].targetTag, 1, "unknown"];
+        data = [links[i].sourceTag, 1, "unknown"];
       }
       pairs.push(data);
     }
