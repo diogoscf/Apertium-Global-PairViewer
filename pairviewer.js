@@ -233,6 +233,10 @@ function chooseNodeColor(stage) {
   }
 }
 
+function calculateDX(label) {
+  return -3 * label.length;
+}
+
 function displayModal(d, pairs) {
   let modal = document.getElementById("languageModal");
   let span = document.getElementsByClassName("close")[0];
@@ -321,8 +325,8 @@ function displayModal(d, pairs) {
     .enter().append("text")
       .text(node => node.label)
       .attr("font-size", 15)
-      .attr("dx", -20)
-      .attr("dy", 4)
+      .attr("dx", node => calculateDX(node.label))
+      .attr("dy", 5)
       .style("pointer-events", "none");
 
   simulation.nodes(nodes).on("tick", () => {
