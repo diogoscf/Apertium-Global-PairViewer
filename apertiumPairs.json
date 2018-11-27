@@ -179,8 +179,6 @@
 ,
 	{"lg1": "cat", "lg2": "cos", "last_updated": "2013-11-05", "created": "2013-05-30", "direction": "<>", "repo": "incubator", "stems": 316}
 ,
-	{"lg1": "ces", "lg2": "ces", "last_updated": "2014-07-04", "created": "2014-01-22", "direction": "", "repo": "incubator", "stems": -1}
-,
 	{"lg1": "ces", "lg2": "hbs", "last_updated": "2013-05-15", "created": "2013-05-03", "direction": "<>", "repo": "incubator", "stems": 167}
 ,
 	{"lg1": "ces", "lg2": "rus", "last_updated": "2017-06-30", "created": "2013-09-12", "direction": "<>", "repo": "incubator", "stems": 5322}
@@ -304,8 +302,6 @@
 	{"lg1": "hun", "lg2": "eng", "last_updated": "2016-01-19", "created": "2013-05-21", "direction": ">", "repo": "incubator", "stems": 2030}
 ,
 	{"lg1": "isl", "lg2": "rus", "last_updated": "2015-06-26", "created": "2014-02-09", "direction": "<>", "repo": "incubator", "stems": 52}
-,
-	{"lg1": "ita", "lg2": "ita", "last_updated": "2014-01-07", "created": "?", "direction": "?", "repo": "incubator", "stems": 1}
 ,
 	{"lg1": "ita", "lg2": "nor", "last_updated": "2015-03-17", "created": "2014-05-12", "direction": "", "repo": "incubator", "stems": 115752}
 ,

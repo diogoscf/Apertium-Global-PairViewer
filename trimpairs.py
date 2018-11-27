@@ -33,7 +33,7 @@ def filter_pairs(filename, languages, altCodes):
         if lang2 in altCodes and lang2 not in languages:
             lang2 = altCodes[lang2]
 
-        if lang1 in languages and lang2 in languages:
+        if lang1 in languages and lang2 in languages and lang1 != lang2:
             if (lang1, lang2) not in language_pairs and (lang2, lang1) not in language_pairs:
                 # Getting rid of last comma
                 line[-1] = line[-1][:-1]
