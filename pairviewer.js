@@ -303,7 +303,7 @@ function displayModal(d, pairs) {
     .selectAll("line")
     .data(connections)
     .enter().append("line")
-      .attr("stroke-width", d => Math.log(d.stems / 100, 2) * 3)
+      .attr("stroke-width", d => Math.log(d.stems / 100, 2) * 3 + 4)
       .attr("stroke", d => d.color)
       .attr("opacity", 0.5);
 
@@ -322,7 +322,8 @@ function displayModal(d, pairs) {
       .text(node => node.label)
       .attr("font-size", 15)
       .attr("dx", -20)
-      .attr("dy", 4);
+      .attr("dy", 4)
+      .style("pointer-events", "none");
 
   simulation.nodes(nodes).on("tick", () => {
     linkElements
