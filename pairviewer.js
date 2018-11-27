@@ -204,17 +204,11 @@ function getPairs(d) {
     if (links[i].sourceTag === d) {
       let data = [links[i].targetTag, links[i].stems, links[i].stage];
 
-      if (data[1] < 0) {
-        data = [links[i].targetTag, 1, "unknown"];
-      }
       pairs.push(data);
 
     } else if (links[i].targetTag === d) {
       let data = [links[i].sourceTag, links[i].stems, links[i].stage];
 
-      if (data[1] < 0) {
-        data = [links[i].sourceTag, 1, "unknown"];
-      }
       pairs.push(data);
     }
   }
@@ -232,7 +226,7 @@ function chooseNodeColor(stage) {
   } else if (stage === "incubator") {
     return INCUBATOR_COLOR;
   } else {
-    return "#808080";
+    return UNKNOWN_COLOR;
   }
 }
 
@@ -310,8 +304,8 @@ function displayModal(d, pairs) {
     .selectAll("line")
     .data(connections)
     .enter().append("line")
-      .attr("stroke-width", d => Math.log(d.stems / 100, 2) * 3 + 4)
-      .attr("stroke", d => d.color)
+      .attr("stroke-width", d => d.stems < 0 ? 2 : Math.log(d.stems / 100, 2) * 3 + 4)
+      .attr("stroke", d => d.stems < 0 ? "#808080" : d.color)
       .attr("opacity", 0.5);
 
   const nodeElements = svgContainer.append("g")
@@ -348,7 +342,7 @@ function displayModal(d, pairs) {
 
   simulation.force("link").links(connections);
 
-  let stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK", "UNKNOWN"];
+  const stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK", "UNKNOWN"];
   let legend = svgContainer.selectAll(".legend")
     .data(stages)
     .enter().append("g")
@@ -356,20 +350,20 @@ function displayModal(d, pairs) {
       {
           return "translate(0," + (i * 20 + 10) + ")"
       }
-    })
+    });
     
   legend.append("rect")
     .attr("x", 0)
     .attr("y", 0)
     .attr("width", 10)
     .attr("height", 10)
-    .style("fill", stage => chooseNodeColor(stage.toLowerCase()))
+    .style("fill", stage => chooseNodeColor(stage.toLowerCase()));
 
   legend.append("text")
     .attr("x", 20)
     .attr("y", 10)
     .text(stage => stage)
-    .style("font-size", 15)
+    .style("font-size", 15);
 }
 
 queue()
