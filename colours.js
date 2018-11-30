@@ -4,9 +4,32 @@ var NURSERY_COLOR = "#ff5900";
 var INCUBATOR_COLOR = "#cc0000";
 var UNKNOWN_COLOR = "#9c27b0";
 
-var countryColor = d3.scaleThreshold()
-  .domain([10000,100000,500000,1000000,5000000,10000000,50000000,100000000,500000000,1500000000])
-  .range(["#ffffff", "#ccffcc", "#99ff99", "#66ff66", "#33ff33", "#00ff00","#00cc00","#009900","#006600","#003300"]);
+var countryColor = d3
+  .scaleThreshold()
+  .domain([
+    10000,
+    100000,
+    500000,
+    1000000,
+    5000000,
+    10000000,
+    50000000,
+    100000000,
+    500000000,
+    1500000000
+  ])
+  .range([
+    "#ffffff",
+    "#ccffcc",
+    "#99ff99",
+    "#66ff66",
+    "#33ff33",
+    "#00ff00",
+    "#00cc00",
+    "#009900",
+    "#006600",
+    "#003300"
+  ]);
 
 /********* colorbrewing *********/
 var maxStems = 100000;
