@@ -29,7 +29,7 @@
 ,
 	{"type": "Feature", "tag": "bua", "geometry": { "type": "Point", "coordinates": [109.0, 53.0]} }
 ,
-	{"type": "Feature", "tag": "bul", "geometry": { "type": "Point", "coordinates": [35.0, 43.0]} }
+	{"type": "Feature", "tag": "bul", "geometry": { "type": "Point", "coordinates": [25.0, 43.0]} }
 ,
 	{"type": "Feature", "tag": "byv", "geometry": { "type": "Point", "coordinates": [12.0, 6.0]} }
 ,
