@@ -343,7 +343,7 @@ function ready(error, world, places, points, diversity) {
     .style("fill", "url(#ocean_fill)");
 
   diversity.forEach(function(d) {
-    diversityById[d.id] = parseInt(d.diversity);
+    diversityById[d.id] = d.diversity;
   });
 
   svg
