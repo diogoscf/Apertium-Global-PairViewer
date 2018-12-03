@@ -149,10 +149,10 @@ queue()
   .defer(d3.json, "world-110m.json")
   .defer(d3.json, "apertiumPairs.json")
   .defer(d3.json, "apertiumPoints.json")
-  .defer(d3.tsv, "world_population.tsv")
+  .defer(d3.tsv, "linguistic_diversity.tsv")
   .await(ready);
 
-function ready(error, world, places, points, population) {
+function ready(error, world, places, points, diversity) {
   // grid = graticule(); currently lat lon lines not used, can uncomment to use
 
   var ocean_fill = svg
@@ -318,9 +318,9 @@ function ready(error, world, places, points, population) {
     .attr("id", "circle1")
     .style("fill", "url(#ocean_fill)");
 
-  var populationById = {};
-  population.forEach(function(d) {
-    populationById[d.id] = +d.population;
+  var diversityById = {};
+  diversity.forEach(function(d) {
+    diversityById[d.id] = parseInt(d.diversity);
   });
 
   svg
@@ -331,7 +331,7 @@ function ready(error, world, places, points, population) {
     .append("path")
     .attr("class", "land")
     .attr("d", path)
-    .style("fill", d => countryColor(populationById[d.id]))
+    .style("fill", d => countryColor(diversityById[d.id]))
     .style("stroke", "white")
     .style("stroke-width", 1)
     .style("opacity", 0.8);
