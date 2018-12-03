@@ -145,6 +145,30 @@ function getPairs(d) {
   return pairs;
 }
 
+let diversityById = {};
+let toggled = true;
+function toggleMapColour() {
+  $("#toggleMapColour").prop(
+    "checked",
+    !$("#toggleMapColour").prop("checked")
+  );
+  
+  if (toggled) {
+    svg
+      .selectAll("path.land")
+      .style("fill", "white")
+      .style("stroke", "grey");
+  } else {
+    svg
+      .selectAll("path.land")
+      .style("fill", d => countryColor(diversityById[d.id]))
+      .style("stroke", "white");
+  }
+  toggled = !toggled;
+
+  refresh()
+}
+
 queue()
   .defer(d3.json, "world-110m.json")
   .defer(d3.json, "apertiumPairs.json")
@@ -318,14 +342,13 @@ function ready(error, world, places, points, diversity) {
     .attr("id", "circle1")
     .style("fill", "url(#ocean_fill)");
 
-  var diversityById = {};
   diversity.forEach(function(d) {
     diversityById[d.id] = parseInt(d.diversity);
   });
 
   svg
     .append("g")
-    .selectAll("path")
+    .selectAll("path.land")
     .data(world.features)
     .enter()
     .append("path")
