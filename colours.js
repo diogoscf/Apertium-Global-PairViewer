@@ -8,19 +8,29 @@ var countryColor = d3
   .scaleThreshold()
   .domain([
     0,
+    100,
     200,
+    300,
     400,
+    500,
     600,
+    700,
     800,
+    900,
     1000
   ])
   .range([
     "#ffffff",
-    "#ccffcc",
-    "#99ff99",
-    "#66ff66",
-    "#33ff33",
-    "#00ff00",
+    "#fff0ff",
+    "#ffe6ff",
+    "#ffd7ff",
+    "#ffccff",
+    "#ffbfff",
+    "#ffb3ff",
+    "#ffa7ff",
+    "#ff99ff",
+    "#ff8aff",
+    "#ff80ff",
   ]);
 
 /********* colorbrewing *********/
