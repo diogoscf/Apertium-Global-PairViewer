@@ -148,11 +148,6 @@ function getPairs(d) {
 let diversityById = {};
 let toggled = true;
 function toggleMapColour() {
-  $("#toggleMapColour").prop(
-    "checked",
-    !$("#toggleMapColour").prop("checked")
-  );
-  
   if (toggled) {
     svg
       .selectAll("path.land")
@@ -167,6 +162,27 @@ function toggleMapColour() {
   toggled = !toggled;
 
   refresh()
+}
+
+function createStars(number){
+  var data = [];
+  for(var i = 0; i < number; i++){
+      data.push({
+          geometry: {
+              type: 'Point',
+              coordinates: randomLonLat()
+          },
+          type: 'Feature',
+          properties: {
+              radius: Math.random() * 1.5
+          }
+      });
+  }
+  return data;
+}
+
+function randomLonLat(){
+  return [Math.random() * 360 - 180, Math.random() * 180 - 90];
 }
 
 queue()
@@ -610,8 +626,9 @@ function position_labels() {
 // Chooses flyer color based on language pair stage
 // trunk green, staging yellow, nursery orange, incubator red
 function chooseColor(d) {
-  if ($("#colorStemCheckbox").prop("checked") === false) {
-    switch (stage) {
+  console.log(d);
+  if (!colorByStems) {
+    switch (d.stage) {
       case "trunk":
         return TRUNK_COLOR;
       case "staging":
@@ -624,7 +641,7 @@ function chooseColor(d) {
         return UNKNOWN_COLOR;
     }
   }
-  if (d.stems === undefined || d === -1) {
+  if (d.stems === undefined || d.stems === -1) {
     return UNKNOWN_COLOR;
   }
   try {
@@ -648,11 +665,15 @@ function chooseColor(d) {
   }
 }
 
+let colorByStems = false;
 function colorStem() {
-  $("#colorStemCheckbox").prop(
-    "checked",
-    !$("#colorStemCheckbox").prop("checked")
-  );
+  colorByStems = !colorByStems
+  let button = document.getElementById("colorStem");
+  if (colorByStems) {
+    button.innerHTML = " Color By Stage";
+  } else {
+    button.innerHTML = " Color By Stems";
+  }
   svg.selectAll(".flyer").style("stroke", function(d) {
     return chooseColor(d);
   });
