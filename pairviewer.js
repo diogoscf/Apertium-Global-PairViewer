@@ -573,8 +573,7 @@ function ready(error, world, places, points, diversity) {
     })
     .on("click", function(d) {
       rotateToPoint(d.tag);
-      let pairs = getPairs(d.tag);
-      displayModal(d.tag, pairs);
+      filterPoint(d.tag);
     });
 
   // Populate the filter point list
@@ -626,7 +625,6 @@ function position_labels() {
 // Chooses flyer color based on language pair stage
 // trunk green, staging yellow, nursery orange, incubator red
 function chooseColor(d) {
-  console.log(d);
   if (!colorByStems) {
     switch (d.stage) {
       case "trunk":
