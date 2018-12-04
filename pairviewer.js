@@ -776,9 +776,11 @@ function filterPoint(p) {
     );
     currentPointFilter.push(p);
     needToRotate = true;
+    zoomIn();
   } else {
     $("#checkmarkPoint" + p).remove();
     currentPointFilter.splice(currentPointFilter.indexOf(p), 1);
+    zoomOut();
   }
 
   filterArcsAndFlyers();
