@@ -126,25 +126,6 @@ function resize() {
   $("#pointList").css("max-height", total + "px");
 }
 
-// Gets the languages in a pair with d
-function getPairs(d) {
-  let pairs = new Array();
-
-  for (i = 0; i < links.length; i++) {
-    if (links[i].sourceTag === d) {
-      let data = [links[i].targetTag, links[i].stems, links[i].stage];
-
-      pairs.push(data);
-    } else if (links[i].targetTag === d) {
-      let data = [links[i].sourceTag, links[i].stems, links[i].stage];
-
-      pairs.push(data);
-    }
-  }
-
-  return pairs;
-}
-
 let diversityById = {};
 let toggled = true;
 function toggleMapColour() {
@@ -573,7 +554,18 @@ function ready(error, world, places, points, diversity) {
     })
     .on("click", function(d) {
       rotateToPoint(d.tag);
-      filterPoint(d.tag);
+      if (d.tag === currentFiltered) {
+        needToZoom = true;
+        filterPoint(currentFiltered);
+        currentFiltered = "none";
+      } else if (currentFiltered === "none") {
+        filterPoint(d.tag);
+        currentFiltered = d.tag;
+      } else {
+        filterPoint(currentFiltered);
+        filterPoint(d.tag);
+        currentFiltered = d.tag;
+      }
     });
 
   // Populate the filter point list
@@ -767,6 +759,8 @@ function selectDirFilter(dir) {
   handleUnusedPoints();
 }
 
+let currentFiltered = "none";
+let needToZoom = true;
 // Update point filter and globe
 function filterPoint(p) {
   var needToRotate = false;
@@ -776,11 +770,16 @@ function filterPoint(p) {
     );
     currentPointFilter.push(p);
     needToRotate = true;
-    zoomIn();
+    if (needToZoom) {
+      needToZoom = false;
+      zoomIn();
+    }
   } else {
     $("#checkmarkPoint" + p).remove();
     currentPointFilter.splice(currentPointFilter.indexOf(p), 1);
-    zoomOut();
+    if (needToZoom) {
+      zoomOut();
+    }
   }
 
   filterArcsAndFlyers();
