@@ -146,7 +146,7 @@ function toggleMapColour() {
     svg
       .selectAll("path.land")
       .style("fill", d => countryColor(diversityById[d.id]))
-      .style("stroke", "gray");
+      .style("stroke", "#001a00");
 
     svg
       .select(".labels")
@@ -191,6 +191,62 @@ queue()
 
 function ready(error, world, places, points, diversity) {
   // grid = graticule(); currently lat lon lines not used, can uncomment to use
+
+  /*
+  //Setup path for outerspace
+  var space = d3.geo.azimuthal()
+    .mode("equidistant")
+    .translate([width / 2, height / 2]);
+
+  space.scale(space.scale() * 3);
+
+  var spacePath = d3.geo.path()
+    .projection(space)
+    .pointRadius(1);
+
+  //Setup path for globe
+  var projection = d3.geo.azimuthal()
+    .mode("orthographic")
+    .translate([width / 2, height / 2]);
+
+  var scale0 = projection.scale();
+
+  var path = d3.geo.path()
+    .projection(projection)
+    .pointRadius(2);
+
+  //Setup zoom behavior
+  var zoom = d3.behavior.zoom(true)
+    .translate(projection.origin())
+    .scale(projection.scale())
+    .scaleExtent([100, 800])
+    .on("zoom", move);
+
+  var circle = d3.geo.greatCircle();
+
+  var svg = d3.select("body")
+    .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+            .call(zoom)
+            .on("dblclick.zoom", null);
+
+  //Create a list of random stars and add them to outerspace
+  var starList = createStars(300);
+        
+  var stars = svg.append("g")
+    .selectAll("g")
+    .data(starList)
+    .enter()
+    .append("path")
+        .attr("class", "star")
+        .attr("d", function(d){
+            spacePath.pointRadius(d.properties.radius);
+            return spacePath(d);
+        });
+*/
+
 
   var ocean_fill = svg
     .append("defs")
@@ -368,7 +424,7 @@ function ready(error, world, places, points, diversity) {
     .attr("class", "land")
     .attr("d", path)
     .style("fill", d => countryColor(diversityById[d.id]))
-    .style("stroke", "gray")
+    .style("stroke", "#001a00")
     .style("stroke-width", 1)
     .style("opacity", 0.8);
 
@@ -675,7 +731,7 @@ function chooseColor(d) {
 
 let colorByStems = false;
 function colorStem() {
-  colorByStems = !colorByStems
+  colorByStems = !colorByStems;
   let button = document.getElementById("colorStem");
   if (colorByStems) {
     button.innerHTML = " Color By Stage";
@@ -843,18 +899,19 @@ function filterArc(s, t) {
   }
 }
 
+let filterReturn;
 function filterArcsAndFlyers() {
   if ($("#toggleShadowsCheckbox").prop("checked")) {
-    for (var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+    for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
       svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 1);
     }
   } else {
-    for (var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+    for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
       svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 0);
     }
   }
   if ($("#fullDepthCheckbox").prop("checked") === true) {
-    for (var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+    for (i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
       visitMap.set(
         svg.selectAll(".point")._groups[0][i].getAttribute("tag"),
         false
@@ -884,7 +941,7 @@ function filterArcsAndFlyers() {
       currentPointFilter.length > 0 &&
       $("#fullDepthCheckbox").prop("checked") === false
     ) {
-      var filterReturn = 0;
+      filterReturn = 0;
       for (var i = 0; i < currentPointFilter.length; i++) {
         if (
           d.sourceTag === currentPointFilter[i] ||
@@ -901,7 +958,7 @@ function filterArcsAndFlyers() {
     }
 
     if (currentRepoFilter.length > 0) {
-      var filterReturn = 0;
+      filterReturn = 0;
       for (var i = 0; i < currentRepoFilter.length; i++) {
         if (d.stage === currentRepoFilter[i].toLowerCase()) {
           filterReturn = 1;
@@ -915,7 +972,7 @@ function filterArcsAndFlyers() {
     }
 
     if (currentDirFilter.length > 0) {
-      var filterReturn = 0;
+      filterReturn = 0;
       for (var i = 0; i < currentDirFilter.length; i++) {
         if (
           (d.direction === "<>" && currentDirFilter[i] === "Bidirectional") ||
@@ -1162,7 +1219,8 @@ function fade_at_edge(d) {
     end;
   // function is called on 2 different data structures..
   if (d.source) {
-    (start = d.source), (end = d.target);
+    start = d.source;
+    end = d.target;
   } else {
     start = d.coordinates1;
     end = d.coordinates2;
