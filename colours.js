@@ -20,17 +20,17 @@ var countryColor = d3
     1000
   ])
   .range([
-    "#ffffff",
-    "#fff0ff",
-    "#ffe6ff",
-    "#ffd7ff",
-    "#ffccff",
-    "#ffbfff",
-    "#ffb3ff",
-    "#ffa7ff",
-    "#ff99ff",
-    "#ff8aff",
-    "#ff80ff",
+    "#66cc99",
+    "#53c68c",
+    "#40bf80",
+    "#39ac73",
+    "#339966",
+    "#2d8659",
+    "#26734d",
+    "#206040",
+    "#194d33",
+    "#133926",
+    "#0d261a",
   ]);
 
 /********* colorbrewing *********/

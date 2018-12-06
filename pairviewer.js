@@ -70,7 +70,7 @@ var svg = d3
   .append("svg")
   .attr("width", fixedWidth)
   .attr("height", fixedHeight);
-svg.style("background", "#311B92");
+svg.style("background", "black");
 
 window.addEventListener("resize", resize);
 
@@ -133,12 +133,28 @@ function toggleMapColour() {
     svg
       .selectAll("path.land")
       .style("fill", "white")
-      .style("stroke", "grey");
+      .style("stroke", "gray");
+
+    svg
+      .select(".labels")
+      .style("fill", "black");
+
+    svg
+      .select(".points")
+      .style("fill", "black");
   } else {
     svg
       .selectAll("path.land")
       .style("fill", d => countryColor(diversityById[d.id]))
-      .style("stroke", "white");
+      .style("stroke", "gray");
+
+    svg
+      .select(".labels")
+      .style("fill", "white");
+
+    svg
+      .select(".points")
+      .style("fill", "#e0e0e0");
   }
   toggled = !toggled;
 
@@ -352,7 +368,7 @@ function ready(error, world, places, points, diversity) {
     .attr("class", "land")
     .attr("d", path)
     .style("fill", d => countryColor(diversityById[d.id]))
-    .style("stroke", "white")
+    .style("stroke", "gray")
     .style("stroke-width", 1)
     .style("opacity", 0.8);
 
@@ -482,6 +498,7 @@ function ready(error, world, places, points, diversity) {
   svg
     .append("g")
     .attr("class", "labels")
+    .style("fill", "white")
     .selectAll("text")
     .data(points.point_data)
     .enter()
@@ -519,6 +536,7 @@ function ready(error, world, places, points, diversity) {
   svg
     .append("g")
     .attr("class", "points")
+    .style("fill", "#e0e0e0")
     .selectAll("text")
     .data(points.point_data)
     .enter()
@@ -778,7 +796,7 @@ function filterPoint(p) {
     $("#checkmarkPoint" + p).remove();
     currentPointFilter.splice(currentPointFilter.indexOf(p), 1);
     if (needToZoom) {
-      zoomOut();
+      resetZoom();
     }
   }
 
