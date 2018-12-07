@@ -38,12 +38,8 @@ var path = d3
 
 var swoosh = d3
   .line()
-  .x(function(d) {
-    return d[0];
-  })
-  .y(function(d) {
-    return d[1];
-  })
+  .x(d => d[0])
+  .y(d => d[1])
   .curve(d3.curveCardinal.tension(-1.3));
 
 var links = [],
@@ -182,12 +178,8 @@ function drawStars() {
     .enter()
     .append("circle")
     .classed("smallStar", true)
-    .attr("cx", function(d) {
-      return d.x;
-    })
-    .attr("cy", function(d) {
-      return d.y;
-    })
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
     .attr("r", "1px")
     .style("fill", "#fff");
 
@@ -197,12 +189,8 @@ function drawStars() {
     .enter()
     .append("circle")
     .classed("mediumStar", true)
-    .attr("cx", function(d) {
-      return d.x;
-    })
-    .attr("cy", function(d) {
-      return d.y;
-    })
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
     .attr("r", "2px")
     .style("fill", "#fff");
 
@@ -212,12 +200,8 @@ function drawStars() {
     .enter()
     .append("circle")
     .classed("bigStar", true)
-    .attr("cx", function(d) {
-      return d.x;
-    })
-    .attr("cy", function(d) {
-      return d.y;
-    })
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
     .attr("r", "3px")
     .style("fill", "#fff");
 }
@@ -473,18 +457,10 @@ function ready(error, world, places, points, diversity) {
     .append("path")
     .attr("class", "arc")
     .attr("d", path)
-    .attr("stage", function(d) {
-      return d.stage;
-    })
-    .attr("sourceTag", function(d) {
-      return d.sourceTag;
-    })
-    .attr("targetTag", function(d) {
-      return d.targetTag;
-    })
-    .attr("direction", function(d) {
-      return d.direction;
-    });
+    .attr("stage", d => d.stage)
+    .attr("sourceTag", d => d.sourceTag)
+    .attr("targetTag", d => d.targetTag)
+    .attr("direction", d => d.direction);
 
   svg
     .append("g")
@@ -494,18 +470,10 @@ function ready(error, world, places, points, diversity) {
     .enter()
     .append("path")
     .attr("class", "flyer")
-    .attr("sourceTag", function(d) {
-      return d.sourceTag;
-    })
-    .attr("targetTag", function(d) {
-      return d.targetTag;
-    })
-    .attr("d", function(d) {
-      return swoosh(flying_arc(d));
-    })
-    .style("stroke", function(d) {
-      return chooseColor(d);
-    })
+    .attr("sourceTag", d => d.sourceTag)
+    .attr("targetTag", d => d.targetTag)
+    .attr("d", d => swoosh(flying_arc(d)))
+    .style("stroke", d => chooseColor(d))
     .on("mouseover", function(d) {
       //Hovering over flyers for tooltip
       if (d.filtered === "false") {
@@ -554,12 +522,8 @@ function ready(error, world, places, points, diversity) {
     .enter()
     .append("text")
     .attr("class", "label")
-    .attr("coordinate", function(d) {
-      return d.geometry.coordinates;
-    })
-    .text(function(d) {
-      return d.tag;
-    })
+    .attr("coordinate", d => d.geometry.coordinates)
+    .text(d => d.tag)
     .on("mouseover", function(d) {
       //Hovering over labels for tooltip
       if ($(this).css("opacity") === "0") {
@@ -593,12 +557,8 @@ function ready(error, world, places, points, diversity) {
     .append("path")
     .attr("class", "point")
     .attr("d", path)
-    .attr("coordinate", function(d) {
-      return d.geometry.coordinates;
-    })
-    .attr("tag", function(d) {
-      return d.tag;
-    })
+    .attr("coordinate", d => d.geometry.coordinates)
+    .attr("tag", d => d.tag)
     .on("mouseover", function(d) {
       //Also added hovering over points for tooltip
       if ($(this).css("opacity") === "0") {
@@ -730,9 +690,7 @@ function colorStem() {
   } else {
     button.innerHTML = " Color By Stems";
   }
-  svg.selectAll(".flyer").style("stroke", function(d) {
-    return chooseColor(d);
-  });
+  svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   refresh();
 }
 
@@ -765,15 +723,9 @@ function refresh() {
 
   svg
     .selectAll(".flyer")
-    .attr("d", function(d) {
-      return swoosh(flying_arc(d));
-    })
-    .attr("marker-mid", function(d) {
-      return addMarker(d);
-    })
-    .attr("opacity", function(d) {
-      return fade_at_edge(d);
-    });
+    .attr("d", d => swoosh(flying_arc(d)))
+    .attr("marker-mid", d => addMarker(d))
+    .attr("opacity", d => fadeAtEdge(d));
 }
 
 function addMarker(d) {
@@ -863,9 +815,7 @@ function resetFilters() {
   $("#toggleShadowsCheckbox").prop("checked", true);
   $("#colorStemCheckbox").prop("checked", true);
 
-  svg.selectAll(".flyer").style("stroke", function(d) {
-    return chooseColor(d);
-  });
+  svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
@@ -988,7 +938,7 @@ function filterArcsAndFlyers() {
         filterArc(d.sourceTag, d.targetTag);
       }
     }
-    return fade_at_edge(d);
+    return fadeAtEdge(d);
   });
 }
 
@@ -1005,7 +955,7 @@ function dfs(curr) {
       d.filtered = "temp";
       dfs(d.sourceTag);
     }
-    return fade_at_edge(d);
+    return fadeAtEdge(d);
   });
 }
 
@@ -1165,7 +1115,7 @@ function handleUnusedPoints() {
         }
       }
     }
-    return fade_at_edge(d);
+    return fadeAtEdge(d);
   });
 
   for (var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
@@ -1193,7 +1143,7 @@ function handleUnusedPoints() {
   refresh();
 }
 
-function fade_at_edge(d) {
+function fadeAtEdge(d) {
   if (d.filtered === "false") {
     return 0;
   }
