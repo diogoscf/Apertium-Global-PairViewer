@@ -108,7 +108,7 @@ function resize() {
     .pointRadius(3);
 
   svg
-    .selectAll("circle")
+    .select("#globe")
     .attr("cx", fixedWidth / 2)
     .attr("cy", fixedHeight / 2);
 
@@ -135,51 +135,99 @@ function toggleMapColour() {
       .style("fill", "white")
       .style("stroke", "gray");
 
-    svg
-      .select(".labels")
-      .style("fill", "black");
+    svg.select(".labels").style("fill", "black");
 
-    svg
-      .select(".points")
-      .style("fill", "black");
+    svg.select(".points").style("fill", "black");
   } else {
     svg
       .selectAll("path.land")
       .style("fill", d => countryColor(diversityById[d.id]))
       .style("stroke", "#001a00");
 
-    svg
-      .select(".labels")
-      .style("fill", "white");
+    svg.select(".labels").style("fill", "white");
 
-    svg
-      .select(".points")
-      .style("fill", "#e0e0e0");
+    svg.select(".points").style("fill", "#e0e0e0");
   }
   toggled = !toggled;
 
-  refresh()
+  refresh();
 }
 
-function createStars(number){
-  var data = [];
-  for(var i = 0; i < number; i++){
-      data.push({
-          geometry: {
-              type: 'Point',
-              coordinates: randomLonLat()
-          },
-          type: 'Feature',
-          properties: {
-              radius: Math.random() * 1.5
-          }
-      });
+var correctZoom = d3
+  .scaleLinear()
+  .domain([0, window.devicePixelRatio])
+  .range([0, 1]);
+
+var aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
+
+function drawStars() {
+  var smallStars = [];
+  for (var i = 0; i < aFactor * 100; i++) {
+    smallStars.push({ x: randomX(), y: randomY() });
   }
-  return data;
+
+  var mediumStars = [];
+  for (var i = 0; i < aFactor * 10; i++) {
+    mediumStars.push({ x: randomX(), y: randomY() });
+  }
+
+  var bigStars = [];
+  for (var i = 0; i < aFactor; i++) {
+    bigStars.push({ x: randomX(), y: randomY() });
+  }
+
+  svg
+    .selectAll(".smallStar")
+    .data(smallStars)
+    .enter()
+    .append("circle")
+    .classed("smallStar", true)
+    .attr("cx", function(d) {
+      return d.x;
+    })
+    .attr("cy", function(d) {
+      return d.y;
+    })
+    .attr("r", "1px")
+    .style("fill", "#fff");
+
+  svg
+    .selectAll(".mediumStar")
+    .data(mediumStars)
+    .enter()
+    .append("circle")
+    .classed("mediumStar", true)
+    .attr("cx", function(d) {
+      return d.x;
+    })
+    .attr("cy", function(d) {
+      return d.y;
+    })
+    .attr("r", "2px")
+    .style("fill", "#fff");
+
+  svg
+    .selectAll(".bigStar")
+    .data(bigStars)
+    .enter()
+    .append("circle")
+    .classed("bigStar", true)
+    .attr("cx", function(d) {
+      return d.x;
+    })
+    .attr("cy", function(d) {
+      return d.y;
+    })
+    .attr("r", "3px")
+    .style("fill", "#fff");
 }
 
-function randomLonLat(){
-  return [Math.random() * 360 - 180, Math.random() * 180 - 90];
+function randomX() {
+  return Math.round(Math.random() * window.innerWidth);
+}
+
+function randomY() {
+  return Math.round(Math.random() * window.innerHeight);
 }
 
 queue()
@@ -192,61 +240,7 @@ queue()
 function ready(error, world, places, points, diversity) {
   // grid = graticule(); currently lat lon lines not used, can uncomment to use
 
-  /*
-  //Setup path for outerspace
-  var space = d3.geo.azimuthal()
-    .mode("equidistant")
-    .translate([width / 2, height / 2]);
-
-  space.scale(space.scale() * 3);
-
-  var spacePath = d3.geo.path()
-    .projection(space)
-    .pointRadius(1);
-
-  //Setup path for globe
-  var projection = d3.geo.azimuthal()
-    .mode("orthographic")
-    .translate([width / 2, height / 2]);
-
-  var scale0 = projection.scale();
-
-  var path = d3.geo.path()
-    .projection(projection)
-    .pointRadius(2);
-
-  //Setup zoom behavior
-  var zoom = d3.behavior.zoom(true)
-    .translate(projection.origin())
-    .scale(projection.scale())
-    .scaleExtent([100, 800])
-    .on("zoom", move);
-
-  var circle = d3.geo.greatCircle();
-
-  var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-            .call(zoom)
-            .on("dblclick.zoom", null);
-
-  //Create a list of random stars and add them to outerspace
-  var starList = createStars(300);
-        
-  var stars = svg.append("g")
-    .selectAll("g")
-    .data(starList)
-    .enter()
-    .append("path")
-        .attr("class", "star")
-        .attr("d", function(d){
-            spacePath.pointRadius(d.properties.radius);
-            return spacePath(d);
-        });
-*/
-
+  drawStars();
 
   var ocean_fill = svg
     .append("defs")
@@ -408,7 +402,7 @@ function ready(error, world, places, points, diversity) {
     .attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
-    .attr("id", "circle1")
+    .attr("id", "globe")
     .style("fill", "url(#ocean_fill)");
 
   diversity.forEach(function(d) {
@@ -627,9 +621,7 @@ function ready(error, world, places, points, diversity) {
         .style("opacity", 0);
     })
     .on("click", function(d) {
-      rotateToPoint(d.tag);
       if (d.tag === currentFiltered) {
-        needToZoom = true;
         filterPoint(currentFiltered);
         currentFiltered = "none";
       } else if (currentFiltered === "none") {
@@ -834,7 +826,6 @@ function selectDirFilter(dir) {
 }
 
 let currentFiltered = "none";
-let needToZoom = true;
 // Update point filter and globe
 function filterPoint(p) {
   var needToRotate = false;
@@ -844,16 +835,9 @@ function filterPoint(p) {
     );
     currentPointFilter.push(p);
     needToRotate = true;
-    if (needToZoom) {
-      needToZoom = false;
-      zoomIn();
-    }
   } else {
     $("#checkmarkPoint" + p).remove();
     currentPointFilter.splice(currentPointFilter.indexOf(p), 1);
-    if (needToZoom) {
-      resetZoom();
-    }
   }
 
   filterArcsAndFlyers();
@@ -1252,7 +1236,7 @@ function rotateToPoint(p) {
   }
   var q = coords.split(",");
   d3.transition()
-    .duration(1500)
+    .duration(1000)
     .tween("rotate", function() {
       var r = d3.interpolate(proj.rotate(), [
         -parseInt(q[0]),
@@ -1426,7 +1410,7 @@ function zoomed() {
       .projection(proj)
       .pointRadius(3);
 
-    svg.selectAll("circle").attr("r", scale / 4);
+    svg.select("#globe").attr("r", scale / 4);
 
     if (o0) {
       proj.rotate(o0);
