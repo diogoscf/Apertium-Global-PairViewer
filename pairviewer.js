@@ -16,77 +16,7 @@ var currentDirFilter = [];
 
 var visitMap = new Map();
 
-var TRUNK_COLOR = "#5dff0b";
-var STAGING_COLOR = "#ffd900";
-var NURSERY_COLOR = "#ff5900";
-var INCUBATOR_COLOR = "#cc0000";
-var UNKNOWN_COLOR = "#9c27b0";
-
 var MARKER_SIZE = "40";
-
-/********* colorbrewing *********/
-var maxStems = 100000;
-// Forbid the 0-9 category (-1)
-var numShades = parseInt(Math.log(maxStems) / Math.LN10) - 1;
-var translationClasses = ["trunk", "staging", "nursery", "incubator"];
-var goldenYellowScale = {
-  4: ["#ffd54c", "#ffc300", "#CC9C00", "#7f6a26"],
-  5: ["#FFF199", "#FFEC70", "#E0C200", "#CCB100", "#B89F00"],
-  6: ["#FFEC70", "#FFE433", "#E0C200", "#CCB100", "#B89F00", "#A38D00"]
-};
-var translationClassColourChoices = [
-  [colorbrewer.BuGn, colorbrewer.Blues, colorbrewer.YlOrRd, colorbrewer.Greys],
-  [colorbrewer.BuGn, colorbrewer.GnBu, colorbrewer.YlOrBr, colorbrewer.PuRd],
-  [colorbrewer.YlGn, colorbrewer.Blues, colorbrewer.PuRd, colorbrewer.Greys],
-  [colorbrewer.YlGn, colorbrewer.Blues, colorbrewer.PuRd, colorbrewer.OrRd],
-  [colorbrewer.YlGn, colorbrewer.YlGnBu, colorbrewer.Oranges, colorbrewer.Reds],
-  [colorbrewer.YlGn, goldenYellowScale, colorbrewer.Oranges, colorbrewer.Reds]
-];
-// Vary only lightness.
-var niceGreen = d3.rgb("#0c0"),
-  niceYellow = d3.rgb("#fc0"),
-  niceOrange = d3.rgb("#f60"),
-  niceRed = d3.rgb("#c00");
-var temp = [];
-[niceGreen, niceYellow, niceOrange, niceRed].forEach(function(c) {
-  var tempp = [];
-  for (i = 0; i < 5; ++i) {
-    tempp.push(c.darker(i - 1));
-  }
-  temp.push({ 5: tempp.reverse() });
-});
-translationClassColourChoices.push(temp);
-// Desaturate
-// Actually this has become so complex. A colour theory specialist needs to analyse this.
-var temp = [];
-[
-  d3.hsl(100, 1, 0.5),
-  d3.hsl(51, 1, 0.5),
-  d3.hsl(21, 1, 0.5),
-  d3.hsl(0, 1, 0.4)
-].forEach(function(c) {
-  var tempp = [];
-  for (i = 0; i < 5; ++i) {
-    var cc = c.brighter(0);
-    if (cc.h == 0) {
-      cc.s = cc.s / (i + 0.5);
-      cc.l = cc.l + 0.3 * Math.sqrt(i);
-    } else if (cc.h == 100) {
-      cc.s = cc.s / (2 * i + 1);
-      cc.l = cc.l + 0.01 * Math.exp(i + 0.8);
-    } else {
-      cc.s = cc.s / (i + 0.5);
-      cc.l *= Math.pow(1.22, i);
-    }
-    tempp.push(cc);
-  }
-  temp.push({ 5: tempp.reverse() });
-});
-translationClassColourChoices.push(temp);
-var translationClassColours = translationClassColourChoices[7].map(function(e) {
-  return e[numShades + 1].slice(1);
-});
-/********* end of colorbrewing *********/
 
 var proj = d3
   .geoOrthographic()
@@ -108,12 +38,8 @@ var path = d3
 
 var swoosh = d3
   .line()
-  .x(function(d) {
-    return d[0];
-  })
-  .y(function(d) {
-    return d[1];
-  })
+  .x(d => d[0])
+  .y(d => d[1])
   .curve(d3.curveCardinal.tension(-1.3));
 
 var links = [],
@@ -140,7 +66,7 @@ var svg = d3
   .append("svg")
   .attr("width", fixedWidth)
   .attr("height", fixedHeight);
-svg.style("background", "#311B92");
+svg.style("background", "black");
 
 window.addEventListener("resize", resize);
 
@@ -178,7 +104,7 @@ function resize() {
     .pointRadius(3);
 
   svg
-    .selectAll("circle")
+    .select("#globe")
     .attr("cx", fixedWidth / 2)
     .attr("cy", fixedHeight / 2);
 
@@ -196,213 +122,109 @@ function resize() {
   $("#pointList").css("max-height", total + "px");
 }
 
-// Gets the languages in a pair with d
-function getPairs(d) {
-  let pairs = new Array();
+let diversityById = {};
+let toggled = true;
+function toggleMapColour() {
+  if (toggled) {
+    svg
+      .selectAll("path.land")
+      .style("fill", "white")
+      .style("stroke", "gray");
 
-  for (i = 0; i < links.length; i++) {
-    if (links[i].sourceTag === d) {
-      let data = [links[i].targetTag, links[i].stems, links[i].stage];
+    svg.select(".labels").style("fill", "black");
 
-      pairs.push(data);
-    } else if (links[i].targetTag === d) {
-      let data = [links[i].sourceTag, links[i].stems, links[i].stage];
-
-      pairs.push(data);
-    }
-  }
-
-  return pairs;
-}
-
-function chooseNodeColor(stage) {
-  if (stage === "trunk") {
-    return TRUNK_COLOR;
-  } else if (stage === "staging") {
-    return STAGING_COLOR;
-  } else if (stage === "nursery") {
-    return NURSERY_COLOR;
-  } else if (stage === "incubator") {
-    return INCUBATOR_COLOR;
+    svg.select(".points").style("fill", "black");
   } else {
-    return UNKNOWN_COLOR;
+    svg
+      .selectAll("path.land")
+      .style("fill", d => countryColor(diversityById[d.id]))
+      .style("stroke", "#001a00");
+
+    svg.select(".labels").style("fill", "white");
+
+    svg.select(".points").style("fill", "#e0e0e0");
   }
+  toggled = !toggled;
+
+  refresh();
 }
 
-function calculateDX(label) {
-  return -3 * label.length;
-}
+var correctZoom = d3
+  .scaleLinear()
+  .domain([0, window.devicePixelRatio])
+  .range([0, 1]);
 
-function displayModal(d, pairs) {
-  let modal = document.getElementById("languageModal");
-  let span = document.getElementsByClassName("close")[0];
+var aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
 
-  modal.style.display = "block";
-
-  // Exits the modal
-  span.onclick = function() {
-    modal.style.display = "none";
-    d3.select(".modal-body")
-      .select("svg")
-      .remove();
-  };
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-      d3.select(".modal-body")
-        .select("svg")
-        .remove();
-    }
-  };
-
-  document.getElementById("heading").innerHTML = codeToLanguage(d);
-
-  const height = window.innerHeight * 0.7;
-  const width = window.innerWidth * 0.8;
-
-  const svgContainer = d3
-    .select(".modal-body")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-  let nodes = [{ id: d, label: codeToLanguage(d), color: "#2196F3" }];
-  let connections = [];
-  for (i = 0; i < pairs.length; i++) {
-    nodes.push({
-      id: pairs[i][0],
-      label: codeToLanguage(pairs[i][0]),
-      color: chooseNodeColor(pairs[i][2])
-    });
-    connections.push({
-      source: d,
-      target: pairs[i][0],
-      stems: pairs[i][1],
-      color: chooseNodeColor(pairs[i][2]),
-      strength: 0.05
-    });
+function drawStars() {
+  var smallStars = [];
+  for (var i = 0; i < aFactor * 100; i++) {
+    smallStars.push({ x: randomX(), y: randomY() });
   }
 
-  const linkForce = d3
-    .forceLink()
-    .id(function(link) {
-      return link.id;
-    })
-    .strength(function(link) {
-      return link.strength;
-    });
+  var mediumStars = [];
+  for (var i = 0; i < aFactor * 10; i++) {
+    mediumStars.push({ x: randomX(), y: randomY() });
+  }
 
-  const simulation = d3
-    .forceSimulation()
-    .force("link", linkForce)
-    .force("charge", d3.forceManyBody().strength(-100))
-    .force("center", d3.forceCenter(width / 2, height / 2));
+  var bigStars = [];
+  for (var i = 0; i < aFactor; i++) {
+    bigStars.push({ x: randomX(), y: randomY() });
+  }
 
-  const dragDrop = d3
-    .drag()
-    .on("start", function(node) {
-      node.fx = node.x;
-      node.fy = node.y;
-    })
-    .on("drag", function(node) {
-      simulation.alphaTarget(0.7).restart();
-      node.fx = d3.event.x;
-      node.fy = d3.event.y;
-    })
-    .on("end", function(node) {
-      if (!d3.event.active) {
-        simulation.alphaTarget(0);
-      }
-      node.fx = null;
-      node.fy = null;
-    });
-
-  const linkElements = svgContainer
-    .append("g")
-    .selectAll("line")
-    .data(connections)
-    .enter()
-    .append("line")
-    .attr("stroke-width", d =>
-      d.stems < 0 ? 2 : Math.log(d.stems / 100, 2) * 3 + 4
-    )
-    .attr("stroke", d => (d.stems < 0 ? "#808080" : d.color))
-    .attr("opacity", 0.5);
-
-  const nodeElements = svgContainer
-    .append("g")
-    .selectAll("circle")
-    .data(nodes)
+  svg
+    .selectAll(".smallStar")
+    .data(smallStars)
     .enter()
     .append("circle")
-    .attr("r", 30)
-    .attr("fill", d => d.color)
-    .call(dragDrop);
+    .classed("smallStar", true)
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", "1px")
+    .style("fill", "#fff");
 
-  const textElements = svgContainer
-    .append("g")
-    .selectAll("text")
-    .data(nodes)
+  svg
+    .selectAll(".mediumStar")
+    .data(mediumStars)
     .enter()
-    .append("text")
-    .text(node => node.label)
-    .attr("font-size", 15)
-    .attr("dx", node => calculateDX(node.label))
-    .attr("dy", 5)
-    .style("pointer-events", "none");
+    .append("circle")
+    .classed("mediumStar", true)
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", "2px")
+    .style("fill", "#fff");
 
-  simulation.nodes(nodes).on("tick", () => {
-    linkElements
-      .attr("x1", link => link.source.x)
-      .attr("y1", link => link.source.y)
-      .attr("x2", link => link.target.x)
-      .attr("y2", link => link.target.y);
-    nodeElements.attr("cx", node => node.x).attr("cy", node => node.y);
-    textElements.attr("x", node => node.x).attr("y", node => node.y);
-  });
-
-  simulation.force("link").links(connections);
-
-  const stages = ["INCUBATOR", "NURSERY", "STAGING", "TRUNK"];
-  let legend = svgContainer
-    .selectAll(".legend")
-    .data(stages)
+  svg
+    .selectAll(".bigStar")
+    .data(bigStars)
     .enter()
-    .append("g")
-    .attr("transform", function(d, i) {
-      {
-        return "translate(0," + (i * 20 + 10) + ")";
-      }
-    });
+    .append("circle")
+    .classed("bigStar", true)
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", "3px")
+    .style("fill", "#fff");
+}
 
-  legend
-    .append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", 10)
-    .attr("height", 10)
-    .style("fill", stage => chooseNodeColor(stage.toLowerCase()));
+function randomX() {
+  return Math.round(Math.random() * window.innerWidth);
+}
 
-  legend
-    .append("text")
-    .attr("x", 20)
-    .attr("y", 10)
-    .text(stage => stage)
-    .style("font-size", 15);
+function randomY() {
+  return Math.round(Math.random() * window.innerHeight);
 }
 
 queue()
   .defer(d3.json, "world-110m.json")
   .defer(d3.json, "apertiumPairs.json")
   .defer(d3.json, "apertiumPoints.json")
+  .defer(d3.tsv, "linguistic_diversity.tsv")
   .await(ready);
 
-function ready(error, world, places, points) {
-  var land = topojson.object(world, world.objects.land),
-    borders = topojson.mesh(world, world.objects.countries, function(a, b) {
-      return a !== b;
-    });
+function ready(error, world, places, points, diversity) {
   // grid = graticule(); currently lat lon lines not used, can uncomment to use
+
+  drawStars();
 
   var ocean_fill = svg
     .append("defs")
@@ -564,23 +386,25 @@ function ready(error, world, places, points) {
     .attr("cy", fixedHeight / 2)
     .attr("r", proj.scale())
     .attr("class", "noclicks")
-    .attr("id", "circle1")
+    .attr("id", "globe")
     .style("fill", "url(#ocean_fill)");
 
-  svg
-    .append("path")
-    .datum(topojson.object(world, world.objects.land))
-    .attr("class", "land")
-    .attr("d", path)
-    .style("fill", "white");
+  diversity.forEach(function(d) {
+    diversityById[d.id] = d.diversity;
+  });
 
   svg
+    .append("g")
+    .selectAll("path.land")
+    .data(world.features)
+    .enter()
     .append("path")
-    .datum(borders)
-    .attr("class", "mesh")
-    .style("stroke", "#808d98") // Border color can be changed here
-    .style("fill", "999")
-    .style("fill", "transparent");
+    .attr("class", "land")
+    .attr("d", path)
+    .style("fill", d => countryColor(diversityById[d.id]))
+    .style("stroke", "#001a00")
+    .style("stroke-width", 1)
+    .style("opacity", 0.8);
 
   // LONG AND LAT LINES, need to uncomment other graticule references to use
   // svg.append("path")
@@ -633,18 +457,10 @@ function ready(error, world, places, points) {
     .append("path")
     .attr("class", "arc")
     .attr("d", path)
-    .attr("stage", function(d) {
-      return d.stage;
-    })
-    .attr("sourceTag", function(d) {
-      return d.sourceTag;
-    })
-    .attr("targetTag", function(d) {
-      return d.targetTag;
-    })
-    .attr("direction", function(d) {
-      return d.direction;
-    });
+    .attr("stage", d => d.stage)
+    .attr("sourceTag", d => d.sourceTag)
+    .attr("targetTag", d => d.targetTag)
+    .attr("direction", d => d.direction);
 
   svg
     .append("g")
@@ -654,18 +470,10 @@ function ready(error, world, places, points) {
     .enter()
     .append("path")
     .attr("class", "flyer")
-    .attr("sourceTag", function(d) {
-      return d.sourceTag;
-    })
-    .attr("targetTag", function(d) {
-      return d.targetTag;
-    })
-    .attr("d", function(d) {
-      return swoosh(flying_arc(d));
-    })
-    .style("stroke", function(d) {
-      return chooseColor(d);
-    })
+    .attr("sourceTag", d => d.sourceTag)
+    .attr("targetTag", d => d.targetTag)
+    .attr("d", d => swoosh(flying_arc(d)))
+    .style("stroke", d => chooseColor(d))
     .on("mouseover", function(d) {
       //Hovering over flyers for tooltip
       if (d.filtered === "false") {
@@ -708,17 +516,14 @@ function ready(error, world, places, points) {
   svg
     .append("g")
     .attr("class", "labels")
+    .style("fill", "white")
     .selectAll("text")
     .data(points.point_data)
     .enter()
     .append("text")
     .attr("class", "label")
-    .attr("coordinate", function(d) {
-      return d.geometry.coordinates;
-    })
-    .text(function(d) {
-      return d.tag;
-    })
+    .attr("coordinate", d => d.geometry.coordinates)
+    .text(d => d.tag)
     .on("mouseover", function(d) {
       //Hovering over labels for tooltip
       if ($(this).css("opacity") === "0") {
@@ -745,18 +550,15 @@ function ready(error, world, places, points) {
   svg
     .append("g")
     .attr("class", "points")
+    .style("fill", "#e0e0e0")
     .selectAll("text")
     .data(points.point_data)
     .enter()
     .append("path")
     .attr("class", "point")
     .attr("d", path)
-    .attr("coordinate", function(d) {
-      return d.geometry.coordinates;
-    })
-    .attr("tag", function(d) {
-      return d.tag;
-    })
+    .attr("coordinate", d => d.geometry.coordinates)
+    .attr("tag", d => d.tag)
     .on("mouseover", function(d) {
       //Also added hovering over points for tooltip
       if ($(this).css("opacity") === "0") {
@@ -779,11 +581,17 @@ function ready(error, world, places, points) {
         .style("opacity", 0);
     })
     .on("click", function(d) {
-      rotateToPoint(d.tag);
-      let pairs = getPairs(d.tag);
-      console.log(pairs);
-
-      displayModal(d.tag, pairs);
+      if (d.tag === currentFiltered) {
+        filterPoint(currentFiltered);
+        currentFiltered = "none";
+      } else if (currentFiltered === "none") {
+        filterPoint(d.tag);
+        currentFiltered = d.tag;
+      } else {
+        filterPoint(currentFiltered);
+        filterPoint(d.tag);
+        currentFiltered = d.tag;
+      }
     });
 
   // Populate the filter point list
@@ -835,20 +643,21 @@ function position_labels() {
 // Chooses flyer color based on language pair stage
 // trunk green, staging yellow, nursery orange, incubator red
 function chooseColor(d) {
-  if ($("#colorStemCheckbox").prop("checked") === false) {
-    if (d.stage == "trunk") {
-      return TRUNK_COLOR;
-    } else if (d.stage == "staging") {
-      return STAGING_COLOR;
-    } else if (d.stage == "nursery") {
-      return NURSERY_COLOR;
-    } else if (d.stage == "incubator") {
-      return INCUBATOR_COLOR;
-    } else {
-      return UNKNOWN_COLOR;
+  if (!colorByStems) {
+    switch (d.stage) {
+      case "trunk":
+        return TRUNK_COLOR;
+      case "staging":
+        return STAGING_COLOR;
+      case "nursery":
+        return NURSERY_COLOR;
+      case "incubator":
+        return INCUBATOR_COLOR;
+      default:
+        return UNKNOWN_COLOR;
     }
   }
-  if (d.stems === undefined || d === -1) {
+  if (d.stems === undefined || d.stems === -1) {
     return UNKNOWN_COLOR;
   }
   try {
@@ -872,14 +681,16 @@ function chooseColor(d) {
   }
 }
 
+let colorByStems = false;
 function colorStem() {
-  $("#colorStemCheckbox").prop(
-    "checked",
-    !$("#colorStemCheckbox").prop("checked")
-  );
-  svg.selectAll(".flyer").style("stroke", function(d) {
-    return chooseColor(d);
-  });
+  colorByStems = !colorByStems;
+  let button = document.getElementById("colorStem");
+  if (colorByStems) {
+    button.innerHTML = " Color By Stage";
+  } else {
+    button.innerHTML = " Color By Stems";
+  }
+  svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   refresh();
 }
 
@@ -912,15 +723,9 @@ function refresh() {
 
   svg
     .selectAll(".flyer")
-    .attr("d", function(d) {
-      return swoosh(flying_arc(d));
-    })
-    .attr("marker-mid", function(d) {
-      return addMarker(d);
-    })
-    .attr("opacity", function(d) {
-      return fade_at_edge(d);
-    });
+    .attr("d", d => swoosh(flying_arc(d)))
+    .attr("marker-mid", d => addMarker(d))
+    .attr("opacity", d => fadeAtEdge(d));
 }
 
 function addMarker(d) {
@@ -972,6 +777,7 @@ function selectDirFilter(dir) {
   handleUnusedPoints();
 }
 
+let currentFiltered = "none";
 // Update point filter and globe
 function filterPoint(p) {
   var needToRotate = false;
@@ -1009,9 +815,7 @@ function resetFilters() {
   $("#toggleShadowsCheckbox").prop("checked", true);
   $("#colorStemCheckbox").prop("checked", true);
 
-  svg.selectAll(".flyer").style("stroke", function(d) {
-    return chooseColor(d);
-  });
+  svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
@@ -1029,18 +833,19 @@ function filterArc(s, t) {
   }
 }
 
+let filterReturn;
 function filterArcsAndFlyers() {
   if ($("#toggleShadowsCheckbox").prop("checked")) {
-    for (var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+    for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
       svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 1);
     }
   } else {
-    for (var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+    for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
       svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 0);
     }
   }
   if ($("#fullDepthCheckbox").prop("checked") === true) {
-    for (var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+    for (i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
       visitMap.set(
         svg.selectAll(".point")._groups[0][i].getAttribute("tag"),
         false
@@ -1070,7 +875,7 @@ function filterArcsAndFlyers() {
       currentPointFilter.length > 0 &&
       $("#fullDepthCheckbox").prop("checked") === false
     ) {
-      var filterReturn = 0;
+      filterReturn = 0;
       for (var i = 0; i < currentPointFilter.length; i++) {
         if (
           d.sourceTag === currentPointFilter[i] ||
@@ -1087,7 +892,7 @@ function filterArcsAndFlyers() {
     }
 
     if (currentRepoFilter.length > 0) {
-      var filterReturn = 0;
+      filterReturn = 0;
       for (var i = 0; i < currentRepoFilter.length; i++) {
         if (d.stage === currentRepoFilter[i].toLowerCase()) {
           filterReturn = 1;
@@ -1101,7 +906,7 @@ function filterArcsAndFlyers() {
     }
 
     if (currentDirFilter.length > 0) {
-      var filterReturn = 0;
+      filterReturn = 0;
       for (var i = 0; i < currentDirFilter.length; i++) {
         if (
           (d.direction === "<>" && currentDirFilter[i] === "Bidirectional") ||
@@ -1133,7 +938,7 @@ function filterArcsAndFlyers() {
         filterArc(d.sourceTag, d.targetTag);
       }
     }
-    return fade_at_edge(d);
+    return fadeAtEdge(d);
   });
 }
 
@@ -1150,7 +955,7 @@ function dfs(curr) {
       d.filtered = "temp";
       dfs(d.sourceTag);
     }
-    return fade_at_edge(d);
+    return fadeAtEdge(d);
   });
 }
 
@@ -1310,7 +1115,7 @@ function handleUnusedPoints() {
         }
       }
     }
-    return fade_at_edge(d);
+    return fadeAtEdge(d);
   });
 
   for (var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
@@ -1338,7 +1143,7 @@ function handleUnusedPoints() {
   refresh();
 }
 
-function fade_at_edge(d) {
+function fadeAtEdge(d) {
   if (d.filtered === "false") {
     return 0;
   }
@@ -1348,7 +1153,8 @@ function fade_at_edge(d) {
     end;
   // function is called on 2 different data structures..
   if (d.source) {
-    (start = d.source), (end = d.target);
+    start = d.source;
+    end = d.target;
   } else {
     start = d.coordinates1;
     end = d.coordinates2;
@@ -1380,7 +1186,7 @@ function rotateToPoint(p) {
   }
   var q = coords.split(",");
   d3.transition()
-    .duration(1500)
+    .duration(1000)
     .tween("rotate", function() {
       var r = d3.interpolate(proj.rotate(), [
         -parseInt(q[0]),
@@ -1554,7 +1360,7 @@ function zoomed() {
       .projection(proj)
       .pointRadius(3);
 
-    svg.selectAll("circle").attr("r", scale / 4);
+    svg.select("#globe").attr("r", scale / 4);
 
     if (o0) {
       proj.rotate(o0);
