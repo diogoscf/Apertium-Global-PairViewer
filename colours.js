@@ -1,10 +1,10 @@
-var TRUNK_COLOR = "#5dff0b";
-var STAGING_COLOR = "#ffd900";
-var NURSERY_COLOR = "#ff5900";
-var INCUBATOR_COLOR = "#cc0000";
-var UNKNOWN_COLOR = "#9c27b0";
+let TRUNK_COLOR = "#5dff0b";
+let STAGING_COLOR = "#ffd900";
+let NURSERY_COLOR = "#ff5900";
+let INCUBATOR_COLOR = "#cc0000";
+let UNKNOWN_COLOR = "#9c27b0";
 
-var countryColor = d3
+let countryColor = d3
   .scaleThreshold()
   .domain([
     0,
@@ -34,16 +34,16 @@ var countryColor = d3
   ]);
 
 /********* colorbrewing *********/
-var maxStems = 100000;
+let maxStems = 100000;
 // Forbid the 0-9 category (-1)
-var numShades = parseInt(Math.log(maxStems) / Math.LN10) - 1;
-var translationClasses = ["trunk", "staging", "nursery", "incubator"];
-var goldenYellowScale = {
+let numShades = parseInt(Math.log(maxStems) / Math.LN10) - 1;
+let translationClasses = ["trunk", "staging", "nursery", "incubator"];
+let goldenYellowScale = {
   4: ["#ffd54c", "#ffc300", "#CC9C00", "#7f6a26"],
   5: ["#FFF199", "#FFEC70", "#E0C200", "#CCB100", "#B89F00"],
   6: ["#FFEC70", "#FFE433", "#E0C200", "#CCB100", "#B89F00", "#A38D00"]
 };
-var translationClassColourChoices = [
+let translationClassColourChoices = [
   [colorbrewer.BuGn, colorbrewer.Blues, colorbrewer.YlOrRd, colorbrewer.Greys],
   [colorbrewer.BuGn, colorbrewer.GnBu, colorbrewer.YlOrBr, colorbrewer.PuRd],
   [colorbrewer.YlGn, colorbrewer.Blues, colorbrewer.PuRd, colorbrewer.Greys],
@@ -51,14 +51,14 @@ var translationClassColourChoices = [
   [colorbrewer.YlGn, colorbrewer.YlGnBu, colorbrewer.Oranges, colorbrewer.Reds],
   [colorbrewer.YlGn, goldenYellowScale, colorbrewer.Oranges, colorbrewer.Reds]
 ];
-// Vary only lightness.
-var niceGreen = d3.rgb("#0c0"),
+// lety only lightness.
+let niceGreen = d3.rgb("#0c0"),
   niceYellow = d3.rgb("#fc0"),
   niceOrange = d3.rgb("#f60"),
   niceRed = d3.rgb("#c00");
-var temp = [];
+let temp = [];
 [niceGreen, niceYellow, niceOrange, niceRed].forEach(function(c) {
-  var tempp = [];
+  let tempp = [];
   for (i = 0; i < 5; ++i) {
     tempp.push(c.darker(i - 1));
   }
@@ -67,16 +67,16 @@ var temp = [];
 translationClassColourChoices.push(temp);
 // Desaturate
 // Actually this has become so complex. A colour theory specialist needs to analyse this.
-var temp = [];
+temp = [];
 [
   d3.hsl(100, 1, 0.5),
   d3.hsl(51, 1, 0.5),
   d3.hsl(21, 1, 0.5),
   d3.hsl(0, 1, 0.4)
 ].forEach(function(c) {
-  var tempp = [];
+  let tempp = [];
   for (i = 0; i < 5; ++i) {
-    var cc = c.brighter(0);
+    let cc = c.brighter(0);
     if (cc.h == 0) {
       cc.s = cc.s / (i + 0.5);
       cc.l = cc.l + 0.3 * Math.sqrt(i);
@@ -92,7 +92,7 @@ var temp = [];
   temp.push({ 5: tempp.reverse() });
 });
 translationClassColourChoices.push(temp);
-var translationClassColours = translationClassColourChoices[7].map(function(e) {
+let translationClassColours = translationClassColourChoices[7].map(function(e) {
   return e[numShades + 1].slice(1);
 });
 /********* end of colorbrewing *********/

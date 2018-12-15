@@ -2,66 +2,66 @@
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
 
-var fixedWidth = window.innerWidth,
+let fixedWidth = window.innerWidth,
   fixedHeight = window.innerHeight;
 
-var width =
+let width =
   window.innerWidth > window.innerHeight
     ? window.innerHeight
     : window.innerWidth;
 
-var currentRepoFilter = [];
-var currentPointFilter = [];
-var currentDirFilter = [];
+let currentRepoFilter = [];
+let currentPointFilter = [];
+let currentDirFilter = [];
 
-var visitMap = new Map();
+let visitMap = new Map();
 
-var MARKER_SIZE = "40";
+let MARKER_SIZE = "40";
 
-var proj = d3
+let proj = d3
   .geoOrthographic()
   .translate([fixedWidth / 2, fixedHeight / 2])
   .clipAngle(90)
   .scale(width / 4);
 
-var sky = d3
+let sky = d3
   .geoOrthographic()
   .translate([fixedWidth / 2, fixedHeight / 2])
   .clipAngle(90)
   .scale(width / 3);
 
 // Point radius can be updated here
-var path = d3
+let path = d3
   .geoPath()
   .projection(proj)
   .pointRadius(3);
 
-var swoosh = d3
+let swoosh = d3
   .line()
   .x(d => d[0])
   .y(d => d[1])
   .curve(d3.curveCardinal.tension(-1.3));
 
-var links = [],
+let links = [],
   arcLines = [];
 
 // Defining tooltip
-var div = d3
+let div = d3
   .select("body")
   .append("div")
   .attr("class", "tooltip")
   .style("opacity", 0);
 
 // Table used to look up full language names
-var codeToLangTable = {};
+let codeToLangTable = {};
 d3.json("languages.json", function(error, table) {
   codeToLangTable = jQuery.extend(true, {}, table);
 });
 
 // Currently not using long/lat lines, but can be used by uncommenting and pathing
-// var graticule = d3.geo.graticule();
+// let graticule = d3.geo.graticule();
 
-var svg = d3
+let svg = d3
   .select("body")
   .append("svg")
   .attr("width", fixedWidth)
@@ -70,7 +70,7 @@ svg.style("background", "black");
 
 window.addEventListener("resize", resize);
 
-var zoom = d3
+let zoom = d3
   .zoom()
   .scaleExtent([100, 50000])
   .on("start", zoomstart)
@@ -115,10 +115,10 @@ function resize() {
 
   refresh();
 
-  var sidenavHeight = $("#sidenav").css("height");
-  var val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
-  var offset = 487;
-  var total = val - offset >= 0 ? val - offset : 0;
+  let sidenavHeight = $("#sidenav").css("height");
+  let val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
+  let offset = 487;
+  let total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", total + "px");
 }
 
@@ -149,26 +149,26 @@ function toggleMapColour() {
   refresh();
 }
 
-var correctZoom = d3
+let correctZoom = d3
   .scaleLinear()
   .domain([0, window.devicePixelRatio])
   .range([0, 1]);
 
-var aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
+let aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
 
 function drawStars() {
-  var smallStars = [];
-  for (var i = 0; i < aFactor * 100; i++) {
+  let smallStars = [];
+  for (i = 0; i < aFactor * 100; i++) {
     smallStars.push({ x: randomX(), y: randomY() });
   }
 
-  var mediumStars = [];
-  for (var i = 0; i < aFactor * 10; i++) {
+  let mediumStars = [];
+  for (i = 0; i < aFactor * 10; i++) {
     mediumStars.push({ x: randomX(), y: randomY() });
   }
 
-  var bigStars = [];
-  for (var i = 0; i < aFactor; i++) {
+  let bigStars = [];
+  for (i = 0; i < aFactor; i++) {
     bigStars.push({ x: randomX(), y: randomY() });
   }
 
@@ -226,7 +226,7 @@ function ready(error, world, places, points, diversity) {
 
   drawStars();
 
-  var ocean_fill = svg
+  let ocean_fill = svg
     .append("defs")
     .append("radialGradient")
     .attr("id", "ocean_fill")
@@ -241,7 +241,7 @@ function ready(error, world, places, points, diversity) {
     .attr("offset", "100%")
     .attr("stop-color", "#2196F3");
 
-  var drop_shadow = svg
+  let drop_shadow = svg
     .append("defs")
     .append("radialGradient")
     .attr("id", "drop_shadow")
@@ -258,7 +258,7 @@ function ready(error, world, places, points, diversity) {
     .attr("stop-color", "#000")
     .attr("stop-opacity", "0");
 
-  var markerDef = svg.append("defs");
+  let markerDef = svg.append("defs");
   markerDef
     .append("marker")
     .attr("id", "trunkoneway")
@@ -414,8 +414,8 @@ function ready(error, world, places, points, diversity) {
 
   // Parse default pairs
   places.pairs.forEach(function(a) {
-    var s, t;
-    for (var pointInd = 0; pointInd < points.point_data.length; pointInd++) {
+    let s, t;
+    for (pointInd = 0; pointInd < points.point_data.length; pointInd++) {
       if (points.point_data[pointInd].tag === a.lg2) {
         s = points.point_data[pointInd].geometry.coordinates;
       }
@@ -437,7 +437,7 @@ function ready(error, world, places, points, diversity) {
 
   // build geoJSON features from links array
   links.forEach(function(e, i, a) {
-    var feature = {
+    let feature = {
       type: "Feature",
       geometry: { type: "LineString", coordinates: [e.source, e.target] },
       stage: e.stage,
@@ -484,8 +484,8 @@ function ready(error, world, places, points, diversity) {
         .duration(200)
         .style("opacity", 0.9);
       $(this).css("stroke-width", "4px");
-      var arrow = d.direction === "<>" ? "↔" : d.direction === ">" ? "→" : "–";
-      var repo =
+      let arrow = d.direction === "<>" ? "↔" : d.direction === ">" ? "→" : "–";
+      let repo =
         d.stage === undefined
           ? "Unknown"
           : d.stage.charAt(0).toUpperCase() + d.stage.slice(1);
@@ -595,13 +595,13 @@ function ready(error, world, places, points, diversity) {
     });
 
   // Populate the filter point list
-  var alphaPointList = [];
-  for (var i = 0; i < points.point_data.length; i++) {
+  let alphaPointList = [];
+  for (i = 0; i < points.point_data.length; i++) {
     alphaPointList.push(points.point_data[i].tag);
   }
   alphaPointList.sort();
-  for (var i = 0; i < alphaPointList.length; i++) {
-    var newPoint = $("<a>")
+  for (i = 0; i < alphaPointList.length; i++) {
+    let newPoint = $("<a>")
       .attr("id", "point" + alphaPointList[i])
       .attr("class", "dropdown-select")
       .attr("onclick", "filterPoint('" + alphaPointList[i] + "')")
@@ -615,12 +615,12 @@ function ready(error, world, places, points, diversity) {
 
 // Position and hiding labels
 function position_labels() {
-  var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]);
+  let centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]);
 
   svg
     .selectAll(".label")
     .attr("label-anchor", function(d) {
-      var x = proj(d.geometry.coordinates)[0];
+      let x = proj(d.geometry.coordinates)[0];
       return x < width / 2 - 20
         ? "end"
         : x < width / 2 + 20
@@ -628,15 +628,15 @@ function position_labels() {
         : "start";
     })
     .attr("transform", function(d) {
-      var loc = proj(d.geometry.coordinates),
+      let loc = proj(d.geometry.coordinates),
         x = loc[0],
         y = loc[1];
-      var offset = x < width / 2 ? -5 : 5;
+      let offset = x < width / 2 ? -5 : 5;
       return "translate(" + (x + offset) + "," + (y - 2) + ")";
     })
     .style("display", function(d) {
-      var d = d3.geoDistance(d.geometry.coordinates, centerPos);
-      return d > 1.57 ? "none" : "inline";
+      let dist = d3.geoDistance(d.geometry.coordinates, centerPos);
+      return dist > 1.57 ? "none" : "inline";
     });
 }
 
@@ -695,11 +695,11 @@ function colorStem() {
 }
 
 function flying_arc(pts) {
-  var source = pts.source,
+  let source = pts.source,
     target = pts.target;
 
-  var mid = location_along_arc(source, target, 0.5);
-  var result = [proj(source), sky(mid), proj(target)];
+  let mid = location_along_arc(source, target, 0.5);
+  let result = [proj(source), sky(mid), proj(target)];
 
   return result;
 }
@@ -780,7 +780,7 @@ function selectDirFilter(dir) {
 let currentFiltered = "none";
 // Update point filter and globe
 function filterPoint(p) {
-  var needToRotate = false;
+  let needToRotate = false;
   if ($("#checkmarkPoint" + p).length === 0) {
     $("#point" + p).html(
       p + "<i id=checkmarkPoint" + p + " class='fa fa-check checkmark'></i>"
@@ -822,7 +822,7 @@ function resetFilters() {
 }
 
 function filterArc(s, t) {
-  for (var i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+  for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
     if (
       svg.selectAll(".arc")._groups[0][i].getAttribute("sourceTag") === s &&
       svg.selectAll(".arc")._groups[0][i].getAttribute("targetTag") === t
@@ -851,7 +851,7 @@ function filterArcsAndFlyers() {
         false
       );
     }
-    for (var i = 0; i < currentPointFilter.length; i++) {
+    for (i = 0; i < currentPointFilter.length; i++) {
       dfs(currentPointFilter[i]);
     }
   }
@@ -876,7 +876,7 @@ function filterArcsAndFlyers() {
       $("#fullDepthCheckbox").prop("checked") === false
     ) {
       filterReturn = 0;
-      for (var i = 0; i < currentPointFilter.length; i++) {
+      for (i = 0; i < currentPointFilter.length; i++) {
         if (
           d.sourceTag === currentPointFilter[i] ||
           d.targetTag === currentPointFilter[i]
@@ -893,7 +893,7 @@ function filterArcsAndFlyers() {
 
     if (currentRepoFilter.length > 0) {
       filterReturn = 0;
-      for (var i = 0; i < currentRepoFilter.length; i++) {
+      for (i = 0; i < currentRepoFilter.length; i++) {
         if (d.stage === currentRepoFilter[i].toLowerCase()) {
           filterReturn = 1;
           break;
@@ -907,7 +907,7 @@ function filterArcsAndFlyers() {
 
     if (currentDirFilter.length > 0) {
       filterReturn = 0;
-      for (var i = 0; i < currentDirFilter.length; i++) {
+      for (i = 0; i < currentDirFilter.length; i++) {
         if (
           (d.direction === "<>" && currentDirFilter[i] === "Bidirectional") ||
           (d.direction === ">" && currentDirFilter[i] === "Unidirectional") ||
@@ -980,8 +980,8 @@ function closeNav() {
 function toggleDropdown(t, id) {
   if ($(id).css("display") === "none") {
     $(".dropdown-content").css("display", "none");
-    for (var i = 0; i < $(".dropdown-content").length; i++) {
-      var filterButton = $(".dropdown-content")[i].previousElementSibling;
+    for (i = 0; i < $(".dropdown-content").length; i++) {
+      let filterButton = $(".dropdown-content")[i].previousElementSibling;
       filterButton.innerHTML =
         filterButton.innerHTML.slice(0, filterButton.innerHTML.indexOf("<")) +
         "<i class='fa fa-caret-right'></i>";
@@ -997,10 +997,10 @@ function toggleDropdown(t, id) {
       t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
       "<i class='fa fa-caret-down'></i>";
   }
-  var sidenavHeight = $("#sidenav").css("height");
-  var val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
-  var offset = 487;
-  var total = val - offset >= 0 ? val - offset : 0;
+  let sidenavHeight = $("#sidenav").css("height");
+  let val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
+  let offset = 487;
+  let total = val - offset >= 0 ? val - offset : 0;
   $("#pointList").css("max-height", total + "px");
 }
 
@@ -1039,7 +1039,7 @@ $("#stemFilterSlider").on("change", function() {
 });
 
 $("#stemFilterCount").on("change", function() {
-  var val = this.value;
+  let val = this.value;
   val = Math.max(0, val);
   val = Math.min(100000, val);
   $(this).attr("value", val);
@@ -1060,10 +1060,10 @@ function unknownStem() {
 }
 
 function filterSearchPoints() {
-  var searchValue = $("#pointSearch")[0].value;
-  var points = $("#pointList")[0].children;
-  var searchEmpty = 0;
-  for (var i = 0; i < points.length; i++) {
+  let searchValue = $("#pointSearch")[0].value;
+  let points = $("#pointList")[0].children;
+  let searchEmpty = 0;
+  for (i = 0; i < points.length; i++) {
     if (
       $(points[i])
         .text()
@@ -1094,10 +1094,10 @@ function handleUnusedPoints() {
 
   svg.selectAll(".flyer").attr("opacity", function(d) {
     if (this.getAttribute("opacity") !== "0") {
-      var dsource = String(d.source[0]) + "," + String(d.source[1]);
-      var dtarget = String(d.target[0]) + "," + String(d.target[1]);
-      var points = svg.selectAll(".point")._groups[0];
-      for (var j = 0; j < points.length; j++) {
+      let dsource = String(d.source[0]) + "," + String(d.source[1]);
+      let dtarget = String(d.target[0]) + "," + String(d.target[1]);
+      let points = svg.selectAll(".point")._groups[0];
+      for (j = 0; j < points.length; j++) {
         if (points[j].getAttribute("coordinate") === dsource) {
           points[j].setAttribute("style", "opacity: 0.6");
         }
@@ -1105,8 +1105,8 @@ function handleUnusedPoints() {
           points[j].setAttribute("style", "opacity: 0.6");
         }
       }
-      var labels = svg.selectAll(".label")._groups[0];
-      for (var k = 0; k < labels.length; k++) {
+      let labels = svg.selectAll(".label")._groups[0];
+      for (k = 0; k < labels.length; k++) {
         if (labels[k].getAttribute("coordinate") === dsource) {
           labels[k].setAttribute("style", "opacity: 0.9");
         }
@@ -1118,7 +1118,7 @@ function handleUnusedPoints() {
     return fadeAtEdge(d);
   });
 
-  for (var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+  for (i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
     if (
       currentPointFilter.indexOf(
         svg.selectAll(".point")._groups[0][i].getAttribute("tag")
@@ -1129,7 +1129,7 @@ function handleUnusedPoints() {
         ._groups[0][i].setAttribute("style", "opacity: 0.6");
     }
   }
-  for (var i = 0; i < svg.selectAll(".label")._groups[0].length; i++) {
+  for (i = 0; i < svg.selectAll(".label")._groups[0].length; i++) {
     if (
       currentPointFilter.indexOf(
         svg.selectAll(".label")._groups[0][i].innerHTML
@@ -1148,7 +1148,7 @@ function fadeAtEdge(d) {
     return 0;
   }
 
-  var centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
+  let centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
     start,
     end;
   // function is called on 2 different data structures..
@@ -1160,38 +1160,38 @@ function fadeAtEdge(d) {
     end = d.coordinates2;
   }
 
-  var start_dist = 1.57 - d3.geoDistance(start, centerPos),
+  let start_dist = 1.57 - d3.geoDistance(start, centerPos),
     end_dist = 1.57 - d3.geoDistance(end, centerPos);
 
-  var fade = d3
+  let fade = d3
     .scaleLinear()
     .domain([-0.1, 0])
     .range([0, 0.1]);
-  var dist = start_dist < end_dist ? start_dist : end_dist;
+  let dist = start_dist < end_dist ? start_dist : end_dist;
   return fade(dist);
 }
 
 function location_along_arc(start, end, loc) {
-  var interpolator = d3.geoInterpolate(start, end);
+  let interpolator = d3.geoInterpolate(start, end);
   return interpolator(loc);
 }
 
 function rotateToPoint(p) {
-  var rotate = proj.rotate();
-  var coords;
-  for (var i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+  let rotate = proj.rotate();
+  let coords;
+  for (i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
     if (svg.selectAll(".point")._groups[0][i].getAttribute("tag") === p) {
       coords = svg.selectAll(".point")._groups[0][i].getAttribute("coordinate");
+      break;
     }
   }
-  var q = coords.split(",");
+  let q = coords.split(",");
   d3.transition()
     .duration(1000)
     .tween("rotate", function() {
-      var r = d3.interpolate(proj.rotate(), [
+      let r = d3.interpolate(proj.rotate(), [
         -parseInt(q[0]),
-        -parseInt(q[1]),
-        rotate[2]
+        -parseInt(q[1])
       ]);
       return function(t) {
         proj.rotate(r(t));
@@ -1203,10 +1203,10 @@ function rotateToPoint(p) {
 }
 
 // modified from http://bl.ocks.org/tlfrd/df1f1f705c7940a6a7c0dca47041fec8
-var o0;
+let o0;
 
 /********** versor.js **********/
-var acos = Math.acos,
+let acos = Math.acos,
   asin = Math.asin,
   atan2 = Math.atan2,
   cos = Math.cos,
@@ -1220,7 +1220,7 @@ var acos = Math.acos,
 
 // Returns the unit quaternion for the given Euler rotation angles [λ, φ, γ].
 function versor(e) {
-  var l = (e[0] / 2) * radians,
+  let l = (e[0] / 2) * radians,
     sl = sin(l),
     cl = cos(l), // λ / 2
     p = (e[1] / 2) * radians,
@@ -1239,7 +1239,7 @@ function versor(e) {
 
 // Returns Cartesian coordinates [x, y, z] given spherical coordinates [λ, φ].
 versor.cartesian = function(e) {
-  var l = e[0] * radians,
+  let l = e[0] * radians,
     p = e[1] * radians,
     cp = cos(p);
   return [cp * cos(l), cp * sin(l), sin(p)];
@@ -1262,10 +1262,10 @@ versor.rotation = function(q) {
 
 // Returns the quaternion to rotate between two cartesian points on the sphere.
 versor.delta = function(v0, v1) {
-  var w = cross(v0, v1),
+  let w = cross(v0, v1),
     l = sqrt(dot(w, w));
   if (!l) return [1, 0, 0, 0];
-  var t = acos(max(-1, min(1, dot(v0, v1)))) / 2,
+  let t = acos(max(-1, min(1, dot(v0, v1)))) / 2,
     s = sin(t); // t = θ / 2
   return [cos(t), (w[2] / l) * s, (-w[1] / l) * s, (w[0] / l) * s];
 };
@@ -1294,7 +1294,7 @@ function dot(v0, v1) {
 
 /********** end of versor.js **********/
 
-var v0, r0, q0;
+let v0, r0, q0;
 
 window.addEventListener(
   "touchmove",
@@ -1331,12 +1331,12 @@ function zoomstart() {
 }
 
 function zoomed() {
-  var scale = d3.event.transform.k;
+  let scale = d3.event.transform.k;
   if (width === scale) {
     // If not zooming, rotating.
-    var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this)));
-    var q1 = versor.multiply(q0, versor.delta(v0, v1));
-    var r1 = versor.rotation(q1);
+    let v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this)));
+    let q1 = versor.multiply(q0, versor.delta(v0, v1));
+    let r1 = versor.rotation(q1);
     proj.rotate(r1);
     sky.rotate(r1);
     refresh();
@@ -1377,7 +1377,7 @@ function zoomend() {
 
 // Resets zoom to fit window size
 function resetZoom() {
-  var initial = 2;
+  let initial = 2;
   svg
     .transition()
     .call(
