@@ -6,9 +6,7 @@ let fixedWidth = window.innerWidth,
   fixedHeight = window.innerHeight;
 
 let width =
-  window.innerWidth > window.innerHeight
-    ? window.innerHeight
-    : window.innerWidth;
+  window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
 
 let currentRepoFilter = [];
 let currentPointFilter = [];
@@ -212,6 +210,24 @@ function randomX() {
 
 function randomY() {
   return Math.round(Math.random() * window.innerHeight);
+}
+
+let timer = 0;
+let delay = 200;
+let prevent = false;
+
+function singleClick(d) {
+  if (d === currentFiltered) {
+    filterPoint(currentFiltered);
+    currentFiltered = "none";
+  } else if (currentFiltered === "none") {
+    filterPoint(d);
+    currentFiltered = d;
+  } else {
+    filterPoint(currentFiltered);
+    filterPoint(d);
+    currentFiltered = d;
+  }
 }
 
 queue()
@@ -486,9 +502,7 @@ function ready(error, world, places, points, diversity) {
       $(this).css("stroke-width", "4px");
       let arrow = d.direction === "<>" ? "↔" : d.direction === ">" ? "→" : "–";
       let repo =
-        d.stage === undefined
-          ? "Unknown"
-          : d.stage.charAt(0).toUpperCase() + d.stage.slice(1);
+        d.stage === undefined ? "Unknown" : d.stage.charAt(0).toUpperCase() + d.stage.slice(1);
       div
         .html(
           d.sourceTag +
@@ -581,17 +595,17 @@ function ready(error, world, places, points, diversity) {
         .style("opacity", 0);
     })
     .on("click", function(d) {
-      if (d.tag === currentFiltered) {
-        filterPoint(currentFiltered);
-        currentFiltered = "none";
-      } else if (currentFiltered === "none") {
-        filterPoint(d.tag);
-        currentFiltered = d.tag;
-      } else {
-        filterPoint(currentFiltered);
-        filterPoint(d.tag);
-        currentFiltered = d.tag;
-      }
+      timer = setTimeout(function() {
+        if (!prevent) {
+          singleClick(d.tag);
+        }
+        prevent = false;
+      }, delay);
+    })
+    .on("dblclick", function(d) {
+      clearTimeout(timer);
+      prevent = true;
+      rotateToPoint(d.tag);
     });
 
   // Populate the filter point list
@@ -621,11 +635,7 @@ function position_labels() {
     .selectAll(".label")
     .attr("label-anchor", function(d) {
       let x = proj(d.geometry.coordinates)[0];
-      return x < width / 2 - 20
-        ? "end"
-        : x < width / 2 + 20
-        ? "middle"
-        : "start";
+      return x < width / 2 - 20 ? "end" : x < width / 2 + 20 ? "middle" : "start";
     })
     .attr("transform", function(d) {
       let loc = proj(d.geometry.coordinates),
@@ -1189,10 +1199,7 @@ function rotateToPoint(p) {
   d3.transition()
     .duration(1000)
     .tween("rotate", function() {
-      let r = d3.interpolate(proj.rotate(), [
-        -parseInt(q[0]),
-        -parseInt(q[1])
-      ]);
+      let r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
       return function(t) {
         proj.rotate(r(t));
         sky.rotate(r(t));
