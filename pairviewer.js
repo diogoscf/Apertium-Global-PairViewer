@@ -26,7 +26,7 @@ let sky = d3
   .geoOrthographic()
   .translate([fixedWidth / 2, fixedHeight / 2])
   .clipAngle(90)
-  .scale(width / 3);
+  .scale(width / 3.75);
 
 // Point radius can be updated here
 let path = d3
@@ -88,7 +88,7 @@ function resize() {
     .geoOrthographic()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
-    .scale(width / 3);
+    .scale(width / 3.75);
 
   proj = d3
     .geoOrthographic()
@@ -1176,7 +1176,7 @@ function fadeAtEdge(d) {
   let fade = d3
     .scaleLinear()
     .domain([-0.1, 0])
-    .range([0, 0.1]);
+    .range([0, 0.15]);
   let dist = start_dist < end_dist ? start_dist : end_dist;
   return fade(dist);
 }
@@ -1360,7 +1360,7 @@ function zoomed() {
       .geoOrthographic()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
-      .scale(scale / 3);
+      .scale(scale / 3.75);
 
     path = d3
       .geoPath()
