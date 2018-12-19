@@ -6,6 +6,7 @@ body {
   width: 100%;
   height: 100%;
 }
+
 body {
   position: relative;
 }
@@ -40,25 +41,22 @@ body {
   stroke: gray;
   stroke-width: 3;
 }
+
 .flyers {
   stroke-width: 1;
-  opacity: 0.8;
+  opacity: 0.6;
   stroke: blue;
 }
+
 .arc,
 .flyer {
   stroke-linejoin: round;
   fill: none;
 }
+
 .flyer {
   stroke: #e91e63;
   stroke-width: 2px;
-}
-.arc {
-}
-.flyer {
-}
-.flyer:hover {
 }
 
 .labels {
@@ -240,4 +238,21 @@ div.tooltip {
 .resetFilter:hover,
 .resetFilter:focus {
   background-color: #c60500 !important;
+}
+
+.tick line {
+  stroke: white;
+}
+
+.yAxis path {
+  stroke: white;
+}
+
+.tick text {
+  fill: white;
+}
+
+.legend {
+  pointer-events: none;
+  visibility: hidden;
 }

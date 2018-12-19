@@ -38,7 +38,7 @@ let swoosh = d3
   .line()
   .x(d => d[0])
   .y(d => d[1])
-  .curve(d3.curveCardinal.tension(-1.3));
+  .curve(d3.curveCardinal.tension(-1));
 
 let links = [],
   arcLines = [];
@@ -52,7 +52,7 @@ let div = d3
 
 // Table used to look up full language names
 let codeToLangTable = {};
-d3.json("languages.json", function(error, table) {
+d3.json("languages.json", function (error, table) {
   codeToLangTable = jQuery.extend(true, {}, table);
 });
 
@@ -80,6 +80,7 @@ svg.call(zoom);
 d3.select("svg").on("dblclick.zoom", null);
 
 function resize() {
+  drawLegend();
   fixedWidth = window.innerWidth;
   fixedHeight = window.innerHeight;
   svg.attr("width", fixedWidth).attr("height", fixedHeight);
@@ -121,9 +122,10 @@ function resize() {
 }
 
 let diversityById = {};
-let toggled = true;
+let mapToggled = true;
+
 function toggleMapColour() {
-  if (toggled) {
+  if (mapToggled) {
     svg
       .selectAll("path.land")
       .style("fill", "white")
@@ -147,6 +149,18 @@ function toggleMapColour() {
   refresh();
 }
 
+let legendToggled = false;
+
+function toggleLegend() {
+  if (legendToggled) {
+    svg.select(".legend").style("visibility", "hidden");
+  } else {
+    svg.select(".legend").style("visibility", "visible");
+  }
+
+  legendToggled = !legendToggled;
+}
+
 let correctZoom = d3
   .scaleLinear()
   .domain([0, window.devicePixelRatio])
@@ -157,20 +171,31 @@ let aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
 function drawStars() {
   let smallStars = [];
   for (i = 0; i < aFactor * 100; i++) {
-    smallStars.push({ x: randomX(), y: randomY() });
+    smallStars.push({
+      x: randomX(),
+      y: randomY()
+    });
   }
 
   let mediumStars = [];
   for (i = 0; i < aFactor * 10; i++) {
-    mediumStars.push({ x: randomX(), y: randomY() });
+    mediumStars.push({
+      x: randomX(),
+      y: randomY()
+    });
   }
 
   let bigStars = [];
   for (i = 0; i < aFactor; i++) {
-    bigStars.push({ x: randomX(), y: randomY() });
+    bigStars.push({
+      x: randomX(),
+      y: randomY()
+    });
   }
 
-  svg
+  let starContainer = svg.append("g").attr("class", "stars");
+
+  starContainer
     .selectAll(".smallStar")
     .data(smallStars)
     .enter()
@@ -181,7 +206,7 @@ function drawStars() {
     .attr("r", "1px")
     .style("fill", "#fff");
 
-  svg
+  starContainer
     .selectAll(".mediumStar")
     .data(mediumStars)
     .enter()
@@ -192,7 +217,7 @@ function drawStars() {
     .attr("r", "2px")
     .style("fill", "#fff");
 
-  svg
+  starContainer
     .selectAll(".bigStar")
     .data(bigStars)
     .enter()
@@ -228,6 +253,60 @@ function singleClick(d) {
     filterPoint(d);
     currentFiltered = d;
   }
+}
+
+let legend = svg.append("defs")
+  .append("svg:linearGradient")
+  .attr("id", "gradient")
+  .attr("x1", "0%")
+  .attr("y1", "100%")
+  .attr("x2", "100%")
+  .attr("y2", "100%")
+  .attr("spreadMethod", "pad");
+
+legend.append("stop")
+  .attr("offset", "0%")
+  .attr("stop-color", "#55b380")
+  .attr("stop-opacity", 1);
+
+legend.append("stop")
+  .attr("offset", "100%")
+  .attr("stop-color", "#003300")
+  .attr("stop-opacity", 1);
+
+let legendWidth = 200;
+let legendHeight = 20;
+
+let y = d3.scaleLinear()
+  .range([200, 0])
+  .domain([1, 0]);
+
+let yAxis = d3.axisBottom()
+  .scale(y)
+  .ticks(5);
+
+function drawLegend() {
+  svg.selectAll(".legend").remove();
+  legendToggled = false;
+
+  let key = svg.append("g").attr("class", "legend");
+  key.append("rect")
+    .attr("width", legendWidth)
+    .attr("height", legendHeight)
+    .style("fill", "url(#gradient)")
+    .attr("transform", "translate(" + (fixedWidth - legendWidth - 10) + ",10)");
+
+  key.append("g")
+    .attr("class", "yAxis")
+    .attr("transform", "translate(" + (fixedWidth - legendWidth - 10) + ",30)")
+    .call(yAxis);
+
+  key.append("text")
+    .attr("class", "legendHeading")
+    .attr("y", 70)
+    .attr("x", fixedWidth - legendWidth + 15)
+    .style("fill", "white")
+    .text("Linguistic Diversity");
 }
 
 queue()
@@ -405,7 +484,7 @@ function ready(error, world, places, points, diversity) {
     .attr("id", "globe")
     .style("fill", "url(#ocean_fill)");
 
-  diversity.forEach(function(d) {
+  diversity.forEach(function (d) {
     diversityById[d.id] = d.diversity;
   });
 
@@ -429,7 +508,7 @@ function ready(error, world, places, points, diversity) {
   //       .attr("d", path);
 
   // Parse default pairs
-  places.pairs.forEach(function(a) {
+  places.pairs.forEach(function (a) {
     let s, t;
     for (pointInd = 0; pointInd < points.point_data.length; pointInd++) {
       if (points.point_data[pointInd].tag === a.lg2) {
@@ -452,10 +531,13 @@ function ready(error, world, places, points, diversity) {
   });
 
   // build geoJSON features from links array
-  links.forEach(function(e, i, a) {
+  links.forEach(function (e, i, a) {
     let feature = {
       type: "Feature",
-      geometry: { type: "LineString", coordinates: [e.source, e.target] },
+      geometry: {
+        type: "LineString",
+        coordinates: [e.source, e.target]
+      },
       stage: e.stage,
       sourceTag: e.sourceTag,
       targetTag: e.targetTag,
@@ -490,7 +572,7 @@ function ready(error, world, places, points, diversity) {
     .attr("targetTag", d => d.targetTag)
     .attr("d", d => swoosh(flying_arc(d)))
     .style("stroke", d => chooseColor(d))
-    .on("mouseover", function(d) {
+    .on("mouseover", function (d) {
       //Hovering over flyers for tooltip
       if (d.filtered === "false") {
         return;
@@ -506,19 +588,19 @@ function ready(error, world, places, points, diversity) {
       div
         .html(
           d.sourceTag +
-            " " +
-            arrow +
-            " " +
-            d.targetTag +
-            "<br/>" +
-            (d.stems === undefined || d.stems === -1 ? "Unknown" : d.stems) +
-            "<br/>" +
-            repo
+          " " +
+          arrow +
+          " " +
+          d.targetTag +
+          "<br/>" +
+          (d.stems === undefined || d.stems === -1 ? "Unknown" : d.stems) +
+          "<br/>" +
+          repo
         )
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY - 28 + "px");
     })
-    .on("mouseout", function(d) {
+    .on("mouseout", function (d) {
       div
         .transition()
         .duration(500)
@@ -538,7 +620,7 @@ function ready(error, world, places, points, diversity) {
     .attr("class", "label")
     .attr("coordinate", d => d.geometry.coordinates)
     .text(d => d.tag)
-    .on("mouseover", function(d) {
+    .on("mouseover", function (d) {
       //Hovering over labels for tooltip
       if ($(this).css("opacity") === "0") {
         return;
@@ -553,7 +635,7 @@ function ready(error, world, places, points, diversity) {
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY - 28 + "px");
     })
-    .on("mouseout", function(d) {
+    .on("mouseout", function (d) {
       div
         .transition()
         .duration(500)
@@ -573,7 +655,7 @@ function ready(error, world, places, points, diversity) {
     .attr("d", path)
     .attr("coordinate", d => d.geometry.coordinates)
     .attr("tag", d => d.tag)
-    .on("mouseover", function(d) {
+    .on("mouseover", function (d) {
       //Also added hovering over points for tooltip
       if ($(this).css("opacity") === "0") {
         return;
@@ -588,21 +670,21 @@ function ready(error, world, places, points, diversity) {
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY - 28 + "px");
     })
-    .on("mouseout", function(d) {
+    .on("mouseout", function (d) {
       div
         .transition()
         .duration(500)
         .style("opacity", 0);
     })
-    .on("click", function(d) {
-      timer = setTimeout(function() {
+    .on("click", function (d) {
+      timer = setTimeout(function () {
         if (!prevent) {
           singleClick(d.tag);
         }
         prevent = false;
       }, delay);
     })
-    .on("dblclick", function(d) {
+    .on("dblclick", function (d) {
       clearTimeout(timer);
       prevent = true;
       rotateToPoint(d.tag);
@@ -623,6 +705,8 @@ function ready(error, world, places, points, diversity) {
     $("#pointList").append(newPoint);
   }
 
+  drawLegend();
+
   refresh();
   handleUnusedPoints();
 }
@@ -633,18 +717,18 @@ function position_labels() {
 
   svg
     .selectAll(".label")
-    .attr("label-anchor", function(d) {
+    .attr("label-anchor", function (d) {
       let x = proj(d.geometry.coordinates)[0];
       return x < width / 2 - 20 ? "end" : x < width / 2 + 20 ? "middle" : "start";
     })
-    .attr("transform", function(d) {
+    .attr("transform", function (d) {
       let loc = proj(d.geometry.coordinates),
         x = loc[0],
         y = loc[1];
       let offset = x < width / 2 ? -5 : 5;
       return "translate(" + (x + offset) + "," + (y - 2) + ")";
     })
-    .style("display", function(d) {
+    .style("display", function (d) {
       let dist = d3.geoDistance(d.geometry.coordinates, centerPos);
       return dist > 1.57 ? "none" : "inline";
     });
@@ -680,8 +764,8 @@ function chooseColor(d) {
       .scaleOrdinal()
       .domain(translationClasses)
       .range(translationClassColours)(d.stage)[
-      d.stems <= 99 ? 0 : parseInt(Math.log(d.stems) / Math.LN10) - 1
-    ];
+        d.stems <= 99 ? 0 : parseInt(Math.log(d.stems) / Math.LN10) - 1
+      ];
   } catch (e) {
     // Give it the lightest colour if the stem count is unknown
     return d3
@@ -692,6 +776,7 @@ function chooseColor(d) {
 }
 
 let colorByStems = false;
+
 function colorStem() {
   colorByStems = !colorByStems;
   let button = document.getElementById("colorStem");
@@ -844,6 +929,7 @@ function filterArc(s, t) {
 }
 
 let filterReturn;
+
 function filterArcsAndFlyers() {
   if ($("#toggleShadowsCheckbox").prop("checked")) {
     for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
@@ -866,7 +952,7 @@ function filterArcsAndFlyers() {
     }
   }
 
-  svg.selectAll(".flyer").attr("opacity", function(d) {
+  svg.selectAll(".flyer").attr("opacity", function (d) {
     if (
       $("#fullDepthCheckbox").prop("checked") === false ||
       currentPointFilter.length === 0
@@ -957,7 +1043,7 @@ function dfs(curr) {
     return;
   }
   visitMap.set(curr, true);
-  svg.selectAll(".flyer").attr("opacity", function(d) {
+  svg.selectAll(".flyer").attr("opacity", function (d) {
     if (d.sourceTag === curr) {
       d.filtered = "temp";
       dfs(d.targetTag);
@@ -969,11 +1055,11 @@ function dfs(curr) {
   });
 }
 
-$(".eP").click(function(e) {
+$(".eP").click(function (e) {
   e.stopPropagation();
 });
 
-$("body,html").click(function(e) {
+$("body,html").click(function (e) {
   if ($("#sidenav").css("left") === "0px") {
     closeNav();
   }
@@ -1038,17 +1124,17 @@ function toggleShadows() {
   refresh();
 }
 
-$("#stemFilterSlider").on("input", function() {
+$("#stemFilterSlider").on("input", function () {
   $("#stemFilterCount").attr("value", this.value);
 });
 
-$("#stemFilterSlider").on("change", function() {
+$("#stemFilterSlider").on("change", function () {
   filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
 });
 
-$("#stemFilterCount").on("change", function() {
+$("#stemFilterCount").on("change", function () {
   let val = this.value;
   val = Math.max(0, val);
   val = Math.min(100000, val);
@@ -1076,9 +1162,9 @@ function filterSearchPoints() {
   for (i = 0; i < points.length; i++) {
     if (
       $(points[i])
-        .text()
-        .substring(0, searchValue.length)
-        .toUpperCase() !== searchValue.toUpperCase()
+      .text()
+      .substring(0, searchValue.length)
+      .toUpperCase() !== searchValue.toUpperCase()
     ) {
       $(points[i]).css("display", "none");
     } else {
@@ -1102,7 +1188,7 @@ function handleUnusedPoints() {
     return;
   }
 
-  svg.selectAll(".flyer").attr("opacity", function(d) {
+  svg.selectAll(".flyer").attr("opacity", function (d) {
     if (this.getAttribute("opacity") !== "0") {
       let dsource = String(d.source[0]) + "," + String(d.source[1]);
       let dtarget = String(d.target[0]) + "," + String(d.target[1]);
@@ -1198,9 +1284,9 @@ function rotateToPoint(p) {
   let q = coords.split(",");
   d3.transition()
     .duration(1000)
-    .tween("rotate", function() {
+    .tween("rotate", function () {
       let r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
-      return function(t) {
+      return function (t) {
         proj.rotate(r(t));
         sky.rotate(r(t));
         o0 = proj.rotate();
@@ -1245,7 +1331,7 @@ function versor(e) {
 }
 
 // Returns Cartesian coordinates [x, y, z] given spherical coordinates [λ, φ].
-versor.cartesian = function(e) {
+versor.cartesian = function (e) {
   let l = e[0] * radians,
     p = e[1] * radians,
     cp = cos(p);
@@ -1253,7 +1339,7 @@ versor.cartesian = function(e) {
 };
 
 // Returns the Euler rotation angles [λ, φ, γ] for the given quaternion.
-versor.rotation = function(q) {
+versor.rotation = function (q) {
   return [
     atan2(
       2 * (q[0] * q[1] + q[2] * q[3]),
@@ -1268,7 +1354,7 @@ versor.rotation = function(q) {
 };
 
 // Returns the quaternion to rotate between two cartesian points on the sphere.
-versor.delta = function(v0, v1) {
+versor.delta = function (v0, v1) {
   let w = cross(v0, v1),
     l = sqrt(dot(w, w));
   if (!l) return [1, 0, 0, 0];
@@ -1278,7 +1364,7 @@ versor.delta = function(v0, v1) {
 };
 
 // Returns the quaternion that represents q0 * q1.
-versor.multiply = function(q0, q1) {
+versor.multiply = function (q0, q1) {
   return [
     q0[0] * q1[0] - q0[1] * q1[1] - q0[2] * q1[2] - q0[3] * q1[3],
     q0[0] * q1[1] + q0[1] * q1[0] + q0[2] * q1[3] - q0[3] * q1[2],
@@ -1305,7 +1391,7 @@ let v0, r0, q0;
 
 window.addEventListener(
   "touchmove",
-  function(e) {
+  function (e) {
     e.preventDefault();
   },
   false
@@ -1396,7 +1482,7 @@ function resetZoom() {
 }
 
 // Zoom-in with + key and zoom-out with - key and reset with 0
-window.onkeydown = function(e) {
+window.onkeydown = function (e) {
   if (navigator.userAgent.search("Chrome") >= 0) {
     if (e.keyCode === 187) {
       e.preventDefault();
