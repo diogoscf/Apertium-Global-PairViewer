@@ -122,10 +122,10 @@ function resize() {
 }
 
 let diversityById = {};
-let mapToggled = true;
+let mapColoursOn = true;
 
 function toggleMapColour() {
-  if (mapToggled) {
+  if (mapColoursOn) {
     svg
       .selectAll("path.land")
       .style("fill", "white")
@@ -134,6 +134,10 @@ function toggleMapColour() {
     svg.select(".labels").style("fill", "black");
 
     svg.select(".points").style("fill", "black");
+
+    d3.select("#toggleLegend").style("display", "none");
+    svg.select(".legend").style("visibility", "hidden");
+    legendOn = false;
   } else {
     svg
       .selectAll("path.land")
@@ -143,22 +147,23 @@ function toggleMapColour() {
     svg.select(".labels").style("fill", "white");
 
     svg.select(".points").style("fill", "#e0e0e0");
+    d3.select("#toggleLegend").style("display", "block");
   }
-  toggled = !toggled;
+  mapColoursOn = !mapColoursOn;
 
   refresh();
 }
 
-let legendToggled = false;
+let legendOn = false;
 
 function toggleLegend() {
-  if (legendToggled) {
+  if (legendOn) {
     svg.select(".legend").style("visibility", "hidden");
   } else {
     svg.select(".legend").style("visibility", "visible");
   }
 
-  legendToggled = !legendToggled;
+  legendOn = !legendOn;
 }
 
 let correctZoom = d3
@@ -287,7 +292,7 @@ let yAxis = d3.axisBottom()
 
 function drawLegend() {
   svg.selectAll(".legend").remove();
-  legendToggled = false;
+  legendOn = false;
 
   let key = svg.append("g").attr("class", "legend");
   key.append("rect")
@@ -304,7 +309,7 @@ function drawLegend() {
   key.append("text")
     .attr("class", "legendHeading")
     .attr("y", 70)
-    .attr("x", fixedWidth - legendWidth + 15)
+    .attr("x", fixedWidth - legendWidth + 25)
     .style("fill", "white")
     .text("Linguistic Diversity");
 }
