@@ -137,7 +137,7 @@ div.tooltip {
   width: 100%;
   padding-top: 12px;
   padding-bottom: 12px;
-  font-size: 16px;
+  font-size: 15px;
   border: none;
   cursor: pointer;
   text-align: left;
@@ -254,6 +254,5 @@ div.tooltip {
 
 .legend {
   pointer-events: none;
-  visibility: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }

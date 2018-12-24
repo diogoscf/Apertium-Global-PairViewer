@@ -80,9 +80,9 @@ svg.call(zoom);
 d3.select("svg").on("dblclick.zoom", null);
 
 function resize() {
-  drawLegend();
   fixedWidth = window.innerWidth;
   fixedHeight = window.innerHeight;
+  drawLegend();
   svg.attr("width", fixedWidth).attr("height", fixedHeight);
 
   sky = d3
@@ -122,10 +122,14 @@ function resize() {
 }
 
 let diversityById = {};
-let mapColoursOn = true;
 
 function toggleMapColour() {
-  if (mapColoursOn) {
+  $("#toggleMapColourCheckbox").prop(
+    "checked",
+    !$("#toggleMapColourCheckbox").prop("checked")
+  );
+
+  if (!$("#toggleMapColourCheckbox").prop("checked")) {
     svg
       .selectAll("path.land")
       .style("fill", "white")
@@ -137,7 +141,6 @@ function toggleMapColour() {
 
     d3.select("#toggleLegend").style("display", "none");
     svg.select(".legend").style("visibility", "hidden");
-    legendOn = false;
   } else {
     svg
       .selectAll("path.land")
@@ -148,22 +151,23 @@ function toggleMapColour() {
 
     svg.select(".points").style("fill", "#e0e0e0");
     d3.select("#toggleLegend").style("display", "block");
+    svg.select(".legend").style("visibility", $("#toggleLegendCheckbox").prop("checked") ? "visible" : "hidden");
   }
-  mapColoursOn = !mapColoursOn;
 
   refresh();
 }
 
-let legendOn = false;
-
 function toggleLegend() {
-  if (legendOn) {
+  $("#toggleLegendCheckbox").prop(
+    "checked",
+    !$("#toggleLegendCheckbox").prop("checked")
+  );
+
+  if (!$("#toggleLegendCheckbox").prop("checked")) {
     svg.select(".legend").style("visibility", "hidden");
   } else {
     svg.select(".legend").style("visibility", "visible");
   }
-
-  legendOn = !legendOn;
 }
 
 let correctZoom = d3
@@ -291,10 +295,10 @@ let yAxis = d3.axisBottom()
   .ticks(5);
 
 function drawLegend() {
-  svg.selectAll(".legend").remove();
-  legendOn = false;
+  d3.select(".legend").remove();
 
-  let key = svg.append("g").attr("class", "legend");
+  let key = svg.append("g").attr("class", "legend")
+    .style("visibility", $("#toggleLegendCheckbox").prop("checked") ? "visible" : "hidden");
   key.append("rect")
     .attr("width", legendWidth)
     .attr("height", legendHeight)
@@ -711,6 +715,7 @@ function ready(error, world, places, points, diversity) {
   }
 
   drawLegend();
+  toggleLegend();
 
   refresh();
   handleUnusedPoints();
@@ -742,7 +747,7 @@ function position_labels() {
 // Chooses flyer color based on language pair stage
 // trunk green, staging yellow, nursery orange, incubator red
 function chooseColor(d) {
-  if (!colorByStems) {
+  if (!$("#colorStemCheckbox").prop("checked")) {
     switch (d.stage) {
       case "trunk":
         return TRUNK_COLOR;
@@ -780,16 +785,12 @@ function chooseColor(d) {
   }
 }
 
-let colorByStems = false;
-
 function colorStem() {
-  colorByStems = !colorByStems;
-  let button = document.getElementById("colorStem");
-  if (colorByStems) {
-    button.innerHTML = " Color By Stage";
-  } else {
-    button.innerHTML = " Color By Stems";
-  }
+  $("#colorStemCheckbox").prop(
+    "checked",
+    !$("#colorStemCheckbox").prop("checked")
+  );
+
   svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   refresh();
 }
@@ -914,6 +915,9 @@ function resetFilters() {
   $("#fullDepthCheckbox").prop("checked", false);
   $("#toggleShadowsCheckbox").prop("checked", true);
   $("#colorStemCheckbox").prop("checked", true);
+  $("#toggleMapColourCheckbox").prop("checked", true);
+  $("#toggleLegendCheckbox").prop("checked", false);
+  d3.selectAll(".legend").style("visibility", "hidden");
 
   svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   filterArcsAndFlyers();
