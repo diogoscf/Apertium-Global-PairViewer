@@ -715,6 +715,8 @@ function ready(error, world, places, points, diversity) {
   }
 
   drawLegend();
+  $("#toggleLegendCheckbox").prop("checked", false);
+  d3.selectAll(".legend").style("visibility", "hidden");
 
   refresh();
   handleUnusedPoints();
