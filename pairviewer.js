@@ -715,7 +715,6 @@ function ready(error, world, places, points, diversity) {
   }
 
   drawLegend();
-  toggleLegend();
 
   refresh();
   handleUnusedPoints();
