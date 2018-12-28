@@ -720,6 +720,7 @@ function ready(error, world, places, points, diversity) {
   colourMap();
   d3.selectAll(".legend").style("visibility", "hidden");
 
+  filterArcsAndFlyers();
   refresh();
   handleUnusedPoints();
 }
