@@ -918,9 +918,13 @@ function resetFilters() {
   $("#fullDepthCheckbox").prop("checked", false);
   $("#toggleShadowsCheckbox").prop("checked", true);
   $("#colorStemCheckbox").prop("checked", true);
+  $("#unknownStemCheckbox").prop("checked", true);
   $("#toggleMapColourCheckbox").prop("checked", true);
   $("#toggleLegendCheckbox").prop("checked", false);
   d3.selectAll(".legend").style("visibility", "hidden");
+
+  $("#stemFilterSlider").attr("value", 0)
+  $("#stemFilterCount").attr("value", 0)
 
   svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   filterArcsAndFlyers();
