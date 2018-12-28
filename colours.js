@@ -51,7 +51,7 @@ let translationClassColourChoices = [
   [colorbrewer.YlGn, colorbrewer.YlGnBu, colorbrewer.Oranges, colorbrewer.Reds],
   [colorbrewer.YlGn, goldenYellowScale, colorbrewer.Oranges, colorbrewer.Reds]
 ];
-// lety only lightness.
+// Vary only lightness.
 let niceGreen = d3.rgb("#0c0"),
   niceYellow = d3.rgb("#fc0"),
   niceOrange = d3.rgb("#f60"),

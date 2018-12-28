@@ -121,14 +121,7 @@ function resize() {
   $("#pointList").css("max-height", total + "px");
 }
 
-let diversityById = {};
-
-function toggleMapColour() {
-  $("#toggleMapColourCheckbox").prop(
-    "checked",
-    !$("#toggleMapColourCheckbox").prop("checked")
-  );
-
+function colourMap() {
   if (!$("#toggleMapColourCheckbox").prop("checked")) {
     svg
       .selectAll("path.land")
@@ -153,7 +146,17 @@ function toggleMapColour() {
     d3.select("#toggleLegend").style("display", "block");
     svg.select(".legend").style("visibility", $("#toggleLegendCheckbox").prop("checked") ? "visible" : "hidden");
   }
+}
 
+let diversityById = {};
+
+function toggleMapColour() {
+  $("#toggleMapColourCheckbox").prop(
+    "checked",
+    !$("#toggleMapColourCheckbox").prop("checked")
+  );
+
+  colourMap();
   refresh();
 }
 
@@ -505,8 +508,6 @@ function ready(error, world, places, points, diversity) {
     .append("path")
     .attr("class", "land")
     .attr("d", path)
-    .style("fill", d => countryColor(diversityById[d.id]))
-    .style("stroke", "#001a00")
     .style("stroke-width", 1)
     .style("opacity", 0.8);
 
@@ -716,6 +717,7 @@ function ready(error, world, places, points, diversity) {
 
   drawLegend();
   $("#toggleLegendCheckbox").prop("checked", false);
+  colourMap();
   d3.selectAll(".legend").style("visibility", "hidden");
 
   refresh();
@@ -923,6 +925,7 @@ function resetFilters() {
   svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
   filterArcsAndFlyers();
   refresh();
+  colourMap();
   handleUnusedPoints();
 }
 
