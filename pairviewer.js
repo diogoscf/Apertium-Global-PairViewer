@@ -1303,7 +1303,7 @@ function rotateToPoint(p) {
   d3.transition()
     .duration(1000)
     .tween("rotate", function () {
-      let r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
+      let r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1]), proj.rotate()[2]]);
       return function (t) {
         proj.rotate(r(t));
         sky.rotate(r(t));
