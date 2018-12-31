@@ -1082,7 +1082,7 @@ function openNav() {
 }
 
 function closeNav() {
-  $("#sidenav").css("left", "-180px");
+  $("#sidenav").css("left", "-185px");
 }
 
 function toggleDropdown(t, id) {
