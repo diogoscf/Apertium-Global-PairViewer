@@ -113,12 +113,6 @@ function resize() {
   }
 
   refresh();
-
-  let sidenavHeight = $("#sidenav").css("height");
-  let val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
-  let offset = 487;
-  let total = val - offset >= 0 ? val - offset : 0;
-  $("#pointList").css("max-height", total + "px");
 }
 
 function colourMap() {
@@ -1111,11 +1105,6 @@ function toggleDropdown(t, id) {
       t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
       "<i class='fa fa-caret-down'></i>";
   }
-  let sidenavHeight = $("#sidenav").css("height");
-  let val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
-  let offset = 487;
-  let total = val - offset >= 0 ? val - offset : 0;
-  $("#pointList").css("max-height", total + "px");
 }
 
 function checkPoints() {

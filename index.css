@@ -110,6 +110,7 @@ div.tooltip {
   position: relative;
   width: 100%;
   min-height: 42px;
+  max-height: 210px;
 }
 
 #stemFilterCount {
@@ -210,6 +211,7 @@ div.tooltip {
   left: -180px;
   background-color: #dddddd;
   transition: 0.5s;
+  overflow: auto;
 }
 
 .closebtn {
