@@ -80,7 +80,7 @@ div.tooltip {
 #settings {
   position: absolute;
   margin-top: 0px;
-  width: 180px;
+  width: 185px;
 }
 
 .checkbox {
@@ -110,6 +110,7 @@ div.tooltip {
   position: relative;
   width: 100%;
   min-height: 42px;
+  max-height: 210px;
 }
 
 #stemFilterCount {
@@ -203,13 +204,14 @@ div.tooltip {
 
 .sidenav {
   height: 100%;
-  width: 180px;
+  width: 185px;
   position: fixed;
   z-index: 1;
   top: 0;
-  left: -180px;
+  left: -185px;
   background-color: #dddddd;
   transition: 0.5s;
+  overflow: auto;
 }
 
 .closebtn {

@@ -113,12 +113,6 @@ function resize() {
   }
 
   refresh();
-
-  let sidenavHeight = $("#sidenav").css("height");
-  let val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
-  let offset = 487;
-  let total = val - offset >= 0 ? val - offset : 0;
-  $("#pointList").css("max-height", total + "px");
 }
 
 function colourMap() {
@@ -1088,7 +1082,7 @@ function openNav() {
 }
 
 function closeNav() {
-  $("#sidenav").css("left", "-180px");
+  $("#sidenav").css("left", "-185px");
 }
 
 function toggleDropdown(t, id) {
@@ -1111,11 +1105,6 @@ function toggleDropdown(t, id) {
       t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
       "<i class='fa fa-caret-down'></i>";
   }
-  let sidenavHeight = $("#sidenav").css("height");
-  let val = parseInt(sidenavHeight.substring(0, sidenavHeight.length - 2));
-  let offset = 487;
-  let total = val - offset >= 0 ? val - offset : 0;
-  $("#pointList").css("max-height", total + "px");
 }
 
 function checkPoints() {
@@ -1303,7 +1292,7 @@ function rotateToPoint(p) {
   d3.transition()
     .duration(1000)
     .tween("rotate", function () {
-      let r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
+      let r = d3.interpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1]), proj.rotate()[2]]);
       return function (t) {
         proj.rotate(r(t));
         sky.rotate(r(t));
