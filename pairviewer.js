@@ -1252,9 +1252,9 @@ function fadeAtEdge(d) {
   }
 
   let centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
-  start,
-  end,
-  distancePair; // distance of a flyer (in radians)
+    start,
+    end,
+    distancePair; // distance of a flyer (in radians)
 
   // function is called on 2 different data structures..
   if (d.source) {
