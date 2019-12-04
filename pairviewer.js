@@ -1252,8 +1252,10 @@ function fadeAtEdge(d) {
   }
 
   let centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
-    start,
-    end;
+  start,
+  end,
+  distancePair; // distance of a flyer (in radians)
+
   // function is called on 2 different data structures..
   if (d.source) {
     start = d.source;
@@ -1263,6 +1265,8 @@ function fadeAtEdge(d) {
     end = d.coordinates2;
   }
 
+  distancePair = d3.geoDistance(start, end);
+
   let start_dist = 1.57 - d3.geoDistance(start, centerPos),
     end_dist = 1.57 - d3.geoDistance(end, centerPos);
 
@@ -1270,7 +1274,41 @@ function fadeAtEdge(d) {
     .scaleLinear()
     .domain([-0.1, 0])
     .range([0, 0.15]);
+
   let dist = start_dist < end_dist ? start_dist : end_dist;
+
+  if(distancePair>=1.7) {
+    // 1.7 radians has been taken as an approximate value for a "long" flyer.
+    // However, this value can be changed as desired.
+    let avgLongitudeStartEnd = (start[0]+end[0])/2, // average longitude of the flyer's start and end points
+    avgLatitudeStartEnd = (start[1]+end[1])/2,      // average latitude of the flyer's start and end points
+    diffAvgCenterLongitude,                         // difference between avgLongitudeStartEnd and the longitude in centerPos
+    diffAvgCenterLatitude,                          // difference between avgLatitudeStartEnd and the latitude in centerPos
+    atBack = false;                                 // boolean representing if the flyer is at the back of the globe
+
+    diffAvgCenterLongitude = avgLongitudeStartEnd - centerPos[0];
+    if (diffAvgCenterLongitude > 180) diffAvgCenterLongitude = -180 + (diffAvgCenterLongitude-180);
+    else if (diffAvgCenterLongitude < 180) diffAvgCenterLongitude = 180 - (diffAvgCenterLongitude+180);
+
+    diffAvgCenterLatitude = avgLatitudeStartEnd - centerPos[1];
+    if (diffAvgCenterLatitude > 180) diffAvgCenterLatitude = -180 + (diffAvgCenterLatitude-180);
+    else if (diffAvgCenterLatitude < 180) diffAvgCenterLatitude = 180 - (diffAvgCenterLatitude+180);
+
+    if (diffAvgCenterLongitude <= -130 && diffAvgCenterLongitude >= -180) atBack = true;
+    else if(diffAvgCenterLongitude >= 130 && diffAvgCenterLongitude <=180) atBack = true;
+    else if(diffAvgCenterLatitude <= -130 && diffAvgCenterLatitude >= -180) atBack = true;
+    else if(diffAvgCenterLatitude >= 130 && diffAvgCenterLatitude <= 180) atBack = true;
+
+    if(atBack){
+      svg.select('.flyer').attr("opacity", 0);
+      return 0;
+    }
+
+    return fade(dist+0.6); // 0.6 makes the flyer visible in most parts of it,
+                           // without seeing the end part through the globe
+                           // (if the end part is at the back of the globe).
+                           // This value can also be changed as desired.
+  }
   return fade(dist);
 }
 
