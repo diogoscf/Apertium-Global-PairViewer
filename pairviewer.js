@@ -1287,17 +1287,27 @@ function fadeAtEdge(d) {
     atBack = false;                                 // boolean representing if the flyer is at the back of the globe
 
     diffAvgCenterLongitude = avgLongitudeStartEnd - centerPos[0];
-    if (diffAvgCenterLongitude > 180) diffAvgCenterLongitude = -180 + (diffAvgCenterLongitude-180);
-    else if (diffAvgCenterLongitude < 180) diffAvgCenterLongitude = 180 - (diffAvgCenterLongitude+180);
+    if (diffAvgCenterLongitude > 180) {
+      diffAvgCenterLongitude = -180 + (diffAvgCenterLongitude-180);
+    }
+    else if (diffAvgCenterLongitude < -180) {
+      diffAvgCenterLongitude = 180 - (diffAvgCenterLongitude+180);
+    }
 
     diffAvgCenterLatitude = avgLatitudeStartEnd - centerPos[1];
-    if (diffAvgCenterLatitude > 180) diffAvgCenterLatitude = -180 + (diffAvgCenterLatitude-180);
-    else if (diffAvgCenterLatitude < 180) diffAvgCenterLatitude = 180 - (diffAvgCenterLatitude+180);
+    if (diffAvgCenterLatitude > 180) {
+      diffAvgCenterLatitude = -180 + (diffAvgCenterLatitude-180);
+    }
+    else if (diffAvgCenterLatitude < -180) {
+      diffAvgCenterLatitude = 180 - (diffAvgCenterLatitude+180);
+    }
 
-    if (diffAvgCenterLongitude <= -130 && diffAvgCenterLongitude >= -180) atBack = true;
-    else if(diffAvgCenterLongitude >= 130 && diffAvgCenterLongitude <=180) atBack = true;
-    else if(diffAvgCenterLatitude <= -130 && diffAvgCenterLatitude >= -180) atBack = true;
-    else if(diffAvgCenterLatitude >= 130 && diffAvgCenterLatitude <= 180) atBack = true;
+    if((diffAvgCenterLongitude <= -130 && diffAvgCenterLongitude >= -180) ||
+      (diffAvgCenterLongitude >= 130 && diffAvgCenterLongitude <=180) ||
+      (diffAvgCenterLatitude <= -130 && diffAvgCenterLatitude >= -180) ||
+      (diffAvgCenterLatitude >= 130 && diffAvgCenterLatitude <=180)) {
+      atBack = true;
+    }
 
     if(atBack){
       svg.select('.flyer').attr("opacity", 0);
