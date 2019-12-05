@@ -1302,10 +1302,10 @@ function fadeAtEdge(d) {
       diffAvgCenterLatitude = 180 - (diffAvgCenterLatitude+180);
     }
 
-    if((diffAvgCenterLongitude <= -130 && diffAvgCenterLongitude >= -180) ||
-      (diffAvgCenterLongitude >= 130 && diffAvgCenterLongitude <=180) ||
-      (diffAvgCenterLatitude <= -130 && diffAvgCenterLatitude >= -180) ||
-      (diffAvgCenterLatitude >= 130 && diffAvgCenterLatitude <=180)) {
+    if((diffAvgCenterLongitude <= -90 && diffAvgCenterLongitude >= -180) ||
+      (diffAvgCenterLongitude >= 90 && diffAvgCenterLongitude <=180) ||
+      (diffAvgCenterLatitude <= -90 && diffAvgCenterLatitude >= -180) ||
+      (diffAvgCenterLatitude >= 90 && diffAvgCenterLatitude <=180)) {
       atBack = true;
     }
 
@@ -1314,7 +1314,7 @@ function fadeAtEdge(d) {
       return 0;
     }
 
-    return fade(dist+0.6); // 0.6 makes the flyer visible in most parts of it,
+    return fade(dist+0.4); // 0.4 makes the flyer visible in most parts of it,
                            // without seeing the end part through the globe
                            // (if the end part is at the back of the globe).
                            // This value can also be changed as desired.
