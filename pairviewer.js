@@ -38,7 +38,7 @@ let swoosh = d3
   .line()
   .x(d => d[0])
   .y(d => d[1])
-  .curve(d3.curveCardinal.tension(-1));
+  .curve(d3.curveCardinal.tension(-1.5));
 
 let links = [],
   arcLines = [];
