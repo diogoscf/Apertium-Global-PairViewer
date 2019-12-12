@@ -40,6 +40,17 @@ let swoosh = d3
   .y(d => d[1])
   .curve(d3.curveCardinal.tension(-1));
 
+let space = d3
+  .geoAzimuthalEquidistant()
+  .translate([fixedWidth / 2, fixedHeight / 2])
+  .clipAngle(90)
+  .scale(width);
+
+let spacePath = d3
+  .geoPath()
+  .projection(space)
+  .pointRadius(1);
+
 let links = [],
   arcLines = [];
 
@@ -70,7 +81,7 @@ window.addEventListener("resize", resize);
 
 let zoom = d3
   .zoom()
-  .scaleExtent([100, 50000])
+  .scaleExtent([500, 50000])
   .on("start", zoomstart)
   .on("zoom", zoomed)
   .on("end", zoomend);
@@ -102,6 +113,17 @@ function resize() {
     .projection(proj)
     .pointRadius(3);
 
+  space = d3
+    .geoAzimuthalEquidistant()
+    .translate([fixedWidth / 2, fixedHeight / 2])
+    .clipAngle(90)
+    .scale(width);
+
+  spacePath = d3
+    .geoPath()
+    .projection(space)
+    .pointRadius(1);
+
   svg
     .select("#globe")
     .attr("cx", fixedWidth / 2)
@@ -110,6 +132,7 @@ function resize() {
   if (o0) {
     proj.rotate(o0);
     sky.rotate(o0);
+    space.rotate([-o0[0], -o0[1], o0[2]]);
   }
 
   refresh();
@@ -174,73 +197,35 @@ let correctZoom = d3
 
 let aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
 
-function drawStars() {
-  let smallStars = [];
-  for (i = 0; i < aFactor * 100; i++) {
-    smallStars.push({
-      x: randomX(),
-      y: randomY()
-    });
-  }
-
-  let mediumStars = [];
-  for (i = 0; i < aFactor * 10; i++) {
-    mediumStars.push({
-      x: randomX(),
-      y: randomY()
-    });
-  }
-
-  let bigStars = [];
-  for (i = 0; i < aFactor; i++) {
-    bigStars.push({
-      x: randomX(),
-      y: randomY()
-    });
-  }
-
-  let starContainer = svg.append("g").attr("class", "stars");
-
-  starContainer
-    .selectAll(".smallStar")
-    .data(smallStars)
-    .enter()
-    .append("circle")
-    .classed("smallStar", true)
-    .attr("cx", d => d.x)
-    .attr("cy", d => d.y)
-    .attr("r", "1px")
-    .style("fill", "#fff");
-
-  starContainer
-    .selectAll(".mediumStar")
-    .data(mediumStars)
-    .enter()
-    .append("circle")
-    .classed("mediumStar", true)
-    .attr("cx", d => d.x)
-    .attr("cy", d => d.y)
-    .attr("r", "2px")
-    .style("fill", "#fff");
-
-  starContainer
-    .selectAll(".bigStar")
-    .data(bigStars)
-    .enter()
-    .append("circle")
-    .classed("bigStar", true)
-    .attr("cx", d => d.x)
-    .attr("cy", d => d.y)
-    .attr("r", "3px")
-    .style("fill", "#fff");
+function drawStars(){
+    let data = [];
+    for(let i = 0; i < 500; i++) { //you can change the number of stars here
+        data.push({
+            geometry: {
+                type: 'Point',
+                coordinates: randomLonLat()
+            },
+            type: 'Feature',
+            properties: {
+                radius: Math.random() * 1.5 + 0.2
+            }
+        });
+    }
+    svg.append("g").attr("class", "stars")
+      .selectAll(".star")
+      .data(data)
+      .enter()
+      .append("path")
+      .attr("class", "star")
+      .attr("d", function(d){
+          spacePath.pointRadius(d.properties.radius);
+          return spacePath(d);
+      })
+      .style("fill", "#fff");
 }
 
-function randomX() {
-  return Math.round(Math.random() * window.innerWidth);
-}
-
-function randomY() {
-  return Math.round(Math.random() * window.innerHeight);
+function randomLonLat(){
+  return [Math.random() * 360 - 180, Math.random() * 180 - 90];
 }
 
 let timer = 0;
@@ -816,6 +801,10 @@ function refresh() {
   svg.selectAll(".point").attr("d", path);
   svg.selectAll(".mesh").attr("d", path);
   svg.selectAll(".arc").attr("d", path);
+  svg.selectAll(".star").attr("d", function(d){
+                spacePath.pointRadius(d.properties.radius);
+                return spacePath(d);
+            });
   // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
 
   position_labels();
@@ -1296,6 +1285,7 @@ function rotateToPoint(p) {
       return function (t) {
         proj.rotate(r(t));
         sky.rotate(r(t));
+        space.rotate([-r(t)[0], -r(t)[1], r(t)[2]])
         o0 = proj.rotate();
         refresh();
       };
@@ -1439,6 +1429,7 @@ function zoomed() {
     let r1 = versor.rotation(q1);
     proj.rotate(r1);
     sky.rotate(r1);
+    space.rotate([-r1[0], -r1[1], r1[2]]);
     refresh();
   } else {
     width = scale;
@@ -1460,11 +1451,23 @@ function zoomed() {
       .projection(proj)
       .pointRadius(3);
 
+   space = d3
+      .geoAzimuthalEquidistant()
+      .translate([fixedWidth / 2, fixedHeight / 2])
+      .clipAngle(90)
+      .scale(scale);
+
+   spacePath = d3
+      .geoPath()
+      .projection(space)
+      .pointRadius(1);
+
     svg.select("#globe").attr("r", scale / 4);
 
     if (o0) {
       proj.rotate(o0);
       sky.rotate(o0);
+      space.rotate([-o0[0], -o0[1], o0[2]]);
     }
 
     refresh();
