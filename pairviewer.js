@@ -212,7 +212,7 @@ function drawStars(){
         });
     }
     svg.append("g").attr("class", "stars")
-      .selectAll(".stars")
+      .selectAll(".star")
       .data(data)
       .enter()
       .append("path")
