@@ -44,14 +44,12 @@ let space = d3
   .geoAzimuthalEquidistant()
   .translate([fixedWidth / 2, fixedHeight / 2])
   .clipAngle(90)
-  .scale(width / 1.5);
+  .scale(width);
 
 let spacePath = d3
   .geoPath()
   .projection(space)
   .pointRadius(1);
-
-let stars;
 
 let links = [],
   arcLines = [];
@@ -83,7 +81,7 @@ window.addEventListener("resize", resize);
 
 let zoom = d3
   .zoom()
-  .scaleExtent([100, 50000])
+  .scaleExtent([500, 50000])
   .on("start", zoomstart)
   .on("zoom", zoomed)
   .on("end", zoomend);
@@ -119,7 +117,7 @@ function resize() {
     .geoAzimuthalEquidistant()
     .translate([fixedWidth / 2, fixedHeight / 2])
     .clipAngle(90)
-    .scale(width / 1.5);
+    .scale(width);
 
   spacePath = d3
     .geoPath()
@@ -201,7 +199,7 @@ let aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
 
 function drawStars(){
     let data = [];
-    for(let i = 0; i < 300; i++) { //you can change the number of stars here
+    for(let i = 0; i < 500; i++) { //you can change the number of stars here
         data.push({
             geometry: {
                 type: 'Point',
@@ -209,21 +207,21 @@ function drawStars(){
             },
             type: 'Feature',
             properties: {
-                radius: Math.random() * 1.5
+                radius: Math.random() * 1.5 + 0.2
             }
         });
     }
-    stars = svg.append("g")
-            .selectAll(".stars")
-            .data(data)
-            .enter()
-            .append("path")
-            .attr("class", "stars")
-            .attr("d", function(d){
-                spacePath.pointRadius(d.properties.radius);
-                return spacePath(d);
-            })
-            .style("fill", "#fff");
+    svg.append("g").attr("class", "stars")
+      .selectAll(".stars")
+      .data(data)
+      .enter()
+      .append("path")
+      .attr("class", "star")
+      .attr("d", function(d){
+          spacePath.pointRadius(d.properties.radius);
+          return spacePath(d);
+      })
+      .style("fill", "#fff");
 }
 
 function randomLonLat(){
@@ -803,7 +801,7 @@ function refresh() {
   svg.selectAll(".point").attr("d", path);
   svg.selectAll(".mesh").attr("d", path);
   svg.selectAll(".arc").attr("d", path);
-  stars.attr("d", function(d){
+  svg.selectAll(".star").attr("d", function(d){
                 spacePath.pointRadius(d.properties.radius);
                 return spacePath(d);
             });
@@ -1457,7 +1455,7 @@ function zoomed() {
       .geoAzimuthalEquidistant()
       .translate([fixedWidth / 2, fixedHeight / 2])
       .clipAngle(90)
-      .scale(scale / 1.5);
+      .scale(scale);
 
    spacePath = d3
       .geoPath()
