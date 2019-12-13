@@ -1281,11 +1281,13 @@ function rotateToPoint(p) {
   d3.transition()
     .duration(1000)
     .tween("rotate", function () {
-      let r = d3.geoInterpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1]), proj.rotate()[2]]);
+      let r = d3.geoInterpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
       return function (t) {
-        proj.rotate(r(t));
-        sky.rotate(r(t));
-        space.rotate([-r(t)[0], -r(t)[1], r(t)[2]])
+        let s = r(t);
+        s.push(proj.rotate()[2]);
+        proj.rotate(s);
+        sky.rotate(s);
+        space.rotate([-s[0], -s[1], s[2]])
         o0 = proj.rotate();
         refresh();
       };
