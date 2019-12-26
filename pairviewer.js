@@ -1,7 +1,6 @@
 // Apertium Global Pairviewer
 // Colin Pillsbury, Spring 2017
 // cpillsb1@swarthmore.edu
-// Modified from http://bl.ocks.org/tlfrd/df1f1f705c7940a6a7c0dca47041fec8
 
 let fixedWidth = window.innerWidth,
   fixedHeight = window.innerHeight;
@@ -1587,6 +1586,7 @@ window.onkeydown = function (e) {
   }
 };
 
+// Modified from http://bl.ocks.org/tlfrd/df1f1f705c7940a6a7c0dca47041fec8
 /********** versor.js **********/
 let acos = Math.acos,
   asin = Math.asin,
