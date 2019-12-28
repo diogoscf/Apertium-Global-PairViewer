@@ -12,8 +12,6 @@ let currentRepoFilter = [];
 let currentPointFilter = [];
 let currentDirFilter = [];
 
-let visitMap = new Map();
-
 let MARKER_SIZE = "40";
 
 let proj = d3
@@ -77,8 +75,6 @@ let svg = d3
   .attr("height", fixedHeight);
 svg.style("background", "black");
 
-window.addEventListener("resize", resize);
-
 let zoom = d3
   .zoom()
   .scaleExtent([500, 50000])
@@ -90,6 +86,12 @@ svg.call(zoom);
 
 d3.select("svg").on("dblclick.zoom", null);
 
+window.addEventListener("resize", resize);
+
+/**
+ * Called on window resize
+ * Recenters the globe, keeping the old rotation and zoom
+ */
 function resize() {
   fixedWidth = window.innerWidth;
   fixedHeight = window.innerHeight;
@@ -138,6 +140,11 @@ function resize() {
   refresh();
 }
 
+let diversityById = {};
+
+/**
+ * Colours the globe according to language diversity, or decolours it
+ */
 function colourMap() {
   if (!$("#toggleMapColourCheckbox").prop("checked")) {
     svg
@@ -165,8 +172,9 @@ function colourMap() {
   }
 }
 
-let diversityById = {};
-
+/**
+ * Changes whether the map is coloured or not
+ */
 function toggleMapColour() {
   $("#toggleMapColourCheckbox").prop(
     "checked",
@@ -177,6 +185,9 @@ function toggleMapColour() {
   refresh();
 }
 
+/**
+ * Displays or hides the globe's colour legend
+ */
 function toggleLegend() {
   $("#toggleLegendCheckbox").prop(
     "checked",
@@ -187,62 +198,6 @@ function toggleLegend() {
     svg.select(".legend").style("visibility", "hidden");
   } else {
     svg.select(".legend").style("visibility", "visible");
-  }
-}
-
-let correctZoom = d3
-  .scaleLinear()
-  .domain([0, window.devicePixelRatio])
-  .range([0, 1]);
-
-let aFactor = Math.round((fixedWidth * fixedHeight) / 500000);
-
-function drawStars(){
-    let data = [];
-    for(let i = 0; i < 500; i++) { //you can change the number of stars here
-        data.push({
-            geometry: {
-                type: 'Point',
-                coordinates: randomLonLat()
-            },
-            type: 'Feature',
-            properties: {
-                radius: Math.random() * 1.5 + 0.2
-            }
-        });
-    }
-    svg.append("g").attr("class", "stars")
-      .selectAll(".star")
-      .data(data)
-      .enter()
-      .append("path")
-      .attr("class", "star")
-      .attr("d", function(d){
-          spacePath.pointRadius(d.properties.radius);
-          return spacePath(d);
-      })
-      .style("fill", "#fff");
-}
-
-function randomLonLat(){
-  return [Math.random() * 360 - 180, Math.random() * 180 - 90];
-}
-
-let timer = 0;
-let delay = 200;
-let prevent = false;
-
-function singleClick(d) {
-  if (d === currentFiltered) {
-    filterPoint(currentFiltered);
-    currentFiltered = "none";
-  } else if (currentFiltered === "none") {
-    filterPoint(d);
-    currentFiltered = d;
-  } else {
-    filterPoint(currentFiltered);
-    filterPoint(d);
-    currentFiltered = d;
   }
 }
 
@@ -268,14 +223,17 @@ legend.append("stop")
 let legendWidth = 200;
 let legendHeight = 20;
 
-let y = d3.scaleLinear()
+let yScale = d3.scaleLinear()
   .range([200, 0])
   .domain([1, 0]);
 
 let yAxis = d3.axisBottom()
-  .scale(y)
+  .scale(yScale)
   .ticks(5);
 
+/**
+ * Draws the globe colour legend
+ */
 function drawLegend() {
   d3.select(".legend").remove();
 
@@ -300,6 +258,76 @@ function drawLegend() {
     .text("Linguistic Diversity");
 }
 
+/**
+ * Draws the stars in space along a rotateable sphere
+ * @param {Number} stars Number of stars to create
+ */
+function drawStars(stars) {
+  let data = [];
+  for (let i = 0; i < stars; i++) {
+    data.push({
+      geometry: {
+        type: "Point",
+        coordinates: randomLonLat()
+      },
+      type: "Feature",
+      properties: {
+        radius: Math.random() * 1.5 + 0.2
+      }
+    });
+  }
+  svg.append("g").attr("class", "stars")
+    .selectAll(".star")
+    .data(data)
+    .enter()
+    .append("path")
+    .attr("class", "star")
+    .attr("d", function (d) {
+      spacePath.pointRadius(d.properties.radius);
+      return spacePath(d);
+    })
+    .style("fill", "#fff");
+}
+
+/**
+ * Generates a random longitude and latitude
+ * @return {Array} random longitude and latitude
+ */
+function randomLonLat() {
+  return [Math.random() * 360 - 180, Math.random() * 180 - 90];
+}
+
+/**
+ * Changes the filtered language according to the clicked point
+ * @param {String} d Clicked point
+ */
+function singleClick(d) {
+  if (d === currentFiltered) {
+    filterPoint(currentFiltered);
+    currentFiltered = "none";
+  } else if (currentFiltered === "none") {
+    filterPoint(d);
+    currentFiltered = d;
+  } else {
+    filterPoint(currentFiltered);
+    filterPoint(d);
+    currentFiltered = d;
+  }
+}
+
+/**
+ * Finds the language name for a given three-letter code
+ * @param {String} code Language Code
+ * @return {String} Language Name
+ */
+function codeToLanguage(code) {
+  return codeToLangTable[code] || "Unknown";
+}
+
+let timer = 0;
+let delay = 200;
+let prevent = false;
+
 queue()
   .defer(d3.json, "world-110m.json")
   .defer(d3.json, "apertiumPairs.json")
@@ -307,38 +335,47 @@ queue()
   .defer(d3.tsv, "linguistic_diversity.tsv")
   .await(ready);
 
+/**
+ * Runs when all external resources have been loaded
+ * Draws the svg (globe, points, flyers, stars)
+ * @param {Error} error Error while loading resources
+ * @param {Object} world Data for world aspect (land, oceans, international borders)
+ * @param {Object} places Language pairs supported by Apertium and respective data
+ * @param {Object} points Languages supported by Apertium and respective coordinates
+ * @param {Array} diversity Linguistic diversity for each country (used for colouring the globe)
+ */
 function ready(error, world, places, points, diversity) {
   // grid = graticule(); currently lat lon lines not used, can uncomment to use
 
-  drawStars();
+  drawStars(500); // You can change the number of stars here
 
-  let ocean_fill = svg
+  let oceanFill = svg
     .append("defs")
     .append("radialGradient")
-    .attr("id", "ocean_fill")
+    .attr("id", "oceanFill")
     .attr("cx", "75%")
     .attr("cy", "25%");
-  ocean_fill
+  oceanFill
     .append("stop")
     .attr("offset", "5%")
     .attr("stop-color", "#82B1FF");
-  ocean_fill
+  oceanFill
     .append("stop")
     .attr("offset", "100%")
     .attr("stop-color", "#2196F3");
 
-  let drop_shadow = svg
+  let dropShadow = svg
     .append("defs")
     .append("radialGradient")
-    .attr("id", "drop_shadow")
+    .attr("id", "dropShadow")
     .attr("cx", "50%")
     .attr("cy", "50%");
-  drop_shadow
+  dropShadow
     .append("stop")
     .attr("offset", "20%")
     .attr("stop-color", "#000")
     .attr("stop-opacity", ".5");
-  drop_shadow
+  dropShadow
     .append("stop")
     .attr("offset", "100%")
     .attr("stop-color", "#000")
@@ -473,7 +510,7 @@ function ready(error, world, places, points, diversity) {
     .attr("r", proj.scale())
     .attr("class", "noclicks")
     .attr("id", "globe")
-    .style("fill", "url(#ocean_fill)");
+    .style("fill", "url(#oceanFill)");
 
   diversity.forEach(function (d) {
     diversityById[d.id] = d.diversity;
@@ -499,7 +536,7 @@ function ready(error, world, places, points, diversity) {
   // Parse default pairs
   places.pairs.forEach(function (a) {
     let s, t;
-    for (pointInd = 0; pointInd < points.point_data.length; pointInd++) {
+    for (let pointInd = 0; pointInd < points.point_data.length; pointInd++) {
       if (points.point_data[pointInd].tag === a.lg2) {
         s = points.point_data[pointInd].geometry.coordinates;
       }
@@ -520,7 +557,7 @@ function ready(error, world, places, points, diversity) {
   });
 
   // build geoJSON features from links array
-  links.forEach(function (e, i, a) {
+  links.forEach(function (e) {
     let feature = {
       type: "Feature",
       geometry: {
@@ -559,10 +596,10 @@ function ready(error, world, places, points, diversity) {
     .attr("class", "flyer")
     .attr("sourceTag", d => d.sourceTag)
     .attr("targetTag", d => d.targetTag)
-    .attr("d", d => swoosh(flying_arc(d)))
+    .attr("d", d => swoosh(flyingArc(d)))
     .style("stroke", d => chooseColor(d))
     .on("mouseover", function (d) {
-      //Hovering over flyers for tooltip
+      // Hovering over flyers for tooltip
       if (d.filtered === "false") {
         return;
       }
@@ -589,7 +626,7 @@ function ready(error, world, places, points, diversity) {
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY - 28 + "px");
     })
-    .on("mouseout", function (d) {
+    .on("mouseout", function () {
       div
         .transition()
         .duration(500)
@@ -610,7 +647,7 @@ function ready(error, world, places, points, diversity) {
     .attr("coordinate", d => d.geometry.coordinates)
     .text(d => d.tag)
     .on("mouseover", function (d) {
-      //Hovering over labels for tooltip
+      // Hovering over labels for tooltip
       if ($(this).css("opacity") === "0") {
         return;
       }
@@ -624,7 +661,7 @@ function ready(error, world, places, points, diversity) {
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY - 28 + "px");
     })
-    .on("mouseout", function (d) {
+    .on("mouseout", function () {
       div
         .transition()
         .duration(500)
@@ -645,7 +682,7 @@ function ready(error, world, places, points, diversity) {
     .attr("coordinate", d => d.geometry.coordinates)
     .attr("tag", d => d.tag)
     .on("mouseover", function (d) {
-      //Also added hovering over points for tooltip
+      // Hovering over points for tooltip
       if ($(this).css("opacity") === "0") {
         return;
       }
@@ -659,7 +696,7 @@ function ready(error, world, places, points, diversity) {
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY - 28 + "px");
     })
-    .on("mouseout", function (d) {
+    .on("mouseout", function () {
       div
         .transition()
         .duration(500)
@@ -681,11 +718,11 @@ function ready(error, world, places, points, diversity) {
 
   // Populate the filter point list
   let alphaPointList = [];
-  for (i = 0; i < points.point_data.length; i++) {
+  for (let i = 0; i < points.point_data.length; i++) {
     alphaPointList.push(points.point_data[i].tag);
   }
   alphaPointList.sort();
-  for (i = 0; i < alphaPointList.length; i++) {
+  for (let i = 0; i < alphaPointList.length; i++) {
     let newPoint = $("<a>")
       .attr("id", "point" + alphaPointList[i])
       .attr("class", "dropdown-select")
@@ -704,8 +741,10 @@ function ready(error, world, places, points, diversity) {
   handleUnusedPoints();
 }
 
-// Position and hiding labels
-function position_labels() {
+/**
+ * Positions the flyer labels
+ */
+function positionLabels() {
   let centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]);
 
   svg
@@ -727,8 +766,624 @@ function position_labels() {
     });
 }
 
-// Chooses flyer color based on language pair stage
-// trunk green, staging yellow, nursery orange, incubator red
+/**
+ * Find coordinates of a point along an arc
+ * @param {Number} start Start of the arc
+ * @param {Number} end End of the arc
+ * @param {Number} loc Relative distance to the start of the arc (in range [0, 1])
+ * @return {Array} Coordinates of point
+ */
+function locationAlongArc(start, end, loc) {
+  let interpolator = d3.geoInterpolate(start, end);
+  return interpolator(loc);
+}
+
+/**
+ * Finds the coordinates for a flyer
+ * @param {Object} pt Point data
+ * @return {Array} Coordinates for the flyer
+ */
+function flyingArc(pt) {
+  let source = pt.source,
+    target = pt.target;
+
+  let mid = locationAlongArc(source, target, 0.5);
+  let result = [proj(source), sky(mid), proj(target)];
+
+  return result;
+}
+
+/**
+ * Refreshes the globe. Called after any change
+ */
+function refresh() {
+  svg.selectAll(".land").attr("d", path);
+  svg.selectAll(".point").attr("d", path);
+  svg.selectAll(".mesh").attr("d", path);
+  svg.selectAll(".arc").attr("d", path);
+  svg.selectAll(".star").attr("d", function (d) {
+                spacePath.pointRadius(d.properties.radius);
+                return spacePath(d);
+            });
+  // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
+
+  positionLabels();
+
+  svg
+    .selectAll(".flyer")
+    .attr("d", d => swoosh(flyingArc(d)))
+    .attr("marker-mid", d => addMarker(d))
+    .attr("opacity", d => fadeAtEdge(d));
+}
+
+/**
+ * Return the correct marker for a flyer
+ * @param {Object} d flyer
+ * @return {String} marker
+ */
+function addMarker(d) {
+  if (d.direction === "<>") {
+    return "url(#" + d.stage + "twoway)";
+  } else if (d.direction === ">") {
+    return "url(#" + d.stage + "oneway)";
+  } else {
+    return "";
+  }
+}
+
+/**
+ * Changes the opacity of all points and labels
+ * @param {Number} o1 Point opacity
+ * @param {Number} o2 Label opacity
+ */
+function setPoints(o1, o2) {
+  svg.selectAll(".point").style("opacity", o1);
+  svg.selectAll(".label").style("opacity", o2);
+}
+
+/**
+ * Filters pairs by repo
+ * @param {String} f Repo (Trunk, Staging, Incubator or Nursery)
+ */
+function selectRepoFilter(f) {
+  if ($("#checkmark" + f).length === 0) {
+    $("#filter" + f).html(
+      f + "<i id=checkmark" + f + " class='fa fa-check checkmark'></i>"
+    );
+    currentRepoFilter.push(f);
+  } else {
+    $("#checkmark" + f).remove();
+    currentRepoFilter.splice(currentRepoFilter.indexOf(f), 1);
+  }
+
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+}
+
+/**
+ * Filters pairs by direction
+ * @param {String} dir Direction (Bidirectional, Unidirectional or Unknown)
+ */
+function selectDirFilter(dir) {
+  if ($("#checkmarkDir" + dir).length === 0) {
+    $("#dir" + dir).html(
+      dir + "<i id=checkmarkDir" + dir + " class='fa fa-check checkmark'></i>"
+    );
+    currentDirFilter.push(dir);
+  } else {
+    $("#checkmarkDir" + dir).remove();
+    currentDirFilter.splice(currentDirFilter.indexOf(dir), 1);
+  }
+
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+}
+
+let currentFiltered = "none";
+
+/**
+ * Filters pairs by language, and rotates to the language point if necessary
+ * @param {String} p Language to filter by
+ */
+function filterPoint(p) {
+  let needToRotate = false;
+  if ($("#checkmarkPoint" + p).length === 0) {
+    $("#point" + p).html(
+      p + "<i id=checkmarkPoint" + p + " class='fa fa-check checkmark'></i>"
+    );
+    currentPointFilter.push(p);
+    needToRotate = true;
+  } else {
+    $("#checkmarkPoint" + p).remove();
+    currentPointFilter.splice(currentPointFilter.indexOf(p), 1);
+  }
+
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+  if (needToRotate) {
+    rotateToPoint(p);
+  }
+}
+
+/**
+ * Resets all user choices to default
+ */
+function resetFilters() {
+  $(".checkmark").remove();
+
+  currentRepoFilter = [];
+  currentPointFilter = [];
+  currentDirFilter = [];
+
+  $("#pointSearch")[0].value = "";
+  filterSearchPoints();
+
+  $("#pointCheckbox").prop("checked", false);
+  $("#fullDepthCheckbox").prop("checked", false);
+  $("#toggleShadowsCheckbox").prop("checked", true);
+  $("#colorStemCheckbox").prop("checked", true);
+  $("#unknownStemCheckbox").prop("checked", true);
+  $("#toggleMapColourCheckbox").prop("checked", true);
+  $("#toggleLegendCheckbox").prop("checked", false);
+  d3.selectAll(".legend").style("visibility", "hidden");
+
+  $("#stemFilterSlider").attr("value", 0);
+  $("#stemFilterCount").attr("value", 0);
+
+  svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
+  filterArcsAndFlyers();
+  refresh();
+  colourMap();
+  handleUnusedPoints();
+}
+
+/**
+ * Filters out the arc with a certain source and target
+ * @param {String} s Source of arc to filter out
+ * @param {String} t Target of arc to filter out
+ */
+function filterArc(s, t) {
+  for (let i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+    if (
+      svg.selectAll(".arc")._groups[0][i].getAttribute("sourceTag") === s &&
+      svg.selectAll(".arc")._groups[0][i].getAttribute("targetTag") === t
+    ) {
+      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 0);
+      break;
+    }
+  }
+}
+
+let filterReturn,
+    visitMap = new Map();
+
+/**
+ * Filters Arcs and Flyers according to user choice
+ */
+function filterArcsAndFlyers() {
+  if ($("#toggleShadowsCheckbox").prop("checked")) {
+    for (let i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 1);
+    }
+  } else {
+    for (let i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
+      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 0);
+    }
+  }
+  if ($("#fullDepthCheckbox").prop("checked") === true) {
+    for (let i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+      visitMap.set(
+        svg.selectAll(".point")._groups[0][i].getAttribute("tag"),
+        false
+      );
+    }
+    for (let i = 0; i < currentPointFilter.length; i++) {
+      fullDepthFilter(currentPointFilter[i]);
+    }
+  }
+
+  svg.selectAll(".flyer").attr("opacity", function (d) {
+    if (
+      $("#fullDepthCheckbox").prop("checked") === false ||
+      currentPointFilter.length === 0
+    ) {
+      d.filtered = "true";
+    } else if (d.filtered === "temp") {
+       d.filtered = "true";
+    } else {
+       d.filtered = "false";
+       filterArc(d.sourceTag, d.targetTag);
+    }
+
+    if (
+      currentPointFilter.length > 0 &&
+      $("#fullDepthCheckbox").prop("checked") === false
+    ) {
+      filterReturn = 0;
+      for (let i = 0; i < currentPointFilter.length; i++) {
+        if (
+          d.sourceTag === currentPointFilter[i] ||
+          d.targetTag === currentPointFilter[i]
+        ) {
+          filterReturn = 1;
+          break;
+        }
+      }
+      if (filterReturn === 0) {
+        d.filtered = "false";
+        filterArc(d.sourceTag, d.targetTag);
+      }
+    }
+
+    if (currentRepoFilter.length > 0) {
+      filterReturn = 0;
+      for (let i = 0; i < currentRepoFilter.length; i++) {
+        if (d.stage === currentRepoFilter[i].toLowerCase()) {
+          filterReturn = 1;
+          break;
+        }
+      }
+      if (filterReturn === 0) {
+        d.filtered = "false";
+        filterArc(d.sourceTag, d.targetTag);
+      }
+    }
+
+    if (currentDirFilter.length > 0) {
+      filterReturn = 0;
+      for (let i = 0; i < currentDirFilter.length; i++) {
+        if (
+          (d.direction === "<>" && currentDirFilter[i] === "Bidirectional") ||
+          (d.direction === ">" && currentDirFilter[i] === "Unidirectional") ||
+          (currentDirFilter[i] === "Unknown" &&
+            d.direction !== "<>" &&
+            d.direction !== ">")
+        ) {
+          filterReturn = 1;
+          break;
+        }
+      }
+      if (filterReturn === 0) {
+        d.filtered = "false";
+        filterArc(d.sourceTag, d.targetTag);
+      }
+    }
+
+    if ($("#unknownStemCheckbox").prop("checked")) {
+      if (!(d.stems === undefined || d.stems === -1) && d.stems < parseInt($("#stemFilterCount").attr("value"))) {
+        d.filtered = "false";
+        filterArc(d.sourceTag, d.targetTag);
+      }
+    } else if (d.stems < parseInt($("#stemFilterCount").attr("value"))) {
+      d.filtered = "false";
+      filterArc(d.sourceTag, d.targetTag);
+    }
+    return fadeAtEdge(d);
+  });
+}
+
+/**
+ * Filters out only languages completely isolated from a set language (curr)
+ * @param {String} curr Language to filter by
+ */
+function fullDepthFilter(curr) {
+  if (visitMap.get(curr) === true) {
+    return;
+  }
+  visitMap.set(curr, true);
+  svg.selectAll(".flyer").attr("opacity", function (d) {
+    if (d.sourceTag === curr) {
+      d.filtered = "temp";
+      fullDepthFilter(d.targetTag);
+    } else if (d.targetTag === curr) {
+      d.filtered = "temp";
+      fullDepthFilter(d.sourceTag);
+    }
+    return fadeAtEdge(d);
+  });
+}
+
+/**
+ * Displays or hides unused points, according to user choice
+ */
+function handleUnusedPoints() {
+  if ($("#pointCheckbox").prop("checked") === false) {
+    setPoints(0, 0);
+  } else {
+    setPoints(0.6, 0.9);
+    return;
+  }
+
+  svg.selectAll(".flyer").attr("opacity", function (d) {
+    if (this.getAttribute("opacity") !== "0") {
+      let dsource = String(d.source[0]) + "," + String(d.source[1]);
+      let dtarget = String(d.target[0]) + "," + String(d.target[1]);
+      let points = svg.selectAll(".point")._groups[0];
+      for (let j = 0; j < points.length; j++) {
+        if (points[j].getAttribute("coordinate") === dsource) {
+          points[j].setAttribute("style", "opacity: 0.6");
+        }
+        if (points[j].getAttribute("coordinate") === dtarget) {
+          points[j].setAttribute("style", "opacity: 0.6");
+        }
+      }
+      let labels = svg.selectAll(".label")._groups[0];
+      for (let k = 0; k < labels.length; k++) {
+        if (labels[k].getAttribute("coordinate") === dsource) {
+          labels[k].setAttribute("style", "opacity: 0.9");
+        }
+        if (labels[k].getAttribute("coordinate") === dtarget) {
+          labels[k].setAttribute("style", "opacity: 0.9");
+        }
+      }
+    }
+    return fadeAtEdge(d);
+  });
+
+  for (let i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+    if (
+      currentPointFilter.indexOf(
+        svg.selectAll(".point")._groups[0][i].getAttribute("tag")
+      ) !== -1
+    ) {
+      svg
+        .selectAll(".point")
+        ._groups[0][i].setAttribute("style", "opacity: 0.6");
+    }
+  }
+  for (let i = 0; i < svg.selectAll(".label")._groups[0].length; i++) {
+    if (
+      currentPointFilter.indexOf(
+        svg.selectAll(".label")._groups[0][i].innerHTML
+      ) !== -1
+    ) {
+      svg
+        .selectAll(".label")
+        ._groups[0][i].setAttribute("style", "opacity: 0.9");
+    }
+  }
+  refresh();
+}
+
+/**
+ * Determine opacity of a flyer, depending on the globe rotation
+ * @param {Object} d Flyer
+ * @return {Number} Opacity
+ */
+function fadeAtEdge(d) {
+  if (d.filtered === "false") {
+    return 0;
+  }
+
+  let centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
+    start = d.source,
+    end = d.target,
+    distancePair = d3.geoDistance(start, end); // distance of a flyer (in radians)
+
+  let startDist = 1.57 - d3.geoDistance(start, centerPos),
+    endDist = 1.57 - d3.geoDistance(end, centerPos);
+
+  let fade = d3
+    .scaleLinear()
+    .domain([-0.1, 0])
+    .range([0, 0.15]);
+
+  let dist = startDist < endDist ? startDist : endDist;
+
+  if (distancePair >= 1.7) {
+    /* 1.7 radians has been taken as an approximate value for a "long" flyer.
+     However, this value can be as desired.*/
+    let avgLongitudeStartEnd = (start[0] + end[0]) / 2,
+    avgLatitudeStartEnd = (start[1] + end[1]) / 2,
+    diffAvgCenterLongitude = avgLongitudeStartEnd - centerPos[0],
+    diffAvgCenterLatitude = avgLatitudeStartEnd - centerPos[1],
+    atBack = false; // boolean representing if the flyer is at the back of the globe
+
+    diffAvgCenterLongitude = (diffAvgCenterLongitude + 540) % 360 - 180;
+    diffAvgCenterLatitude = (diffAvgCenterLatitude + 540) % 360 - 180;
+
+    if ((diffAvgCenterLongitude <= -90 && diffAvgCenterLongitude >= -180) ||
+      (diffAvgCenterLongitude >= 90 && diffAvgCenterLongitude <= 180) ||
+      (diffAvgCenterLatitude <= -90 && diffAvgCenterLatitude >= -180) ||
+      (diffAvgCenterLatitude >= 90 && diffAvgCenterLatitude <= 180)) {
+        atBack = true;
+    }
+
+    if (atBack) {
+      return 0;
+    }
+
+    return fade(dist + 0.4);
+    /* 0.4 makes the flyer visible in most parts of it,
+     without seeing the end part through the globe
+     (if the end part is at the back of the globe).
+     This value can also be changed as desired.*/
+  }
+  return fade(dist);
+}
+
+/**
+ * Rotates the globe (and the stars) to center on a point
+ * @param {String} p Point to rotate to
+ */
+function rotateToPoint(p) {
+  let coords;
+  for (let i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
+    if (svg.selectAll(".point")._groups[0][i].getAttribute("tag") === p) {
+      coords = svg.selectAll(".point")._groups[0][i].getAttribute("coordinate");
+      break;
+    }
+  }
+  let q = coords.split(",");
+  d3.transition()
+    .duration(1000)
+    .tween("rotate", function () {
+      let r = d3.geoInterpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
+      return function (t) {
+        let s = r(t);
+        s.push(proj.rotate()[2]);
+        proj.rotate(s);
+        sky.rotate(s);
+        space.rotate([-s[0], -s[1], s[2]]);
+        o0 = proj.rotate();
+        refresh();
+      };
+    });
+}
+
+$(".eP").click(e => e.stopPropagation());
+
+$("body,html").click(function () {
+  if ($("#sidenav").css("left") === "0px") {
+    closeNav();
+  }
+});
+
+/**
+ * Opens the settings navbar
+ */
+function openNav() {
+  $("#sidenav").css("left", "0px");
+}
+
+/**
+ * Closes the settings navbar
+ */
+function closeNav() {
+  $("#sidenav").css("left", "-185px");
+}
+
+/**
+ * Toggles a certain dropdown
+ * @param {Object} t Dropdown button
+ * @param {String} id Dropdown html id
+ */
+function toggleDropdown(t, id) {
+  if ($(id).css("display") === "none") {
+    $(".dropdown-content").css("display", "none");
+    for (let i = 0; i < $(".dropdown-content").length; i++) {
+      let filterButton = $(".dropdown-content")[i].previousElementSibling;
+      filterButton.innerHTML =
+        filterButton.innerHTML.slice(0, filterButton.innerHTML.indexOf("<")) +
+        "<i class='fa fa-caret-right'></i>";
+    }
+  }
+  $(id).toggle();
+  if ($(id).css("display") === "none") {
+    t.innerHTML =
+      t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
+      "<i class='fa fa-caret-right'></i>";
+  } else {
+    t.innerHTML =
+      t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
+      "<i class='fa fa-caret-down'></i>";
+  }
+}
+
+/**
+ * Changes whether unused points are displayed or not, according to user choice
+ */
+function checkPoints() {
+  $("#pointCheckbox").prop("checked", !$("#pointCheckbox").prop("checked"));
+  handleUnusedPoints();
+}
+
+/**
+ * Changes whether filtering by language is done in full depth, according to user choice
+ */
+function fullDepth() {
+  $("#fullDepthCheckbox").prop(
+    "checked",
+    !$("#fullDepthCheckbox").prop("checked")
+  );
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+}
+
+/**
+ * Changes shadows (arcs) are displayed
+ */
+function toggleShadows() {
+  $("#toggleShadowsCheckbox").prop(
+    "checked",
+    !$("#toggleShadowsCheckbox").prop("checked")
+  );
+  filterArcsAndFlyers();
+  refresh();
+}
+
+/**
+ * Filter points in the filter by language dropdown, according to the text entered by the user
+ */
+function filterSearchPoints() {
+  let searchValue = $("#pointSearch")[0].value;
+  let points = $("#pointList")[0].children;
+  let searchEmpty = 0;
+  for (let i = 0; i < points.length; i++) {
+    if (
+      $(points[i])
+      .text()
+      .substring(0, searchValue.length)
+      .toUpperCase() !== searchValue.toUpperCase()
+    ) {
+      $(points[i]).css("display", "none");
+    } else {
+      $(points[i]).css("display", "");
+      searchEmpty = 1;
+    }
+  }
+  if (searchEmpty === 0) {
+    $("#pointList").css("min-height", 0);
+  }
+  if (searchEmpty === 1 || searchValue === "") {
+    $("#pointList").css("min-height", 42);
+  }
+}
+
+$("#stemFilterSlider").on("input", function () {
+  $("#stemFilterCount").attr("value", this.value);
+});
+
+$("#stemFilterSlider").on("change", function () {
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+});
+
+$("#stemFilterCount").on("change", function () {
+  let val = this.value;
+  val = Math.max(0, val);
+  val = Math.min(100000, val);
+  $(this).attr("value", val);
+  $("#stemFilterSlider").attr("value", this.value);
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+});
+
+/**
+ * Changes whether pairs with an unknown amount of stems are displayed
+ */
+function unknownStem() {
+  $("#unknownStemCheckbox").prop(
+    "checked",
+    !$("#unknownStemCheckbox").prop("checked")
+  );
+  filterArcsAndFlyers();
+  refresh();
+  handleUnusedPoints();
+}
+
+/**
+ * Chooses flyer colour based on language pair stage or number of stems (depends on user choice)
+ * @param {Object} d Selected flyer attributes
+ * @return {String|Object} Colour of flyer (hex or hsl format)
+ * Note: see colours.js to change returned colours
+ */
 function chooseColor(d) {
   if (!$("#colorStemCheckbox").prop("checked")) {
     switch (d.stage) {
@@ -768,6 +1423,9 @@ function chooseColor(d) {
   }
 }
 
+/**
+ * Colours the stems and refreshes the globe
+ */
 function colorStem() {
   $("#colorStemCheckbox").prop(
     "checked",
@@ -778,673 +1436,13 @@ function colorStem() {
   refresh();
 }
 
-function flying_arc(pts) {
-  let source = pts.source,
-    target = pts.target;
+let o0, v0, r0, q0;
 
-  let mid = location_along_arc(source, target, 0.5);
-  let result = [proj(source), sky(mid), proj(target)];
+window.addEventListener("touchmove", e => e.preventDefault(), false);
 
-  return result;
-}
-
-function codeToLanguage(code) {
-  // Presuming that it is in fact a three-letter terminological code
-  if (codeToLangTable[code] === undefined) {
-    return "Unknown";
-  }
-  return codeToLangTable[code];
-}
-
-function refresh() {
-  svg.selectAll(".land").attr("d", path);
-  svg.selectAll(".point").attr("d", path);
-  svg.selectAll(".mesh").attr("d", path);
-  svg.selectAll(".arc").attr("d", path);
-  svg.selectAll(".star").attr("d", function(d){
-                spacePath.pointRadius(d.properties.radius);
-                return spacePath(d);
-            });
-  // svg.selectAll(".graticule").attr("d", path); //This adds long and lat lines
-
-  position_labels();
-
-  svg
-    .selectAll(".flyer")
-    .attr("d", d => swoosh(flying_arc(d)))
-    .attr("marker-mid", d => addMarker(d))
-    .attr("opacity", d => fadeAtEdge(d));
-}
-
-function addMarker(d) {
-  if (d.direction === "<>") {
-    return "url(#" + d.stage + "twoway)";
-  } else if (d.direction === ">") {
-    return "url(#" + d.stage + "oneway)";
-  } else {
-    return "";
-  }
-}
-
-function setPoints(o1, o2) {
-  svg.selectAll(".point").style("opacity", o1);
-  svg.selectAll(".label").style("opacity", o2);
-}
-
-// Update globe and repo filter array
-function selectRepoFilter(f) {
-  if ($("#checkmark" + f).length === 0) {
-    $("#filter" + f).html(
-      f + "<i id=checkmark" + f + " class='fa fa-check checkmark'></i>"
-    );
-    currentRepoFilter.push(f);
-  } else {
-    $("#checkmark" + f).remove();
-    currentRepoFilter.splice(currentRepoFilter.indexOf(f), 1);
-  }
-
-  filterArcsAndFlyers();
-  refresh();
-  handleUnusedPoints();
-}
-
-// Update direction filter and globe
-function selectDirFilter(dir) {
-  if ($("#checkmarkDir" + dir).length === 0) {
-    $("#dir" + dir).html(
-      dir + "<i id=checkmarkDir" + dir + " class='fa fa-check checkmark'></i>"
-    );
-    currentDirFilter.push(dir);
-  } else {
-    $("#checkmarkDir" + dir).remove();
-    currentDirFilter.splice(currentDirFilter.indexOf(dir), 1);
-  }
-
-  filterArcsAndFlyers();
-  refresh();
-  handleUnusedPoints();
-}
-
-let currentFiltered = "none";
-// Update point filter and globe
-function filterPoint(p) {
-  let needToRotate = false;
-  if ($("#checkmarkPoint" + p).length === 0) {
-    $("#point" + p).html(
-      p + "<i id=checkmarkPoint" + p + " class='fa fa-check checkmark'></i>"
-    );
-    currentPointFilter.push(p);
-    needToRotate = true;
-  } else {
-    $("#checkmarkPoint" + p).remove();
-    currentPointFilter.splice(currentPointFilter.indexOf(p), 1);
-  }
-
-  filterArcsAndFlyers();
-  refresh();
-  handleUnusedPoints();
-  if (needToRotate) {
-    rotateToPoint(p);
-  }
-}
-
-function resetFilters() {
-  $(".checkmark").remove();
-
-  currentRepoFilter = [];
-  currentPointFilter = [];
-  currentDirFilter = [];
-
-  $("#pointSearch")[0].value = "";
-  filterSearchPoints();
-
-  $("#pointCheckbox").prop("checked", false);
-  $("#fullDepthCheckbox").prop("checked", false);
-  $("#toggleShadowsCheckbox").prop("checked", true);
-  $("#colorStemCheckbox").prop("checked", true);
-  $("#unknownStemCheckbox").prop("checked", true);
-  $("#toggleMapColourCheckbox").prop("checked", true);
-  $("#toggleLegendCheckbox").prop("checked", false);
-  d3.selectAll(".legend").style("visibility", "hidden");
-
-  $("#stemFilterSlider").attr("value", 0)
-  $("#stemFilterCount").attr("value", 0)
-
-  svg.selectAll(".flyer").style("stroke", d => chooseColor(d));
-  filterArcsAndFlyers();
-  refresh();
-  colourMap();
-  handleUnusedPoints();
-}
-
-function filterArc(s, t) {
-  for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
-    if (
-      svg.selectAll(".arc")._groups[0][i].getAttribute("sourceTag") === s &&
-      svg.selectAll(".arc")._groups[0][i].getAttribute("targetTag") === t
-    ) {
-      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 0);
-      break;
-    }
-  }
-}
-
-let filterReturn;
-
-function filterArcsAndFlyers() {
-  if ($("#toggleShadowsCheckbox").prop("checked")) {
-    for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
-      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 1);
-    }
-  } else {
-    for (i = 0; i < svg.selectAll(".arc")._groups[0].length; i++) {
-      svg.selectAll(".arc")._groups[0][i].setAttribute("opacity", 0);
-    }
-  }
-  if ($("#fullDepthCheckbox").prop("checked") === true) {
-    for (i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
-      visitMap.set(
-        svg.selectAll(".point")._groups[0][i].getAttribute("tag"),
-        false
-      );
-    }
-    for (i = 0; i < currentPointFilter.length; i++) {
-      dfs(currentPointFilter[i]);
-    }
-  }
-
-  svg.selectAll(".flyer").attr("opacity", function (d) {
-    if (
-      $("#fullDepthCheckbox").prop("checked") === false ||
-      currentPointFilter.length === 0
-    ) {
-      d.filtered = "true";
-    } else {
-      if (d.filtered === "temp") {
-        d.filtered = "true";
-      } else {
-        d.filtered = "false";
-        filterArc(d.sourceTag, d.targetTag);
-      }
-    }
-
-    if (
-      currentPointFilter.length > 0 &&
-      $("#fullDepthCheckbox").prop("checked") === false
-    ) {
-      filterReturn = 0;
-      for (i = 0; i < currentPointFilter.length; i++) {
-        if (
-          d.sourceTag === currentPointFilter[i] ||
-          d.targetTag === currentPointFilter[i]
-        ) {
-          filterReturn = 1;
-          break;
-        }
-      }
-      if (filterReturn === 0) {
-        d.filtered = "false";
-        filterArc(d.sourceTag, d.targetTag);
-      }
-    }
-
-    if (currentRepoFilter.length > 0) {
-      filterReturn = 0;
-      for (i = 0; i < currentRepoFilter.length; i++) {
-        if (d.stage === currentRepoFilter[i].toLowerCase()) {
-          filterReturn = 1;
-          break;
-        }
-      }
-      if (filterReturn === 0) {
-        d.filtered = "false";
-        filterArc(d.sourceTag, d.targetTag);
-      }
-    }
-
-    if (currentDirFilter.length > 0) {
-      filterReturn = 0;
-      for (i = 0; i < currentDirFilter.length; i++) {
-        if (
-          (d.direction === "<>" && currentDirFilter[i] === "Bidirectional") ||
-          (d.direction === ">" && currentDirFilter[i] === "Unidirectional") ||
-          (currentDirFilter[i] === "Unknown" &&
-            d.direction !== "<>" &&
-            d.direction !== ">")
-        ) {
-          filterReturn = 1;
-          break;
-        }
-      }
-      if (filterReturn === 0) {
-        d.filtered = "false";
-        filterArc(d.sourceTag, d.targetTag);
-      }
-    }
-
-    if ($("#unknownStemCheckbox").prop("checked")) {
-      if (!(d.stems === undefined || d.stems === -1)) {
-        if (d.stems < parseInt($("#stemFilterCount").attr("value"))) {
-          d.filtered = "false";
-          filterArc(d.sourceTag, d.targetTag);
-        }
-      }
-    } else {
-      if (d.stems < parseInt($("#stemFilterCount").attr("value"))) {
-        d.filtered = "false";
-        filterArc(d.sourceTag, d.targetTag);
-      }
-    }
-    return fadeAtEdge(d);
-  });
-}
-
-function dfs(curr) {
-  if (visitMap.get(curr) === true) {
-    return;
-  }
-  visitMap.set(curr, true);
-  svg.selectAll(".flyer").attr("opacity", function (d) {
-    if (d.sourceTag === curr) {
-      d.filtered = "temp";
-      dfs(d.targetTag);
-    } else if (d.targetTag === curr) {
-      d.filtered = "temp";
-      dfs(d.sourceTag);
-    }
-    return fadeAtEdge(d);
-  });
-}
-
-$(".eP").click(function (e) {
-  e.stopPropagation();
-});
-
-$("body,html").click(function (e) {
-  if ($("#sidenav").css("left") === "0px") {
-    closeNav();
-  }
-});
-
-function openNav() {
-  $("#sidenav").css("left", "0px");
-}
-
-function closeNav() {
-  $("#sidenav").css("left", "-185px");
-}
-
-function toggleDropdown(t, id) {
-  if ($(id).css("display") === "none") {
-    $(".dropdown-content").css("display", "none");
-    for (i = 0; i < $(".dropdown-content").length; i++) {
-      let filterButton = $(".dropdown-content")[i].previousElementSibling;
-      filterButton.innerHTML =
-        filterButton.innerHTML.slice(0, filterButton.innerHTML.indexOf("<")) +
-        "<i class='fa fa-caret-right'></i>";
-    }
-  }
-  $(id).toggle();
-  if ($(id).css("display") === "none") {
-    t.innerHTML =
-      t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
-      "<i class='fa fa-caret-right'></i>";
-  } else {
-    t.innerHTML =
-      t.innerHTML.slice(0, t.innerHTML.indexOf("<")) +
-      "<i class='fa fa-caret-down'></i>";
-  }
-}
-
-function checkPoints() {
-  $("#pointCheckbox").prop("checked", !$("#pointCheckbox").prop("checked"));
-  handleUnusedPoints();
-}
-
-function fullDepth() {
-  $("#fullDepthCheckbox").prop(
-    "checked",
-    !$("#fullDepthCheckbox").prop("checked")
-  );
-  filterArcsAndFlyers();
-  refresh();
-  handleUnusedPoints();
-}
-
-function toggleShadows() {
-  $("#toggleShadowsCheckbox").prop(
-    "checked",
-    !$("#toggleShadowsCheckbox").prop("checked")
-  );
-  filterArcsAndFlyers();
-  refresh();
-}
-
-$("#stemFilterSlider").on("input", function () {
-  $("#stemFilterCount").attr("value", this.value);
-});
-
-$("#stemFilterSlider").on("change", function () {
-  filterArcsAndFlyers();
-  refresh();
-  handleUnusedPoints();
-});
-
-$("#stemFilterCount").on("change", function () {
-  let val = this.value;
-  val = Math.max(0, val);
-  val = Math.min(100000, val);
-  $(this).attr("value", val);
-  $("#stemFilterSlider").attr("value", this.value);
-  filterArcsAndFlyers();
-  refresh();
-  handleUnusedPoints();
-});
-
-function unknownStem() {
-  $("#unknownStemCheckbox").prop(
-    "checked",
-    !$("#unknownStemCheckbox").prop("checked")
-  );
-  filterArcsAndFlyers();
-  refresh();
-  handleUnusedPoints();
-}
-
-function filterSearchPoints() {
-  let searchValue = $("#pointSearch")[0].value;
-  let points = $("#pointList")[0].children;
-  let searchEmpty = 0;
-  for (i = 0; i < points.length; i++) {
-    if (
-      $(points[i])
-      .text()
-      .substring(0, searchValue.length)
-      .toUpperCase() !== searchValue.toUpperCase()
-    ) {
-      $(points[i]).css("display", "none");
-    } else {
-      $(points[i]).css("display", "");
-      searchEmpty = 1;
-    }
-  }
-  if (searchEmpty === 0) {
-    $("#pointList").css("min-height", 0);
-  }
-  if (searchEmpty === 1 || searchValue === "") {
-    $("#pointList").css("min-height", 42);
-  }
-}
-
-function handleUnusedPoints() {
-  if ($("#pointCheckbox").prop("checked") === false) {
-    setPoints(0, 0);
-  } else {
-    setPoints(0.6, 0.9);
-    return;
-  }
-
-  svg.selectAll(".flyer").attr("opacity", function (d) {
-    if (this.getAttribute("opacity") !== "0") {
-      let dsource = String(d.source[0]) + "," + String(d.source[1]);
-      let dtarget = String(d.target[0]) + "," + String(d.target[1]);
-      let points = svg.selectAll(".point")._groups[0];
-      for (j = 0; j < points.length; j++) {
-        if (points[j].getAttribute("coordinate") === dsource) {
-          points[j].setAttribute("style", "opacity: 0.6");
-        }
-        if (points[j].getAttribute("coordinate") === dtarget) {
-          points[j].setAttribute("style", "opacity: 0.6");
-        }
-      }
-      let labels = svg.selectAll(".label")._groups[0];
-      for (k = 0; k < labels.length; k++) {
-        if (labels[k].getAttribute("coordinate") === dsource) {
-          labels[k].setAttribute("style", "opacity: 0.9");
-        }
-        if (labels[k].getAttribute("coordinate") === dtarget) {
-          labels[k].setAttribute("style", "opacity: 0.9");
-        }
-      }
-    }
-    return fadeAtEdge(d);
-  });
-
-  for (i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
-    if (
-      currentPointFilter.indexOf(
-        svg.selectAll(".point")._groups[0][i].getAttribute("tag")
-      ) !== -1
-    ) {
-      svg
-        .selectAll(".point")
-        ._groups[0][i].setAttribute("style", "opacity: 0.6");
-    }
-  }
-  for (i = 0; i < svg.selectAll(".label")._groups[0].length; i++) {
-    if (
-      currentPointFilter.indexOf(
-        svg.selectAll(".label")._groups[0][i].innerHTML
-      ) !== -1
-    ) {
-      svg
-        .selectAll(".label")
-        ._groups[0][i].setAttribute("style", "opacity: 0.9");
-    }
-  }
-  refresh();
-}
-
-function fadeAtEdge(d) {
-  if (d.filtered === "false") {
-    return 0;
-  }
-
-  let centerPos = proj.invert([fixedWidth / 2, fixedHeight / 2]),
-    start,
-    end,
-    distancePair; // distance of a flyer (in radians)
-
-  // function is called on 2 different data structures..
-  if (d.source) {
-    start = d.source;
-    end = d.target;
-  } else {
-    start = d.coordinates1;
-    end = d.coordinates2;
-  }
-
-  distancePair = d3.geoDistance(start, end);
-
-  let start_dist = 1.57 - d3.geoDistance(start, centerPos),
-    end_dist = 1.57 - d3.geoDistance(end, centerPos);
-
-  let fade = d3
-    .scaleLinear()
-    .domain([-0.1, 0])
-    .range([0, 0.15]);
-
-  let dist = start_dist < end_dist ? start_dist : end_dist;
-
-  if(distancePair>=1.7) {
-    // 1.7 radians has been taken as an approximate value for a "long" flyer.
-    // However, this value can be changed as desired.
-    let avgLongitudeStartEnd = (start[0]+end[0])/2, // average longitude of the flyer's start and end points
-    avgLatitudeStartEnd = (start[1]+end[1])/2,      // average latitude of the flyer's start and end points
-    diffAvgCenterLongitude,                         // difference between avgLongitudeStartEnd and the longitude in centerPos
-    diffAvgCenterLatitude,                          // difference between avgLatitudeStartEnd and the latitude in centerPos
-    atBack = false;                                 // boolean representing if the flyer is at the back of the globe
-
-    diffAvgCenterLongitude = avgLongitudeStartEnd - centerPos[0];
-    if (diffAvgCenterLongitude > 180) {
-      diffAvgCenterLongitude = -180 + (diffAvgCenterLongitude-180);
-    }
-    else if (diffAvgCenterLongitude < -180) {
-      diffAvgCenterLongitude = 180 - (diffAvgCenterLongitude+180);
-    }
-
-    diffAvgCenterLatitude = avgLatitudeStartEnd - centerPos[1];
-    if (diffAvgCenterLatitude > 180) {
-      diffAvgCenterLatitude = -180 + (diffAvgCenterLatitude-180);
-    }
-    else if (diffAvgCenterLatitude < -180) {
-      diffAvgCenterLatitude = 180 - (diffAvgCenterLatitude+180);
-    }
-
-    if((diffAvgCenterLongitude <= -90 && diffAvgCenterLongitude >= -180) ||
-      (diffAvgCenterLongitude >= 90 && diffAvgCenterLongitude <=180) ||
-      (diffAvgCenterLatitude <= -90 && diffAvgCenterLatitude >= -180) ||
-      (diffAvgCenterLatitude >= 90 && diffAvgCenterLatitude <=180)) {
-      atBack = true;
-    }
-
-    if(atBack){
-      svg.select('.flyer').attr("opacity", 0);
-      return 0;
-    }
-
-    return fade(dist+0.4); // 0.4 makes the flyer visible in most parts of it,
-                           // without seeing the end part through the globe
-                           // (if the end part is at the back of the globe).
-                           // This value can also be changed as desired.
-  }
-  return fade(dist);
-}
-
-function location_along_arc(start, end, loc) {
-  let interpolator = d3.geoInterpolate(start, end);
-  return interpolator(loc);
-}
-
-function rotateToPoint(p) {
-  let rotate = proj.rotate();
-  let coords;
-  for (i = 0; i < svg.selectAll(".point")._groups[0].length; i++) {
-    if (svg.selectAll(".point")._groups[0][i].getAttribute("tag") === p) {
-      coords = svg.selectAll(".point")._groups[0][i].getAttribute("coordinate");
-      break;
-    }
-  }
-  let q = coords.split(",");
-  d3.transition()
-    .duration(1000)
-    .tween("rotate", function () {
-      let r = d3.geoInterpolate(proj.rotate(), [-parseInt(q[0]), -parseInt(q[1])]);
-      return function (t) {
-        let s = r(t);
-        s.push(proj.rotate()[2]);
-        proj.rotate(s);
-        sky.rotate(s);
-        space.rotate([-s[0], -s[1], s[2]])
-        o0 = proj.rotate();
-        refresh();
-      };
-    });
-}
-
-// modified from http://bl.ocks.org/tlfrd/df1f1f705c7940a6a7c0dca47041fec8
-let o0;
-
-/********** versor.js **********/
-let acos = Math.acos,
-  asin = Math.asin,
-  atan2 = Math.atan2,
-  cos = Math.cos,
-  max = Math.max,
-  min = Math.min,
-  PI = Math.PI,
-  sin = Math.sin,
-  sqrt = Math.sqrt,
-  radians = PI / 180,
-  degrees = 180 / PI;
-
-// Returns the unit quaternion for the given Euler rotation angles [λ, φ, γ].
-function versor(e) {
-  let l = (e[0] / 2) * radians,
-    sl = sin(l),
-    cl = cos(l), // λ / 2
-    p = (e[1] / 2) * radians,
-    sp = sin(p),
-    cp = cos(p), // φ / 2
-    g = (e[2] / 2) * radians,
-    sg = sin(g),
-    cg = cos(g); // γ / 2
-  return [
-    cl * cp * cg + sl * sp * sg,
-    sl * cp * cg - cl * sp * sg,
-    cl * sp * cg + sl * cp * sg,
-    cl * cp * sg - sl * sp * cg
-  ];
-}
-
-// Returns Cartesian coordinates [x, y, z] given spherical coordinates [λ, φ].
-versor.cartesian = function (e) {
-  let l = e[0] * radians,
-    p = e[1] * radians,
-    cp = cos(p);
-  return [cp * cos(l), cp * sin(l), sin(p)];
-};
-
-// Returns the Euler rotation angles [λ, φ, γ] for the given quaternion.
-versor.rotation = function (q) {
-  return [
-    atan2(
-      2 * (q[0] * q[1] + q[2] * q[3]),
-      1 - 2 * (q[1] * q[1] + q[2] * q[2])
-    ) * degrees,
-    asin(max(-1, min(1, 2 * (q[0] * q[2] - q[3] * q[1])))) * degrees,
-    atan2(
-      2 * (q[0] * q[3] + q[1] * q[2]),
-      1 - 2 * (q[2] * q[2] + q[3] * q[3])
-    ) * degrees
-  ];
-};
-
-// Returns the quaternion to rotate between two cartesian points on the sphere.
-versor.delta = function (v0, v1) {
-  let w = cross(v0, v1),
-    l = sqrt(dot(w, w));
-  if (!l) return [1, 0, 0, 0];
-  let t = acos(max(-1, min(1, dot(v0, v1)))) / 2,
-    s = sin(t); // t = θ / 2
-  return [cos(t), (w[2] / l) * s, (-w[1] / l) * s, (w[0] / l) * s];
-};
-
-// Returns the quaternion that represents q0 * q1.
-versor.multiply = function (q0, q1) {
-  return [
-    q0[0] * q1[0] - q0[1] * q1[1] - q0[2] * q1[2] - q0[3] * q1[3],
-    q0[0] * q1[1] + q0[1] * q1[0] + q0[2] * q1[3] - q0[3] * q1[2],
-    q0[0] * q1[2] - q0[1] * q1[3] + q0[2] * q1[0] + q0[3] * q1[1],
-    q0[0] * q1[3] + q0[1] * q1[2] - q0[2] * q1[1] + q0[3] * q1[0]
-  ];
-};
-
-function cross(v0, v1) {
-  return [
-    v0[1] * v1[2] - v0[2] * v1[1],
-    v0[2] * v1[0] - v0[0] * v1[2],
-    v0[0] * v1[1] - v0[1] * v1[0]
-  ];
-}
-
-function dot(v0, v1) {
-  return v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
-}
-
-/********** end of versor.js **********/
-
-let v0, r0, q0;
-
-window.addEventListener(
-  "touchmove",
-  function (e) {
-    e.preventDefault();
-  },
-  false
-);
-
-// Zooms by twice or half
+/**
+ * Zooms in by a factor of 2
+ */
 function zoomIn() {
   svg
     .transition()
@@ -1452,6 +1450,9 @@ function zoomIn() {
     .call(zoom.scaleBy, 2);
 }
 
+/**
+ * Zooms out by a factor of 2
+ */
 function zoomOut() {
   svg
     .transition()
@@ -1462,6 +1463,9 @@ function zoomOut() {
 // Start off zoomed based off of window size
 resetZoom();
 
+/**
+ * Sets the values of mouse position and rotation at the start of a zoom event
+ */
 function zoomstart() {
   if (d3.event.sourceEvent) {
     v0 = versor.cartesian(proj.invert(d3.mouse(this)));
@@ -1470,6 +1474,9 @@ function zoomstart() {
   }
 }
 
+/**
+ * Rotates and/or zooms the globes during a zoom event
+ */
 function zoomed() {
   let scale = d3.event.transform.k;
   if (width === scale) {
@@ -1524,11 +1531,16 @@ function zoomed() {
   }
 }
 
+/**
+ * Sets the value of the globe's rotation at the end of a zoom event
+ */
 function zoomend() {
   o0 = proj.rotate();
 }
 
-// Resets zoom to fit window size
+/**
+ * Resets zoom to fit window size
+ */
 function resetZoom() {
   let initial = 2;
   svg
@@ -1541,7 +1553,9 @@ function resetZoom() {
     );
 }
 
-// Zoom-in with + key and zoom-out with - key and reset with 0
+/**
+ * Zoom-in with + key and zoom-out with - key and reset with 0
+ */
 window.onkeydown = function (e) {
   if (navigator.userAgent.search("Chrome") >= 0) {
     if (e.keyCode === 187) {
@@ -1571,3 +1585,129 @@ window.onkeydown = function (e) {
     }
   }
 };
+
+// Modified from http://bl.ocks.org/tlfrd/df1f1f705c7940a6a7c0dca47041fec8
+/********** versor.js **********/
+let acos = Math.acos,
+  asin = Math.asin,
+  atan2 = Math.atan2,
+  cos = Math.cos,
+  max = Math.max,
+  min = Math.min,
+  PI = Math.PI,
+  sin = Math.sin,
+  sqrt = Math.sqrt,
+  radians = PI / 180,
+  degrees = 180 / PI;
+
+/**
+ * Returns the unit quaternion for the given Euler rotation angles
+ * @param {Array} e Euler rotation angles [λ, φ, γ]
+ * @return {Array} Unit quaternion
+ */
+function versor(e) {
+  let l = (e[0] / 2) * radians,
+    sl = sin(l),
+    cl = cos(l), // λ / 2
+    p = (e[1] / 2) * radians,
+    sp = sin(p),
+    cp = cos(p), // φ / 2
+    g = (e[2] / 2) * radians,
+    sg = sin(g),
+    cg = cos(g); // γ / 2
+  return [
+    cl * cp * cg + sl * sp * sg,
+    sl * cp * cg - cl * sp * sg,
+    cl * sp * cg + sl * cp * sg,
+    cl * cp * sg - sl * sp * cg
+  ];
+}
+
+/**
+ * Returns Cartesian coordinates given spherical coordinates
+ * @param {Array} e Spherical coordinates [λ, φ]
+ * @return {Array} Cartesian coordinates [x, y, z]
+ */
+versor.cartesian = function (e) {
+  let l = e[0] * radians,
+    p = e[1] * radians,
+    cp = cos(p);
+  return [cp * cos(l), cp * sin(l), sin(p)];
+};
+
+/**
+ * Returns the Euler rotation angles for the given quaternion
+ * @param {Array} q Unit quaternion
+ * @return {Array} Euler rotation angles [λ, φ, γ]
+ */
+versor.rotation = function (q) {
+  return [
+    atan2(
+      2 * (q[0] * q[1] + q[2] * q[3]),
+      1 - 2 * (q[1] * q[1] + q[2] * q[2])
+    ) * degrees,
+    asin(max(-1, min(1, 2 * (q[0] * q[2] - q[3] * q[1])))) * degrees,
+    atan2(
+      2 * (q[0] * q[3] + q[1] * q[2]),
+      1 - 2 * (q[2] * q[2] + q[3] * q[3])
+    ) * degrees
+  ];
+};
+
+/**
+ * Returns the quaternion to rotate between two cartesian points on the sphere
+ * @param {Array} v0 Cartesian coordinates of the first point
+ * @param {Array} v1 Cartesian coordinates of the second point
+ * @return {Array} Quaternion
+ */
+versor.delta = function (v0, v1) {
+  let w = cross(v0, v1),
+    l = sqrt(dot(w, w));
+  if (!l) {
+    return [1, 0, 0, 0];
+  }
+  let t = acos(max(-1, min(1, dot(v0, v1)))) / 2,
+    s = sin(t); // t = θ / 2
+  return [cos(t), (w[2] / l) * s, (-w[1] / l) * s, (w[0] / l) * s];
+};
+
+/**
+ * Returns the quaternion that represents q0 * q1
+ * @param {Array} q0 3D vector (cartesian coordinates)
+ * @param {Array} q1 3D vector (cartesian coordinates)
+ * @return {Array} Quaternion
+ */
+versor.multiply = function (q0, q1) {
+  return [
+    q0[0] * q1[0] - q0[1] * q1[1] - q0[2] * q1[2] - q0[3] * q1[3],
+    q0[0] * q1[1] + q0[1] * q1[0] + q0[2] * q1[3] - q0[3] * q1[2],
+    q0[0] * q1[2] - q0[1] * q1[3] + q0[2] * q1[0] + q0[3] * q1[1],
+    q0[0] * q1[3] + q0[1] * q1[2] - q0[2] * q1[1] + q0[3] * q1[0]
+  ];
+};
+
+/**
+ * Returns the cross (vectorial) product of two 3D vectors
+ * @param {Array} v0 3D vector (cartesian coordinates)
+ * @param {Array} v1 3D vector (cartesian coordinates)
+ * @return {Array} Cross product
+ */
+function cross(v0, v1) {
+  return [
+    v0[1] * v1[2] - v0[2] * v1[1],
+    v0[2] * v1[0] - v0[0] * v1[2],
+    v0[0] * v1[1] - v0[1] * v1[0]
+  ];
+}
+
+/**
+ * Returns the dot (scalar) product of two 3D vectors
+ * @param {Array} v0 3D vector (cartesian coordinates)
+ * @param {Array} v1 3D vector (cartesian coordinates)
+ * @return {Number} Dot product
+ */
+function dot(v0, v1) {
+  return v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
+}
+
+/********** end of versor.js **********/
