@@ -1597,6 +1597,7 @@ let acos = Math.acos,
   PI = Math.PI,
   sin = Math.sin,
   sqrt = Math.sqrt,
+  abs = Math.abs,
   radians = PI / 180,
   degrees = 180 / PI;
 
@@ -1606,6 +1607,11 @@ let acos = Math.acos,
  * @return {Array} Unit quaternion
  */
 function versor(e) {
+
+  // fix poles
+  if (e[1] + 90 < 1e-9) e[1] = -90 + 1e-9;
+  if (abs(e[1] - 90) < 1e-9) e[1] = 90 - 1e-9;
+
   let l = (e[0] / 2) * radians,
     sl = sin(l),
     cl = cos(l), // λ / 2
